@@ -19,6 +19,8 @@ use Inertia\Inertia;
 
 class PurchaseController extends Controller
 {
+    private const NAME_MATCH = 'LOWER(TRIM(name)) = ?';
+
     public function index()
     {
         $variants = ProductVariant::with([
@@ -171,9 +173,15 @@ class PurchaseController extends Controller
 
         $itemsQuery = PurchaseItem::with(['purchase', 'variant.product.category', 'variant.product.brand'])
             ->whereHas('purchase', function ($q) use ($desde, $hasta, $proveedor) {
-                if ($desde) $q->whereDate('purchase_date', '>=', $desde);
-                if ($hasta) $q->whereDate('purchase_date', '<=', $hasta);
-                if ($proveedor) $q->where('supplier', $proveedor);
+                if ($desde) {
+                    $q->whereDate('purchase_date', '>=', $desde);
+                }
+                if ($hasta) {
+                    $q->whereDate('purchase_date', '<=', $hasta);
+                }
+                if ($proveedor) {
+                    $q->where('supplier', $proveedor);
+                }
             });
 
         if ($categoria) {
@@ -196,7 +204,7 @@ class PurchaseController extends Controller
 
         // Se agrupa por supplier_id cuando la compra está vinculada a un proveedor real,
         // para no confundir a dos proveedores distintos que se escribieron con el mismo nombre.
-        $porProveedor = $items->groupBy(fn ($i) => $i->purchase->supplier_id ? "id:{$i->purchase->supplier_id}" : 'nombre:' . ($i->purchase->supplier ?: 'Sin proveedor'))
+        $porProveedor = $items->groupBy(fn ($i) => $this->claveProveedor($i->purchase))
             ->map(fn ($group) => [
                 'label' => $group->first()->purchase->supplier ?: 'Sin proveedor',
                 'total' => $group->sum('subtotal'),
@@ -329,7 +337,7 @@ class PurchaseController extends Controller
             'prendas.*.precioVenta' => 'required|numeric|min:0',
         ]);
 
-        $purchase = DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($validated) {
             $total = collect($validated['prendas'])->sum(fn ($p) => $p['cantidad'] * $p['precioCompra']);
 
             // Igual que con el cliente en Ventas: si escriben un proveedor a mano, se
@@ -340,7 +348,7 @@ class PurchaseController extends Controller
             if (!empty($validated['tienda'])) {
                 $nombreProveedor = trim($validated['tienda']);
 
-                $proveedorVinculado = Supplier::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($nombreProveedor)])->first();
+                $proveedorVinculado = Supplier::whereRaw(self::NAME_MATCH, [mb_strtolower($nombreProveedor)])->first();
 
                 if (!$proveedorVinculado) {
                     $proveedorVinculado = Supplier::create(['name' => $nombreProveedor]);
@@ -359,7 +367,7 @@ class PurchaseController extends Controller
 
             foreach ($validated['prendas'] as $item) {
                 // La marca es independiente de la categoría: se busca globalmente por nombre normalizado.
-                $brand = Brand::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($item['marca']))])->first();
+                $brand = Brand::whereRaw(self::NAME_MATCH, [mb_strtolower(trim($item['marca']))])->first();
 
                 // Si vino de una selección explícita del buscador, reutiliza ese producto tal cual.
                 $product = !empty($item['productId'])
@@ -369,7 +377,7 @@ class PurchaseController extends Controller
                 // Red de seguridad: si escribieron el nombre a mano, buscar por coincidencia
                 // normalizada (sin importar mayúsculas/espacios) antes de crear uno nuevo.
                 if (!$product && $brand) {
-                    $product = Product::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($item['nombre']))])
+                    $product = Product::whereRaw(self::NAME_MATCH, [mb_strtolower(trim($item['nombre']))])
                         ->where('brand_id', $brand->id)
                         ->first();
                 }
@@ -413,7 +421,7 @@ class PurchaseController extends Controller
                 // nombre normalizado dentro del producto; si no existe se crea sin foto todavía —
                 // la foto se agrega después desde Catálogo.
                 $productColor = ProductColor::where('product_id', $product->id)
-                    ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($item['colorNombre']))])
+                    ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($item['colorNombre']))])
                     ->first();
 
                 if (!$productColor) {
@@ -462,5 +470,14 @@ class PurchaseController extends Controller
         });
 
         return redirect()->route('admin.purchases.index')->with('success', 'Compra registrada correctamente.');
+    }
+
+    private function claveProveedor(Purchase $purchase): string
+    {
+        if ($purchase->supplier_id) {
+            return "id:{$purchase->supplier_id}";
+        }
+
+        return 'nombre:' . ($purchase->supplier ?: 'Sin proveedor');
     }
 }

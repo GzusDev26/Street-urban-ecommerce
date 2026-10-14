@@ -69,8 +69,8 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad a devolver</label>
-          <input
+          <label for="devolucion-modal-1" class="block text-sm font-medium text-gray-700 mb-2">Cantidad a devolver</label>
+          <input id="devolucion-modal-1"
             v-model.number="cantidad"
             type="number"
             min="1"
@@ -80,8 +80,8 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Motivo (opcional)</label>
-          <input
+          <label for="devolucion-modal-2" class="block text-sm font-medium text-gray-700 mb-2">Motivo (opcional)</label>
+          <input id="devolucion-modal-2"
             v-model="motivo"
             type="text"
             placeholder="Ej. talla equivocada, prenda defectuosa..."

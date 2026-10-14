@@ -85,9 +85,9 @@ const guardar = () => {
 
       <div class="p-6 space-y-5">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
-          <SearchCreateInput v-model="form.categoria" :options="categoriasExistentes" placeholder="Ej: Calzado" />
-          <textarea
+          <label for="registrar-modelo-modal-1" class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+          <SearchCreateInput id="registrar-modelo-modal-1" v-model="form.categoria" :options="categoriasExistentes" placeholder="Ej: Calzado" />
+          <textarea aria-label="Descripción de la categoría"
             v-if="categoriaEsNueva"
             v-model="form.categoriaDescripcion"
             placeholder="Descripción de la categoría (opcional)"
@@ -97,9 +97,9 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Marca</label>
-          <SearchCreateInput v-model="form.marca" :options="marcasExistentes" placeholder="Ej: Adidas" />
-          <textarea
+          <label for="registrar-modelo-modal-2" class="block text-sm font-medium text-gray-700 mb-2">Marca</label>
+          <SearchCreateInput id="registrar-modelo-modal-2" v-model="form.marca" :options="marcasExistentes" placeholder="Ej: Adidas" />
+          <textarea aria-label="Descripción de la marca"
             v-if="marcaEsNueva"
             v-model="form.marcaDescripcion"
             placeholder="Descripción de la marca (opcional)"
@@ -109,14 +109,15 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Modelo</label>
-          <input
+          <label for="registrar-modelo-modal-3" class="block text-sm font-medium text-gray-700 mb-2">Modelo</label>
+          <input id="registrar-modelo-modal-3"
             v-model="form.nombre"
             type="text"
             placeholder="Ej: All Star"
             class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
           >
           <textarea
+            aria-label="Descripción del modelo"
             v-model="form.descripcion"
             placeholder="Descripción del modelo (opcional)"
             rows="2"
@@ -131,24 +132,24 @@ const guardar = () => {
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
-              <input v-model="form.color" required maxlength="50" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-modelo-modal-4" class="block text-sm font-medium text-gray-700 mb-2">Color</label>
+              <input id="registrar-modelo-modal-4" v-model="form.color" required maxlength="50" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Código de color (opcional)</label>
-              <input v-model="form.colorHex" type="color" class="w-full h-10 px-1 border border-gray-200 rounded-lg bg-white">
+              <label for="registrar-modelo-modal-5" class="block text-sm font-medium text-gray-700 mb-2">Código de color (opcional)</label>
+              <input id="registrar-modelo-modal-5" v-model="form.colorHex" type="color" class="w-full h-10 px-1 border border-gray-200 rounded-lg bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Talla</label>
-              <input v-model="form.talla" required maxlength="20" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-modelo-modal-6" class="block text-sm font-medium text-gray-700 mb-2">Talla</label>
+              <input id="registrar-modelo-modal-6" v-model="form.talla" required maxlength="20" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Precio de venta (S/)</label>
-              <input v-model="form.precio" type="number" min="0.01" step="0.01" required class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-modelo-modal-7" class="block text-sm font-medium text-gray-700 mb-2">Precio de venta (S/)</label>
+              <input id="registrar-modelo-modal-7" v-model="form.precio" type="number" min="0.01" step="0.01" required class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stock inicial</label>
-              <input v-model="form.stock" type="number" min="0" step="1" required class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-modelo-modal-8" class="block text-sm font-medium text-gray-700 mb-2">Stock inicial</label>
+              <input id="registrar-modelo-modal-8" v-model="form.stock" type="number" min="0" step="1" required class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
           </div>
         </div>

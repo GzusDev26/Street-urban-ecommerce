@@ -32,7 +32,7 @@
         <div v-if="avatares.length > 0" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
           <div v-for="avatar in avatares" :key="avatar.id" class="relative group">
             <div class="w-full aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
-              <img :src="avatar.url" class="w-full h-full object-cover" />
+              <img :src="avatar.url" alt="Avatar" class="w-full h-full object-cover" />
             </div>
             <button
               @click="eliminar(avatar)"

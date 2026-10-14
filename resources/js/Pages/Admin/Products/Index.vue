@@ -23,7 +23,7 @@
 
             <!-- Búsqueda -->
             <div class="mb-6">
-              <input
+              <input aria-label="Buscar productos"
                 v-model="searchQuery"
                 type="text"
                 placeholder="Buscar productos..."
@@ -86,7 +86,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 
 const props = defineProps({
   products: Array,

@@ -355,6 +355,7 @@ const toggleVariantes = async (productId) => {
     const res = await fetch(`/admin/catalogo/${productId}/variantes`);
     variantesCache.value[productId] = await res.json();
   } catch (e) {
+    console.error('No se pudieron cargar las variantes', e);
     variantesCache.value[productId] = [];
   } finally {
     loadingVariantes.value = false;

@@ -35,27 +35,27 @@
         </div>
         <div class="flex flex-wrap items-end gap-3">
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1.5">Desde</label>
-            <input
+            <label for="reportes-1" class="block text-xs font-medium text-gray-500 mb-1.5">Desde</label>
+            <input id="reportes-1"
               v-model="filtros.desde"
               type="date"
               class="border border-gray-200 rounded-lg text-sm px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
             >
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1.5">Hasta</label>
-            <input
+            <label for="reportes-2" class="block text-xs font-medium text-gray-500 mb-1.5">Hasta</label>
+            <input id="reportes-2"
               v-model="filtros.hasta"
               type="date"
               class="border border-gray-200 rounded-lg text-sm px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
             >
           </div>
           <div class="min-w-[190px]">
-            <label class="block text-xs font-medium text-gray-500 mb-1.5">Cliente</label>
+            <span class="block text-xs font-medium text-gray-500 mb-1.5">Cliente</span>
             <SelectDropdown v-model="filtros.cliente" :options="opcionesCliente" />
           </div>
           <div class="min-w-[190px]">
-            <label class="block text-xs font-medium text-gray-500 mb-1.5">Categoría</label>
+            <span class="block text-xs font-medium text-gray-500 mb-1.5">Categoría</span>
             <SelectDropdown v-model="filtros.categoria" :options="opcionesCategoria" />
           </div>
 

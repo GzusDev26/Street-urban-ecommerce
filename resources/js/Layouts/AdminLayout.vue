@@ -56,7 +56,7 @@
       <div class="px-4 py-4 border-t border-gray-100">
         <div class="flex items-center gap-3 px-3 py-2 mb-1">
           <div class="w-9 h-9 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
-            <img v-if="userAvatarUrl" :src="userAvatarUrl" class="w-full h-full object-cover" />
+            <img v-if="userAvatarUrl" :src="userAvatarUrl" :alt="userName" class="w-full h-full object-cover" />
             <template v-else>{{ userInitial }}</template>
           </div>
           <div class="min-w-0">
@@ -100,7 +100,7 @@
 
             <div class="flex items-center gap-2">
               <div class="w-9 h-9 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
-                <img v-if="userAvatarUrl" :src="userAvatarUrl" class="w-full h-full object-cover" />
+                <img v-if="userAvatarUrl" :src="userAvatarUrl" :alt="userName" class="w-full h-full object-cover" />
                 <template v-else>{{ userInitial }}</template>
               </div>
               <span class="text-sm font-semibold text-gray-800 hidden sm:block">{{ userName }}</span>
@@ -128,7 +128,9 @@ const userInitial = computed(() => userName.value.charAt(0).toUpperCase());
 const userAvatarUrl = computed(() => page.props.auth?.user?.avatar_url ?? null);
 const userRoleLabel = computed(() => {
   const role = page.props.auth?.user?.role;
-  return role === 'admin' ? 'Administrador' : role === 'vendedor' ? 'Vendedor' : 'Staff';
+  if (role === 'admin') return 'Administrador';
+  if (role === 'vendedor') return 'Vendedor';
+  return 'Staff';
 });
 
 const esAdmin = computed(() => page.props.auth?.user?.role === 'admin');

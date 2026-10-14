@@ -51,8 +51,8 @@ const procesarPago = async () => {
 
   try {
     const { data } = await axios.post('/api/cart/confirm', {
-      ...(isCustomer.value ? {} : { items: guestPayloadItems() }),
-      ...(compraData.value || {}),
+      ...(!isCustomer.value && { items: guestPayloadItems() }),
+      ...compraData.value,
     });
 
     success.value = data;

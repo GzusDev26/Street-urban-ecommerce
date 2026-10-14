@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
 
 const page = usePage();

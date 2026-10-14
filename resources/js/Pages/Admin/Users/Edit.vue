@@ -12,8 +12,8 @@
 
         <form @submit.prevent="handleSubmit" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-            <input
+            <label for="edit-1" class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+            <input id="edit-1"
               v-model="formData.name"
               type="text"
               class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -23,8 +23,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
+            <label for="edit-2" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input id="edit-2"
               v-model="formData.email"
               type="email"
               class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -34,7 +34,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+            <span class="block text-sm font-medium text-gray-700 mb-2">Rol</span>
             <SelectDropdown v-model="formData.role" :options="opcionesRol" />
             <p v-if="esYo && usuario.role === 'admin'" class="text-xs text-gray-400 mt-2">
               Si te quitas el rol de admin y eres el único, el sistema no te va a dejar guardar.
@@ -43,8 +43,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nueva contraseña (opcional)</label>
-            <input
+            <label for="edit-3" class="block text-sm font-medium text-gray-700 mb-2">Nueva contraseña (opcional)</label>
+            <input id="edit-3"
               v-model="formData.password"
               type="password"
               placeholder="Déjalo vacío para no cambiarla"

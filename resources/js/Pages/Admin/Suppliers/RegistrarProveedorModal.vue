@@ -50,8 +50,8 @@ const guardar = () => {
 
       <div class="p-6 space-y-5">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-          <input
+          <label for="registrar-proveedor-modal-1" class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+          <input id="registrar-proveedor-modal-1"
             v-model="form.name"
             type="text"
             placeholder="Nombre de la tienda/proveedor"
@@ -60,8 +60,8 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono (opcional)</label>
-          <input
+          <label for="registrar-proveedor-modal-2" class="block text-sm font-medium text-gray-700 mb-2">Teléfono (opcional)</label>
+          <input id="registrar-proveedor-modal-2"
             v-model="form.phone"
             type="text"
             placeholder="987654321"
@@ -70,8 +70,8 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email (opcional)</label>
-          <input
+          <label for="registrar-proveedor-modal-3" class="block text-sm font-medium text-gray-700 mb-2">Email (opcional)</label>
+          <input id="registrar-proveedor-modal-3"
             v-model="form.email"
             type="email"
             placeholder="contacto@proveedor.com"
@@ -80,8 +80,8 @@ const guardar = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Dirección (opcional)</label>
-          <input
+          <label for="registrar-proveedor-modal-4" class="block text-sm font-medium text-gray-700 mb-2">Dirección (opcional)</label>
+          <input id="registrar-proveedor-modal-4"
             v-model="form.address"
             type="text"
             placeholder="Dirección de la tienda"

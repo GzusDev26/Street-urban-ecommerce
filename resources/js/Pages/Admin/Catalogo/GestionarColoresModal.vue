@@ -31,6 +31,7 @@ const cargarColores = async () => {
     const res = await fetch(`/admin/catalogo/${props.producto.id}/colores`);
     colores.value = await res.json();
   } catch (e) {
+    console.error('No se pudieron cargar los colores', e);
     colores.value = [];
   } finally {
     loading.value = false;
@@ -186,8 +187,8 @@ const eliminarColor = (color) => {
             <h3 class="text-sm font-bold text-gray-900">{{ editandoColor ? 'Editar color' : 'Nuevo color' }}</h3>
 
             <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1.5">Nombre</label>
-              <input
+              <label for="gestionar-colores-modal-1" class="block text-xs font-medium text-gray-700 mb-1.5">Nombre</label>
+              <input id="gestionar-colores-modal-1"
                 v-model="formNombre"
                 type="text"
                 placeholder="Ej: Rojo, o una combinación: Blanco / Negro"
@@ -197,7 +198,7 @@ const eliminarColor = (color) => {
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1.5">Color de referencia (solo para el punto en la lista)</label>
+              <span class="block text-xs font-medium text-gray-700 mb-1.5">Color de referencia (solo para el punto en la lista)</span>
               <div class="flex items-center gap-2 flex-wrap">
                 <button
                   v-for="p in paleta"
@@ -208,20 +209,20 @@ const eliminarColor = (color) => {
                   :style="{ backgroundColor: p.hex }"
                   :title="p.nombre"
                 ></button>
-                <input v-model="formHex" type="color" class="w-7 h-7 rounded-full border border-gray-200 cursor-pointer" title="Color personalizado">
+                <input v-model="formHex" type="color" aria-label="Color personalizado" class="w-7 h-7 rounded-full border border-gray-200 cursor-pointer" title="Color personalizado">
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1.5">Foto del color (opcional)</label>
+              <label for="gestionar-colores-modal-2" class="block text-xs font-medium text-gray-700 mb-1.5">Foto del color (opcional)</label>
               <div class="flex items-center gap-3">
                 <div class="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-200 flex-shrink-0">
-                  <img v-if="previewUrl" :src="previewUrl" class="w-full h-full object-cover">
+                  <img v-if="previewUrl" :src="previewUrl" alt="Vista previa del color" class="w-full h-full object-cover">
                   <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
                     <i class="fa-solid fa-image"></i>
                   </div>
                 </div>
-                <input ref="fileInput" type="file" accept="image/*" @change="onImagenSeleccionada" class="text-xs text-gray-500 flex-1">
+                <input id="gestionar-colores-modal-2" ref="fileInput" type="file" accept="image/*" @change="onImagenSeleccionada" class="text-xs text-gray-500 flex-1">
               </div>
             </div>
 

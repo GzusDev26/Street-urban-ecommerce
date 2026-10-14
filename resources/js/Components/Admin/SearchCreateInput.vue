@@ -5,6 +5,7 @@ const props = defineProps({
   options: { type: Array, required: true }, // Array<string>
   placeholder: { type: String, default: 'Elige o escribe uno nuevo...' },
   disabled: { type: Boolean, default: false },
+  id: { type: String, default: undefined },
 });
 
 const model = defineModel({ type: String, default: '' });
@@ -37,6 +38,8 @@ const ocultarConRetraso = () => {
 <template>
   <div class="relative">
     <input
+      :id="id"
+      :aria-label="id ? undefined : placeholder"
       v-model="model"
       :disabled="disabled"
       @focus="showDropdown = true"

@@ -99,9 +99,9 @@
 
             <p>Haz clic en el botón de abajo para crear tu contraseña y activar tu cuenta:</p>
 
-            <center>
+            <div style="text-align: center;">
                 <a href="{{ $activationUrl }}" class="button">Activar Cuenta</a>
-            </center>
+            </div>
 
             <p>O copia y pega este enlace en tu navegador:</p>
             <p style="word-break: break-all; color: #999; font-size: 12px;">

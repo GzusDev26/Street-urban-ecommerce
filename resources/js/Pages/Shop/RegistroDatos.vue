@@ -72,31 +72,31 @@ onMounted(() => {
           <form @submit.prevent="submitForm" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tipo de Documento</label>
-                <select v-model="form.docType" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 uppercase font-bold focus:border-white outline-none">
+                <label for="registro-datos-1" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tipo de Documento</label>
+                <select id="registro-datos-1" v-model="form.docType" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 uppercase font-bold focus:border-white outline-none">
                   <option value="DNI">DNI</option>
                   <option value="RUC">RUC</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Número</label>
-                <input v-model="form.docNumber" type="text" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+                <label for="registro-datos-2" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Número</label>
+                <input id="registro-datos-2" v-model="form.docNumber" type="text" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Nombre / Razón Social</label>
-              <input v-model="form.name" type="text" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+              <label for="registro-datos-3" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Nombre / Razón Social</label>
+              <input id="registro-datos-3" v-model="form.name" type="text" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Correo</label>
-                <input v-model="form.email" type="email" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+                <label for="registro-datos-4" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Correo</label>
+                <input id="registro-datos-4" v-model="form.email" type="email" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
               </div>
               <div>
-                <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Teléfono</label>
-                <input v-model="form.phone" type="tel" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+                <label for="registro-datos-5" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Teléfono</label>
+                <input id="registro-datos-5" v-model="form.phone" type="tel" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
               </div>
             </div>
           </form>

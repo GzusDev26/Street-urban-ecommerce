@@ -66,6 +66,7 @@ const cargarColoresProducto = async () => {
     const res = await fetch(`/admin/catalogo/${prendaForm.value.productId}/colores`);
     coloresProducto.value = await res.json();
   } catch (e) {
+    console.error('No se pudieron cargar los colores del producto', e);
     coloresProducto.value = [];
   } finally {
     cargandoColoresProducto.value = false;
@@ -148,6 +149,7 @@ const ejecutarBusqueda = () => {
       const res = await fetch(`/admin/compras/buscar-productos?${params.toString()}`);
       searchResults.value = await res.json();
     } catch (e) {
+      console.error('Falló la búsqueda de productos', e);
       searchResults.value = [];
     } finally {
       isSearching.value = false;
@@ -348,20 +350,20 @@ const guardarCompra = () => {
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
-              <input v-model="compraForm.fecha" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-1" class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+              <input id="registrar-compra-modal-1" v-model="compraForm.fecha" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tienda/Proveedor</label>
-              <input v-model="tiendaCapitalizada" type="text" placeholder="Ej: Centro Comercial Jockey" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-2" class="block text-sm font-medium text-gray-700 mb-2">Tienda/Proveedor</label>
+              <input id="registrar-compra-modal-2" v-model="tiendaCapitalizada" type="text" placeholder="Ej: Centro Comercial Jockey" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Factura # (opcional)</label>
-              <input v-model="compraForm.factura" type="text" placeholder="F-001234" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-3" class="block text-sm font-medium text-gray-700 mb-2">Factura # (opcional)</label>
+              <input id="registrar-compra-modal-3" v-model="compraForm.factura" type="text" placeholder="F-001234" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Notas (opcional)</label>
-              <input v-model="compraForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-4" class="block text-sm font-medium text-gray-700 mb-2">Notas (opcional)</label>
+              <input id="registrar-compra-modal-4" v-model="compraForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
           </div>
         </div>
@@ -372,8 +374,8 @@ const guardarCompra = () => {
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
-              <SearchCreateInput
+              <label for="compra-categoria" class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+              <SearchCreateInput id="compra-categoria"
                 v-model="categoriaCapitalizada"
                 :options="categorias"
                 :disabled="!!prendaForm.productId"
@@ -381,8 +383,8 @@ const guardarCompra = () => {
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Marca</label>
-              <SearchCreateInput
+              <label for="compra-marca" class="block text-sm font-medium text-gray-700 mb-2">Marca</label>
+              <SearchCreateInput id="compra-marca"
                 v-model="marcaCapitalizada"
                 :options="marcas"
                 :disabled="!!prendaForm.productId"
@@ -391,7 +393,7 @@ const guardarCompra = () => {
             </div>
 
             <div class="relative lg:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Modelo</label>
+              <label for="compra-modelo" class="block text-sm font-medium text-gray-700 mb-2">Modelo</label>
 
               <div v-if="prendaForm.productId" class="w-full px-4 py-2 border border-green-300 bg-green-50 rounded-lg flex items-center justify-between">
                 <div class="min-w-0">
@@ -406,7 +408,7 @@ const guardarCompra = () => {
               </div>
 
               <template v-else>
-                <input
+                <input id="compra-modelo"
                   v-model="searchQuery"
                   @input="onSearchInput"
                   @focus="showSuggestions = true"
@@ -443,13 +445,13 @@ const guardarCompra = () => {
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Talla</label>
+              <span class="block text-sm font-medium text-gray-700 mb-2">Talla</span>
               <SelectDropdown v-model="prendaForm.talla" :options="opcionesTalla" placeholder="Selecciona..." />
             </div>
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
+            <span class="block text-sm font-medium text-gray-700 mb-2">Color</span>
 
             <!-- Colores ya registrados para este modelo: reusarlos evita crear duplicados
                  como "Negro" cuando ya existe "Negro con blanco". -->
@@ -461,7 +463,7 @@ const guardarCompra = () => {
                   :class="['flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border-2 transition-all',
                            prendaForm.colorNombre === c.nombre ? 'border-gray-900 ring-2 ring-offset-1 ring-[#ff8c42]' : 'border-gray-200 hover:border-gray-400']">
                   <span class="w-6 h-6 rounded-full border border-gray-200 overflow-hidden flex-shrink-0 inline-block">
-                    <img v-if="c.imagenUrl" :src="c.imagenUrl" class="w-full h-full object-cover">
+                    <img v-if="c.imagenUrl" :src="c.imagenUrl" :alt="c.nombre" class="w-full h-full object-cover">
                     <ColorSwatch v-else :hex="c.hex" class="w-full h-full" />
                   </span>
                   <span class="text-sm font-medium text-gray-700">{{ c.nombre }}</span>
@@ -476,7 +478,7 @@ const guardarCompra = () => {
               <button v-if="coloresProducto.length > 0" type="button" @click="mostrarNuevoColor = false" class="text-xs text-gray-400 hover:text-gray-600 mb-2 flex items-center gap-1">
                 <i class="fa-solid fa-arrow-left text-[10px]"></i> Ver colores ya registrados
               </button>
-              <input
+              <input aria-label="Nombre del color"
                 v-model="prendaForm.colorNombre"
                 type="text"
                 placeholder="Nombre del color, ej: Negro con blanco"
@@ -499,19 +501,19 @@ const guardarCompra = () => {
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
-              <input v-model.number="prendaForm.cantidad" type="number" min="1" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-5" class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
+              <input id="registrar-compra-modal-5" v-model.number="prendaForm.cantidad" type="number" min="1" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Precio Compra</label>
-              <input v-model.number="prendaForm.precioCompra" type="number" step="0.01" min="0" placeholder="S/ 0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-6" class="block text-sm font-medium text-gray-700 mb-2">Precio Compra</label>
+              <input id="registrar-compra-modal-6" v-model.number="prendaForm.precioCompra" type="number" step="0.01" min="0" placeholder="S/ 0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Precio Venta</label>
-              <input v-model.number="prendaForm.precioVenta" type="number" step="0.01" min="0" placeholder="S/ 0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
+              <label for="registrar-compra-modal-7" class="block text-sm font-medium text-gray-700 mb-2">Precio Venta</label>
+              <input id="registrar-compra-modal-7" v-model.number="prendaForm.precioVenta" type="number" step="0.01" min="0" placeholder="S/ 0.00" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Margen</label>
+              <span class="block text-sm font-medium text-gray-700 mb-2">Margen</span>
               <div
                 :class="[
                   'px-4 py-2 rounded-lg flex items-center justify-center text-sm font-bold border',

@@ -52,7 +52,7 @@
                 <td class="py-3 px-4">
                   <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold text-xs flex-shrink-0 overflow-hidden">
-                      <img v-if="usuario.avatarUrl" :src="usuario.avatarUrl" class="w-full h-full object-cover" />
+                      <img v-if="usuario.avatarUrl" :src="usuario.avatarUrl" :alt="usuario.name" class="w-full h-full object-cover" />
                       <template v-else>{{ usuario.name.charAt(0).toUpperCase() }}</template>
                     </div>
                     <span class="text-gray-900 font-medium">

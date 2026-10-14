@@ -65,10 +65,11 @@ const business = computed(() => page.props.business);
         <form @submit.prevent class="flex gap-2">
           <input 
             type="email" 
+            aria-label="Correo electrónico" 
             placeholder="Email" 
             class="bg-transparent border border-white/20 px-4 py-2 text-sm focus:outline-none focus:border-white transition-colors w-full"
           />
-          <button class="bg-white text-black px-4 py-2 text-xs font-bold uppercase hover:bg-gray-200 transition-colors">
+          <button type="submit" class="bg-white text-black px-4 py-2 text-xs font-bold uppercase hover:bg-gray-200 transition-colors">
             OK
           </button>
         </form>

@@ -10,6 +10,7 @@ const model = defineModel({ type: String, default: '' });
   <div class="relative">
     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
     <input
+      :aria-label="placeholder"
       v-model="model"
       type="text"
       :placeholder="placeholder"

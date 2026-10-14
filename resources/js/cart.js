@@ -141,7 +141,7 @@ export async function add(product) {
   }
 
   const items = getItems();
-  const existing = items.find(item => item.variantId === variantId);
+  const existing = items.some(item => item.variantId === variantId);
   const nextItems = existing
     ? items.map(item => item.variantId === variantId
       ? { ...item, cantidad: item.cantidad + (product.cantidad || 1) }

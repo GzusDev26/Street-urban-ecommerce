@@ -61,6 +61,7 @@ export async function toggle(productId) {
     window.dispatchEvent(new Event('wishlist-updated'));
     return data.added;
   } catch (e) {
+    console.error('Falló la actualización de la lista de deseos', e);
     return null;
   }
 }

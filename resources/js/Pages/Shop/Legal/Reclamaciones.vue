@@ -185,9 +185,9 @@ const submitForm = () => {
           </div>
 
           <div>
-            <label class="block text-sm uppercase tracking-widest text-gray-400 mb-3">
+            <span class="block text-sm uppercase tracking-widest text-gray-400 mb-3">
               Tipo
-            </label>
+            </span>
 
             <div class="flex gap-6">
               <label class="flex items-center gap-2 cursor-pointer">

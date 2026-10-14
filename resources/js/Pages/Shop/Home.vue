@@ -136,7 +136,7 @@ onMounted(() => {
         <p class="text-gray-400 mb-10 text-lg leading-relaxed">Suscríbete y obtén acceso exclusivo a nuevos lanzamientos, ofertas especiales y contenido detrás de cámaras.</p>
 
         <form class="flex flex-col sm:flex-row gap-3 mb-8 max-w-lg mx-auto">
-          <input
+          <input aria-label="Correo electrónico"
             type="email"
             placeholder="tu@email.com"
             required

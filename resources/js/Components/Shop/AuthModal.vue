@@ -270,6 +270,7 @@ const closeAndReset = () => {
           <div>
             <input
               v-model="email"
+              aria-label="Correo electrónico"
               type="email"
               placeholder="ejemplo@gmail.com"
               class="w-full bg-gradient-to-br from-gray-800 to-gray-700 border-2 border-gray-600 px-5 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white focus:ring-2 focus:ring-white/20 transition duration-300 text-base font-medium"
@@ -439,10 +440,10 @@ const closeAndReset = () => {
 
           <!-- Email Input -->
           <div>
-            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+            <label for="auth-modal-1" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
               Correo electrónico
             </label>
-            <input
+            <input id="auth-modal-1"
               v-model="email"
               type="email"
               placeholder="example@gmail.com"
@@ -452,11 +453,11 @@ const closeAndReset = () => {
 
           <!-- Password Input -->
           <div>
-            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+            <label for="auth-modal-2" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
               Contraseña
             </label>
             <div class="relative">
-              <input
+              <input id="auth-modal-2"
                 v-model="password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Tu contraseña"

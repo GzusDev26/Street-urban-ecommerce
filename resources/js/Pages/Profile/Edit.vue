@@ -41,7 +41,7 @@
               usuario.avatar_id === avatar.id ? 'border-gray-900 ring-2 ring-offset-2 ring-[#ff8c42]' : 'border-transparent hover:border-gray-300',
             ]"
           >
-            <img :src="avatar.url" class="w-full h-full object-cover" />
+            <img :src="avatar.url" alt="Avatar" class="w-full h-full object-cover" />
           </button>
         </div>
 
@@ -60,8 +60,8 @@
 
         <form @submit.prevent="guardarPerfil" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-            <input
+            <label for="edit-1" class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+            <input id="edit-1"
               v-model="perfilForm.name"
               type="text"
               class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -71,8 +71,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
+            <label for="edit-2" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input id="edit-2"
               v-model="perfilForm.email"
               type="email"
               class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -82,7 +82,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+            <span class="block text-sm font-medium text-gray-700 mb-2">Rol</span>
             <span
               :class="[
                 'inline-block text-xs font-semibold px-2.5 py-1 rounded-full',
@@ -116,8 +116,8 @@
 
         <form @submit.prevent="guardarPassword" class="space-y-5">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña actual</label>
-            <input
+            <label for="edit-3" class="block text-sm font-medium text-gray-700 mb-2">Contraseña actual</label>
+            <input id="edit-3"
               v-model="passwordForm.current_password"
               type="password"
               autocomplete="current-password"
@@ -127,8 +127,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Nueva contraseña</label>
-            <input
+            <label for="edit-4" class="block text-sm font-medium text-gray-700 mb-2">Nueva contraseña</label>
+            <input id="edit-4"
               v-model="passwordForm.password"
               type="password"
               autocomplete="new-password"
@@ -138,8 +138,8 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar nueva contraseña</label>
-            <input
+            <label for="edit-5" class="block text-sm font-medium text-gray-700 mb-2">Confirmar nueva contraseña</label>
+            <input id="edit-5"
               v-model="passwordForm.password_confirmation"
               type="password"
               autocomplete="new-password"

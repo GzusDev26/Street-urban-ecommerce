@@ -16,7 +16,7 @@ use Inertia\Response;
 // de "no te quedes sin administradores" — por eso esta página no ofrece eliminar la cuenta.
 class ProfileController extends Controller
 {
-    public function edit(Request $request): Response
+    public function edit(): Response
     {
         return Inertia::render('Profile/Edit', [
             'avatares' => Avatar::latest()->get()->map(fn ($a) => [

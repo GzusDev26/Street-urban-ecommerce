@@ -111,9 +111,15 @@ class SaleController extends Controller
         $itemsQuery = SaleItem::with(['sale', 'variant.product.category', 'variant.product.brand'])
             ->whereHas('sale', function ($q) use ($desde, $hasta, $cliente) {
                 $q->whereNull('cancelled_at');
-                if ($desde) $q->whereDate('sale_date', '>=', $desde);
-                if ($hasta) $q->whereDate('sale_date', '<=', $hasta);
-                if ($cliente) $q->where('customer_name', $cliente);
+                if ($desde) {
+                    $q->whereDate('sale_date', '>=', $desde);
+                }
+                if ($hasta) {
+                    $q->whereDate('sale_date', '<=', $hasta);
+                }
+                if ($cliente) {
+                    $q->where('customer_name', $cliente);
+                }
             });
 
         if ($categoria) {
@@ -139,7 +145,7 @@ class SaleController extends Controller
 
         // Se agrupa por customer_id cuando la venta está vinculada a un cliente real, para
         // no confundir a dos personas distintas que escribieron el mismo nombre a mano.
-        $porCliente = $items->groupBy(fn ($i) => $i->sale->customer_id ? "id:{$i->sale->customer_id}" : 'nombre:' . ($i->sale->customer_name ?: 'Sin cliente registrado'))
+        $porCliente = $items->groupBy(fn ($i) => $this->claveCliente($i->sale))
             ->map(fn ($group) => [
                 'label' => $group->first()->sale->customer_name ?: 'Sin cliente registrado',
                 'total' => $group->sum('net_subtotal'),
@@ -354,7 +360,9 @@ class SaleController extends Controller
                         ->get();
 
                     foreach ($lotes as $lote) {
-                        if ($porConsumir <= 0) break;
+                        if ($porConsumir <= 0) {
+                            break;
+                        }
 
                         $tomar = min($porConsumir, $lote->quantity_remaining);
                         $lote->decrement('quantity_remaining', $tomar);
@@ -467,7 +475,9 @@ class SaleController extends Controller
             $porDevolver = $cantidad;
 
             foreach ($item->batches->sortByDesc('id') as $batch) {
-                if ($porDevolver <= 0) break;
+                if ($porDevolver <= 0) {
+                    break;
+                }
 
                 $devolverDeEsteLote = min($porDevolver, $batch->quantity);
 
@@ -494,5 +504,14 @@ class SaleController extends Controller
         });
 
         return back()->with('success', 'Devolución registrada. El stock fue actualizado.');
+    }
+
+    private function claveCliente(Sale $sale): string
+    {
+        if ($sale->customer_id) {
+            return "id:{$sale->customer_id}";
+        }
+
+        return 'nombre:' . ($sale->customer_name ?: 'Sin cliente registrado');
     }
 }

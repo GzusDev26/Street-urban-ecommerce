@@ -23,10 +23,10 @@
 
             <form @submit.prevent="handleSubmit" class="space-y-5">
               <div>
-                <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                <label for="edit-1" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                   <i class="fa-solid fa-tag text-gray-300 text-xs"></i> Nombre del negocio
                 </label>
-                <input
+                <input id="edit-1"
                   v-model="formData.name"
                   type="text"
                   class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -36,10 +36,10 @@
               </div>
 
               <div>
-                <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                <label for="edit-2" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                   <i class="fa-solid fa-envelope text-gray-300 text-xs"></i> Email de contacto (opcional)
                 </label>
-                <input
+                <input id="edit-2"
                   v-model="formData.email"
                   type="email"
                   class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -49,10 +49,10 @@
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                  <label for="edit-3" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                     <i class="fa-solid fa-phone text-gray-300 text-xs"></i> Teléfono (opcional)
                   </label>
-                  <input
+                  <input id="edit-3"
                     v-model="formData.phone"
                     type="text"
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -60,10 +60,10 @@
                   <p v-if="validationErrors.phone" class="text-red-500 text-xs mt-1">{{ validationErrors.phone[0] }}</p>
                 </div>
                 <div>
-                  <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                  <label for="edit-4" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                     <i class="fa-brands fa-whatsapp text-gray-300 text-xs"></i> WhatsApp (opcional)
                   </label>
-                  <input
+                  <input id="edit-4"
                     v-model="formData.whatsapp"
                     type="text"
                     placeholder="51987654321"
@@ -76,10 +76,10 @@
 
               <div class="border-t border-gray-100 pt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                  <label for="edit-5" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                     <i class="fa-solid fa-location-dot text-gray-300 text-xs"></i> Dirección (opcional)
                   </label>
-                  <input
+                  <input id="edit-5"
                     v-model="formData.address"
                     type="text"
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -88,10 +88,10 @@
                 </div>
 
                 <div>
-                  <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                  <label for="edit-6" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                     <i class="fa-solid fa-file-invoice text-gray-300 text-xs"></i> RUC (opcional)
                   </label>
-                  <input
+                  <input id="edit-6"
                     v-model="formData.ruc"
                     type="text"
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
@@ -101,10 +101,10 @@
               </div>
 
               <div class="border-t border-gray-100 pt-5">
-                <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+                <label for="edit-7" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
                   <i class="fa-solid fa-triangle-exclamation text-gray-300 text-xs"></i> Umbral de stock bajo
                 </label>
-                <input
+                <input id="edit-7"
                   v-model.number="formData.low_stock_threshold"
                   type="number"
                   min="1"
