@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 
 defineOptions({
@@ -77,6 +76,7 @@ const handleActivate = async () => {
       location.href = data.redirect || '/';
     }, 1800);
   } catch (e) {
+    console.error('Falló la activación de la cuenta', e);
     responseError.value = 'Error de conexión. Intenta de nuevo.';
     isLoading.value = false;
   }
@@ -117,9 +117,9 @@ const handleActivate = async () => {
       <div v-if="isValid" class="space-y-6">
         <!-- Email Display (Read-only) -->
         <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <span class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Correo electrónico
-          </label>
+          </span>
           <div class="bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white text-sm">
             {{ email }}
           </div>
@@ -127,10 +127,10 @@ const handleActivate = async () => {
 
         <!-- Name Input -->
         <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <label for="activate-account-1" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Nombre completo *
           </label>
-          <input
+          <input id="activate-account-1"
             v-model="name"
             type="text"
             placeholder="Ej: Juan Pérez"
@@ -140,11 +140,11 @@ const handleActivate = async () => {
 
         <!-- Phone Input (Optional) -->
         <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <label for="activate-account-2" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Teléfono
             <span class="text-gray-600">(opcional)</span>
           </label>
-          <input
+          <input id="activate-account-2"
             v-model="phone"
             type="tel"
             placeholder="+51 999 123 456"
@@ -154,11 +154,11 @@ const handleActivate = async () => {
 
         <!-- Password Input -->
         <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <label for="activate-account-3" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Contraseña *
           </label>
           <div class="relative">
-            <input
+            <input id="activate-account-3"
               v-model="password"
               :type="showPassword ? 'text' : 'password'"
               placeholder="Mínimo 8 caracteres"
@@ -182,10 +182,10 @@ const handleActivate = async () => {
 
         <!-- Confirm Password Input -->
         <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+          <label for="activate-account-4" class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Confirmar contraseña *
           </label>
-          <input
+          <input id="activate-account-4"
             v-model="passwordConfirm"
             type="password"
             placeholder="Repite tu contraseña"

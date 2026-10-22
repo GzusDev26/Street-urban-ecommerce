@@ -36,6 +36,7 @@ const cargarColores = async () => {
     const res = await fetch(`/admin/catalogo/${props.producto.id}/colores`);
     colores.value = await res.json();
   } catch (e) {
+    console.error('No se pudieron cargar los colores', e);
     colores.value = [];
   } finally {
     loading.value = false;
@@ -222,7 +223,7 @@ const confirmarEliminacion = () => {
           <FormInput v-model="formNombre" type="text" placeholder="Ej: Rojo, o una combinación: Blanco / Negro" />
         </FormField>
 
-        <FormField label="Color de referencia" hint="Solo se usa para el punto de color en las listas.">
+        <FormField label="Color de referencia" group hint="Solo se usa para el punto de color en las listas.">
           <div class="flex items-center gap-2 flex-wrap">
             <button
               v-for="p in paleta"
@@ -244,7 +245,7 @@ const confirmarEliminacion = () => {
           </div>
         </FormField>
 
-        <FormField label="Foto del color" optional>
+        <FormField label="Foto del color" optional group>
           <div class="flex items-center gap-3">
             <div class="w-16 h-16 rounded-xl overflow-hidden bg-white border border-gray-200 flex-shrink-0">
               <img v-if="previewUrl" :src="previewUrl" alt="Vista previa" class="w-full h-full object-cover">

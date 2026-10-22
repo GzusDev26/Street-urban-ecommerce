@@ -20,6 +20,7 @@ onMounted(async () => {
     compras.value = data.compras;
     stats.value = data.stats;
   } catch (e) {
+    console.error('No se pudo cargar el historial del proveedor', e);
     compras.value = [];
   } finally {
     loading.value = false;

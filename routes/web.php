@@ -72,15 +72,18 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         // Compatibilidad con clientes antiguos: DELETE ya no borra el registro ni su historial.
         Route::delete('/catalogo/{producto}', [CatalogoController::class, 'destroy'])->name('admin.catalogo.destroy');
 
+        $mensajeProductosMovidos = 'La gestión de productos ahora se realiza en el catálogo.';
+        $rutaProducto = '/products/{product}';
+
         // URLs heredadas de lectura llevan al catálogo canónico. Se preservan los nombres
         // de ruta y se responde 410 a escrituras para no fingir que el cambio fue aplicado.
         Route::get('/products', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.index');
         Route::get('/products/create', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.create');
-        Route::post('/products', fn () => abort(410, 'La gestión de productos ahora se realiza en el catálogo.'))->name('admin.products.store');
-        Route::get('/products/{product}', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.show');
+        Route::post('/products', fn () => abort(410, $mensajeProductosMovidos))->name('admin.products.store');
+        Route::get($rutaProducto, fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.show');
         Route::get('/products/{product}/edit', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.edit');
-        Route::match(['put', 'patch'], '/products/{product}', fn () => abort(410, 'La gestión de productos ahora se realiza en el catálogo.'))->name('admin.products.update');
-        Route::delete('/products/{product}', fn () => abort(410, 'La gestión de productos ahora se realiza en el catálogo.'))->name('admin.products.destroy');
+        Route::match(['put', 'patch'], $rutaProducto, fn () => abort(410, $mensajeProductosMovidos))->name('admin.products.update');
+        Route::delete($rutaProducto, fn () => abort(410, $mensajeProductosMovidos))->name('admin.products.destroy');
     });
 
     // Gestión de usuarios/roles y datos del negocio — solo un administrador puede entrar aquí.

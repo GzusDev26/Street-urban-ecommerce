@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { useFieldId } from './useFieldId';
 
 const props = defineProps({
   options: { type: Array, required: true }, // [{ value, label }]
@@ -7,6 +8,7 @@ const props = defineProps({
   size: { type: String, default: 'md' }, // 'md' para formularios, 'sm' para barras de filtros
 });
 
+const fieldId = useFieldId();
 const model = defineModel({ type: String, default: '' });
 
 const isOpen = ref(false);
@@ -32,6 +34,7 @@ const cerrarConRetraso = () => {
   <div class="relative">
     <button
       type="button"
+      :id="fieldId"
       @click="isOpen = !isOpen"
       @blur="cerrarConRetraso"
       @keydown.esc.stop="isOpen = false"

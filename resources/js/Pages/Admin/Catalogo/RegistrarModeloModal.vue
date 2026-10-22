@@ -90,6 +90,7 @@ const guardar = () => {
       <FormTextarea
         v-if="categoriaEsNueva"
         v-model="form.categoriaDescripcion"
+        aria-label="Descripción de la categoría"
         placeholder="Descripción de la categoría (opcional)"
         rows="2"
         class="mt-2"
@@ -101,6 +102,7 @@ const guardar = () => {
       <FormTextarea
         v-if="marcaEsNueva"
         v-model="form.marcaDescripcion"
+        aria-label="Descripción de la marca"
         placeholder="Descripción de la marca (opcional)"
         rows="2"
         class="mt-2"
@@ -111,6 +113,7 @@ const guardar = () => {
       <FormInput v-model="form.nombre" type="text" placeholder="Ej: All Star" />
       <FormTextarea
         v-model="form.descripcion"
+        aria-label="Descripción del modelo"
         placeholder="Descripción del modelo (opcional)"
         rows="2"
         class="mt-2"
@@ -133,9 +136,9 @@ const guardar = () => {
           <FormInput v-model="form.color" required maxlength="50" />
         </FormField>
 
-        <FormField label="Código de color" optional>
+        <FormField label="Código de color" optional group>
           <label class="flex items-center gap-2.5 h-11 px-2.5 rounded-xl border border-gray-200 bg-white hover:border-gray-300 cursor-pointer transition">
-            <input v-model="form.colorHex" type="color" class="w-7 h-7 rounded-lg border-0 p-0 bg-transparent cursor-pointer">
+            <input v-model="form.colorHex" type="color" aria-label="Código de color" class="w-7 h-7 rounded-lg border-0 p-0 bg-transparent cursor-pointer">
             <span class="text-sm text-gray-600 font-mono uppercase">{{ form.colorHex }}</span>
           </label>
         </FormField>

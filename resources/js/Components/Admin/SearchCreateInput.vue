@@ -1,12 +1,16 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { useFieldId } from './useFieldId';
 
 const props = defineProps({
   options: { type: Array, required: true }, // Array<string>
   placeholder: { type: String, default: 'Elige o escribe uno nuevo...' },
   disabled: { type: Boolean, default: false },
+  id: { type: String, default: undefined },
 });
 
+const campoId = useFieldId();
+const idFinal = computed(() => props.id ?? campoId);
 const model = defineModel({ type: String, default: '' });
 
 const showDropdown = ref(false);
@@ -37,6 +41,8 @@ const ocultarConRetraso = () => {
 <template>
   <div class="relative">
     <input
+      :id="idFinal"
+      :aria-label="idFinal ? undefined : placeholder"
       v-model="model"
       :disabled="disabled"
       @focus="showDropdown = true"

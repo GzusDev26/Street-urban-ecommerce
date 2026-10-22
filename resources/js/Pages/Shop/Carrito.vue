@@ -163,7 +163,7 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
 
                 <div class="flex items-end justify-between mt-auto pt-4">
                   <div class="relative">
-                    <select
+                    <select aria-label="Cantidad"
                       :value="item.cantidad"
                       @change="changeQuantity(item.id, $event.target.value)"
                       class="appearance-none w-[4.5rem] bg-[#1f1f1f] border border-gray-700 rounded-lg pl-4 pr-8 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-[#ff8c42] hover:border-gray-500 transition-colors cursor-pointer"

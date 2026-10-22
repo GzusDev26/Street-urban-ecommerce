@@ -335,6 +335,7 @@ const toggleLotes = async (variantId) => {
     const res = await fetch(`/admin/compras/variantes/${variantId}/lotes`);
     lotesCache.value[variantId] = await res.json();
   } catch (e) {
+    console.error('No se pudieron cargar los lotes', e);
     lotesCache.value[variantId] = [];
   } finally {
     loadingLotes.value = false;

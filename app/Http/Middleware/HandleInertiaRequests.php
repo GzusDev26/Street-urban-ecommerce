@@ -17,14 +17,6 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
-     * Determine the current asset version.
-     */
-    public function version(Request $request): ?string
-    {
-        return parent::version($request);
-    }
-
-    /**
      * Define the props that are shared by default.
      *
      * @return array<string, mixed>
@@ -34,11 +26,18 @@ class HandleInertiaRequests extends Middleware
         $staff = Auth::guard('web')->user();
         $customer = Auth::guard('customer')->user();
 
+        $type = null;
+        if ($staff) {
+            $type = 'staff';
+        } elseif ($customer) {
+            $type = 'customer';
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $staff ?? $customer,
-                'type' => $staff ? 'staff' : ($customer ? 'customer' : null),
+                'type' => $type,
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),

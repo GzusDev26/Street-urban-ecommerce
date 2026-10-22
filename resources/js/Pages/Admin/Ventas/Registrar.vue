@@ -58,11 +58,11 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
-                <input v-model="ventaForm.fecha" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
+                <label for="registrar-1" class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+                <input id="registrar-1" v-model="ventaForm.fecha" type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
               </div>
               <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Cliente (opcional)</label>
+                <label for="venta-cliente" class="block text-sm font-medium text-gray-700 mb-2">Cliente (opcional)</label>
 
                 <div v-if="clienteSeleccionado" class="w-full px-4 py-2 border border-green-300 bg-green-50 rounded-lg flex items-center justify-between">
                   <div class="min-w-0">
@@ -75,7 +75,7 @@
                 </div>
 
                 <template v-else>
-                  <input
+                  <input id="venta-cliente"
                     v-model="ventaForm.cliente"
                     @input="onClienteInput"
                     @focus="showClienteSuggestions = true"
@@ -102,8 +102,8 @@
                 </template>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Notas (opcional)</label>
-                <input v-model="ventaForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
+                <label for="registrar-2" class="block text-sm font-medium text-gray-700 mb-2">Notas (opcional)</label>
+                <input id="registrar-2" v-model="ventaForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
               </div>
             </div>
           </div>
@@ -165,12 +165,12 @@
 
               <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
-                  <input v-model.number="cantidad" type="number" min="1" :max="stockDisponibleSeleccion || 1" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
+                  <label for="registrar-3" class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
+                  <input id="registrar-3" v-model.number="cantidad" type="number" min="1" :max="stockDisponibleSeleccion || 1" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Precio de Venta</label>
-                  <input v-model.number="precioVenta" type="number" step="0.01" min="0" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
+                  <label for="registrar-4" class="block text-sm font-medium text-gray-700 mb-2">Precio de Venta</label>
+                  <input id="registrar-4" v-model.number="precioVenta" type="number" step="0.01" min="0" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]">
                 </div>
               </div>
 
@@ -288,6 +288,7 @@ const buscarClientes = () => {
       const res = await fetch(`/admin/ventas/buscar-clientes?q=${encodeURIComponent(q)}`);
       clienteResultados.value = await res.json();
     } catch (e) {
+      console.error('Falló la búsqueda de clientes', e);
       clienteResultados.value = [];
     }
   }, 300);
@@ -357,6 +358,7 @@ const ejecutarBusqueda = () => {
       const res = await fetch(`/admin/ventas/buscar-variantes?${params.toString()}`);
       searchResults.value = await res.json();
     } catch (e) {
+      console.error('Falló la búsqueda de variantes', e);
       searchResults.value = [];
     } finally {
       isSearching.value = false;

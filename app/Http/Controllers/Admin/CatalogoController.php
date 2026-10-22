@@ -15,6 +15,8 @@ use Inertia\Inertia;
 
 class CatalogoController extends Controller
 {
+    private const NAME_MATCH = 'LOWER(TRIM(name)) = ?';
+
     public function index()
     {
         $productos = Product::with(['category', 'brand', 'variants'])
@@ -87,7 +89,7 @@ class CatalogoController extends Controller
             );
 
             $exists = Product::where('brand_id', $brand->id)
-                ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($validated['nombre']))])
+                ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['nombre']))])
                 ->exists();
 
             if ($exists) {
@@ -155,7 +157,7 @@ class CatalogoController extends Controller
         );
 
         $existe = Product::where('brand_id', $brand->id)
-            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($validated['nombre']))])
+            ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['nombre']))])
             ->where('id', '!=', $producto->id)
             ->exists();
 
@@ -226,7 +228,7 @@ class CatalogoController extends Controller
         ]);
 
         $existe = $producto->colors()
-            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($validated['nombre']))])
+            ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['nombre']))])
             ->exists();
 
         if ($existe) {
@@ -255,7 +257,7 @@ class CatalogoController extends Controller
         ]);
 
         $existe = ProductColor::where('product_id', $color->product_id)
-            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($validated['nombre']))])
+            ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['nombre']))])
             ->where('id', '!=', $color->id)
             ->exists();
 

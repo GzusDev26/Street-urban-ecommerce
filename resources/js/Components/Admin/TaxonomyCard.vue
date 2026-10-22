@@ -91,12 +91,14 @@ const confirmarEliminacion = () => {
 
     <form @submit.prevent="agregar" class="flex flex-wrap items-start gap-2 mt-4 mb-5">
       <input
+        :aria-label="`Nueva ${entityLabel}`"
         v-model="nuevoNombre"
         type="text"
         :placeholder="`Nueva ${entityLabel}...`"
         class="flex-1 min-w-[140px] px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
       />
       <input
+        :aria-label="`Descripción de la nueva ${entityLabel}`"
         v-model="nuevaDescripcion"
         type="text"
         placeholder="Descripción (opcional)"
@@ -116,12 +118,14 @@ const confirmarEliminacion = () => {
         <template v-if="editandoId === item.id">
           <div class="flex-1 space-y-2">
             <input
+              aria-label="Nombre"
               v-model="editName"
               type="text"
               class="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
               @keyup.enter="guardar(item)"
             />
             <input
+              aria-label="Descripción"
               v-model="editDescription"
               type="text"
               placeholder="Descripción (opcional)"

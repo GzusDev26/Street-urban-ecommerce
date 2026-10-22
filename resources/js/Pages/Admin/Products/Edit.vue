@@ -14,10 +14,10 @@
             <form @submit.prevent="submit">
               <!-- Nombre -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-1" class="block text-gray-700 text-sm font-bold mb-2">
                   Nombre *
                 </label>
-                <input
+                <input id="edit-1"
                   v-model="form.name"
                   type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -28,10 +28,10 @@
 
               <!-- SKU -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-2" class="block text-gray-700 text-sm font-bold mb-2">
                   SKU *
                 </label>
-                <input
+                <input id="edit-2"
                   v-model="form.sku"
                   type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -42,10 +42,10 @@
 
               <!-- Descripción -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-3" class="block text-gray-700 text-sm font-bold mb-2">
                   Descripción
                 </label>
-                <textarea
+                <textarea id="edit-3"
                   v-model="form.description"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   rows="4"
@@ -54,10 +54,10 @@
 
               <!-- Categoría -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-4" class="block text-gray-700 text-sm font-bold mb-2">
                   Categoría *
                 </label>
-                <select
+                <select id="edit-4"
                   v-model="form.category_id"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   required
@@ -72,10 +72,10 @@
 
               <!-- Precio -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-5" class="block text-gray-700 text-sm font-bold mb-2">
                   Precio *
                 </label>
-                <input
+                <input id="edit-5"
                   v-model="form.price"
                   type="number"
                   step="0.01"
@@ -87,10 +87,10 @@
 
               <!-- Costo -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-6" class="block text-gray-700 text-sm font-bold mb-2">
                   Costo
                 </label>
-                <input
+                <input id="edit-6"
                   v-model="form.cost"
                   type="number"
                   step="0.01"
@@ -100,10 +100,10 @@
 
               <!-- Stock -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-7" class="block text-gray-700 text-sm font-bold mb-2">
                   Stock *
                 </label>
-                <input
+                <input id="edit-7"
                   v-model="form.stock"
                   type="number"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -114,10 +114,10 @@
 
               <!-- URL de imagen -->
               <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="edit-8" class="block text-gray-700 text-sm font-bold mb-2">
                   URL de imagen
                 </label>
-                <input
+                <input id="edit-8"
                   v-model="form.image_url"
                   type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"

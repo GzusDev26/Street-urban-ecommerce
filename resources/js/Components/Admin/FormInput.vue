@@ -1,4 +1,6 @@
 <script setup>
+import { useFieldId } from './useFieldId';
+
 defineOptions({ inheritAttrs: false });
 
 defineProps({
@@ -6,6 +8,7 @@ defineProps({
   prefix: { type: String, default: '' }, // texto fijo a la izquierda, ej. la moneda
 });
 
+const fieldId = useFieldId();
 const model = defineModel({ type: [String, Number], default: '' });
 </script>
 
@@ -15,6 +18,7 @@ const model = defineModel({ type: [String, Number], default: '' });
     <span v-if="prefix" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">{{ prefix }}</span>
     <input
       v-model="model"
+      :id="fieldId"
       v-bind="$attrs"
       :class="[
         'w-full h-11 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition',

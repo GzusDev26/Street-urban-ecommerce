@@ -7,6 +7,11 @@ use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
+    private const BRAND_STREET = 'Street Urban';
+    private const BRAND_CORE = 'Urban Core';
+    private const COLOR_DARK = '#111827';
+    private const COLOR_LIGHT = '#F3F4F6';
+
     public function run(): void
     {
         $builder = app(CatalogBuilder::class);
@@ -21,7 +26,7 @@ class ProductSeeder extends Seeder
         return [
             [
                 'name' => 'Camiseta Urban Básica',
-                'brand' => 'Street Urban',
+                'brand' => self::BRAND_STREET,
                 'category' => 'Camisetas',
                 'description' => 'Camiseta de algodón con corte regular para uso diario.',
                 'sku' => 'CAM-URB-001',
@@ -31,7 +36,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Negro',
-                        'hex' => '#111827',
+                        'hex' => self::COLOR_DARK,
                         'image_url' => 'product-colors/camiseta-urban-negro.svg',
                         'sizes' => [
                             ['size' => 'S', 'stock' => 4],
@@ -42,7 +47,7 @@ class ProductSeeder extends Seeder
                     ],
                     [
                         'name' => 'Blanco / Negro',
-                        'hex' => '#F3F4F6',
+                        'hex' => self::COLOR_LIGHT,
                         'image_url' => 'product-colors/camiseta-urban-blanco-negro.svg',
                         'sizes' => [
                             ['size' => 'S', 'stock' => 3],
@@ -55,7 +60,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Camiseta Streetwear Premium',
-                'brand' => 'Street Urban',
+                'brand' => self::BRAND_STREET,
                 'category' => 'Camisetas',
                 'description' => 'Modelo premium con tela más pesada y caída oversize.',
                 'sku' => 'CAM-PREM-001',
@@ -65,7 +70,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Negro',
-                        'hex' => '#111827',
+                        'hex' => self::COLOR_DARK,
                         'image_url' => 'product-colors/camiseta-premium-negro.svg',
                         'sizes' => [
                             ['size' => 'S', 'stock' => 3],
@@ -91,7 +96,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Camiseta Oversized',
-                'brand' => 'Urban Core',
+                'brand' => self::BRAND_CORE,
                 'category' => 'Camisetas',
                 'description' => 'Camiseta ancha, ideal para outfits relajados y streetwear.',
                 'sku' => 'CAM-OVR-001',
@@ -125,7 +130,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Pantalón Jogger',
-                'brand' => 'Street Urban',
+                'brand' => self::BRAND_STREET,
                 'category' => 'Pantalones',
                 'description' => 'Jogger con pretina elástica y fit cómodo para uso urbano.',
                 'sku' => 'PAN-JOG-001',
@@ -135,7 +140,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Negro',
-                        'hex' => '#111827',
+                        'hex' => self::COLOR_DARK,
                         'image_url' => 'product-colors/pantalon-jogger-negro.svg',
                         'sizes' => [
                             ['size' => '28', 'stock' => 2],
@@ -161,7 +166,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Pantalón Cargo',
-                'brand' => 'Urban Core',
+                'brand' => self::BRAND_CORE,
                 'category' => 'Pantalones',
                 'description' => 'Cargo funcional con bolsillos laterales y acabado resistente.',
                 'sku' => 'PAN-CAR-001',
@@ -197,7 +202,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Gorro Urban',
-                'brand' => 'Street Urban',
+                'brand' => self::BRAND_STREET,
                 'category' => 'Accesorios',
                 'description' => 'Gorro de talla única con ajuste cómodo.',
                 'sku' => 'GOR-URB-001',
@@ -207,7 +212,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Negro',
-                        'hex' => '#111827',
+                        'hex' => self::COLOR_DARK,
                         'image_url' => 'product-colors/gorro-urban-negro.svg',
                         'sizes' => [
                             ['size' => 'Único', 'stock' => 25],
@@ -215,7 +220,7 @@ class ProductSeeder extends Seeder
                     ],
                     [
                         'name' => 'Blanco / Negro',
-                        'hex' => '#F3F4F6',
+                        'hex' => self::COLOR_LIGHT,
                         'image_url' => 'product-colors/gorro-urban-blanco-negro.svg',
                         'sizes' => [
                             ['size' => 'Único', 'stock' => 18],
@@ -235,7 +240,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Negro',
-                        'hex' => '#111827',
+                        'hex' => self::COLOR_DARK,
                         'image_url' => 'product-colors/cinturon-negro.svg',
                         'sizes' => [
                             ['size' => '30', 'stock' => 6],
@@ -259,7 +264,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Zapatilla Alta',
-                'brand' => 'Street Urban',
+                'brand' => self::BRAND_STREET,
                 'category' => 'Calzado',
                 'description' => 'Zapatilla de caña alta con suela de gran agarre.',
                 'sku' => 'ZAP-ALT-001',
@@ -269,7 +274,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Negro / Blanco',
-                        'hex' => '#111827',
+                        'hex' => self::COLOR_DARK,
                         'image_url' => 'product-colors/zapatilla-alta-negro-blanco.svg',
                         'sizes' => [
                             ['size' => '38', 'stock' => 2],
@@ -282,7 +287,7 @@ class ProductSeeder extends Seeder
                     ],
                     [
                         'name' => 'Blanco / Rojo',
-                        'hex' => '#F3F4F6',
+                        'hex' => self::COLOR_LIGHT,
                         'image_url' => 'product-colors/zapatilla-alta-blanco-rojo.svg',
                         'sizes' => [
                             ['size' => '38', 'stock' => 1],
@@ -297,7 +302,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'name' => 'Zapatilla Baja',
-                'brand' => 'Urban Core',
+                'brand' => self::BRAND_CORE,
                 'category' => 'Calzado',
                 'description' => 'Zapatilla baja versátil para uso diario.',
                 'sku' => 'ZAP-BAJ-001',
@@ -307,7 +312,7 @@ class ProductSeeder extends Seeder
                 'colors' => [
                     [
                         'name' => 'Blanco',
-                        'hex' => '#F3F4F6',
+                        'hex' => self::COLOR_LIGHT,
                         'image_url' => 'product-colors/zapatilla-baja-blanco.svg',
                         'sizes' => [
                             ['size' => '36', 'stock' => 2],

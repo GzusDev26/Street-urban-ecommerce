@@ -93,7 +93,7 @@ class CartService
         $tax = round($subtotal - ($subtotal / (1 + self::TAX_RATE)), 2);
 
         return [
-            'valid' => count($errors) === 0,
+            'valid' => empty($errors),
             'items' => array_values($items),
             'errors' => $errors,
             'summary' => [

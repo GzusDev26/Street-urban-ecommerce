@@ -20,6 +20,7 @@ onMounted(async () => {
     ventas.value = data.ventas;
     stats.value = data.stats;
   } catch (e) {
+    console.error('No se pudo cargar el historial del cliente', e);
     ventas.value = [];
   } finally {
     loading.value = false;

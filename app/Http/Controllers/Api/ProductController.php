@@ -35,10 +35,8 @@ class ProductController extends Controller
             $query->where('price', '<=', $request->input('max_price'));
         }
 
-        if ($request->has('in_stock')) {
-            if ($request->boolean('in_stock')) {
-                $query->where('stock', '>', 0);
-            }
+        if ($request->has('in_stock') && $request->boolean('in_stock')) {
+            $query->where('stock', '>', 0);
         }
 
         if ($request->has('active')) {

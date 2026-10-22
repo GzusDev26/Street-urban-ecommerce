@@ -39,7 +39,7 @@ class OrderSeeder extends Seeder
 
             $total = 0;
             foreach ($products as $product) {
-                $qty = rand(1, 3);
+                $qty = random_int(1, 3);
                 $subtotal = $product->price * $qty;
                 $total += $subtotal;
 

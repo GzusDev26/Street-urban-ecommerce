@@ -63,7 +63,7 @@ watch(type, () => {
 <template>
   <div>
     <div class="flex items-center justify-between mb-1.5">
-      <label class="text-sm font-semibold text-gray-700">Documento <span class="font-normal text-gray-400">(opcional)</span></label>
+      <label for="campo-documento" class="text-sm font-semibold text-gray-700">Documento <span class="font-normal text-gray-400">(opcional)</span></label>
 
       <div class="inline-flex p-0.5 bg-gray-100 rounded-lg" role="group" aria-label="Tipo de documento">
         <button
@@ -84,6 +84,7 @@ watch(type, () => {
 
     <div class="relative">
       <input
+        id="campo-documento"
         v-model="number"
         type="text"
         inputmode="numeric"
