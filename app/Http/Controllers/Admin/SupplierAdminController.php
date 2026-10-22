@@ -18,6 +18,7 @@ class SupplierAdminController extends Controller
                 'name' => $s->name,
                 'phone' => $s->phone,
                 'email' => $s->email,
+                'address' => $s->address,
                 'registrado' => $s->created_at->format('d/m/Y'),
             ]);
 
@@ -47,11 +48,11 @@ class SupplierAdminController extends Controller
         return redirect()->route('admin.suppliers.index')->with('success', 'Proveedor registrado exitosamente.');
     }
 
-    public function edit(Supplier $supplier)
+    // La edición se hace desde un modal en el índice; esta ruta se deja por si algo la
+    // visita directamente (la genera Route::resource), pero no tiene vista propia.
+    public function edit()
     {
-        return Inertia::render('Admin/Suppliers/Edit', [
-            'supplier' => $supplier,
-        ]);
+        return redirect()->route('admin.suppliers.index');
     }
 
     public function update(Request $request, Supplier $supplier)

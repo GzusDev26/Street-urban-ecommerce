@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\User;
+use App\Services\ApiPeruService;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class CustomerAdminController extends Controller
 {
@@ -20,6 +22,8 @@ class CustomerAdminController extends Controller
             ->map(fn ($c) => [
                 'id' => $c->id,
                 'name' => $c->name,
+                'document_type' => $c->document_type,
+                'document_number' => $c->document_number,
                 'email' => $c->email,
                 'phone' => $c->phone,
                 'activa' => $c->email_verified_at !== null,
@@ -47,6 +51,13 @@ class CustomerAdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'document_type' => 'nullable|in:DNI,RUC|required_with:document_number',
+            'document_number' => [
+                'nullable',
+                'digits_between:8,11',
+                'unique:customers,document_number',
+                fn ($attr, $value, $fail) => $this->documentoValido($request->input('document_type'), $value) ?: $fail('El número no corresponde al tipo de documento.'),
+            ],
             'email' => [
                 'nullable',
                 'email',
@@ -60,6 +71,8 @@ class CustomerAdminController extends Controller
 
         Customer::create([
             'name' => $validated['name'],
+            'document_type' => $validated['document_number'] ?? null ? $validated['document_type'] : null,
+            'document_number' => $validated['document_number'] ?? null,
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make(Str::random(40)),
@@ -68,11 +81,56 @@ class CustomerAdminController extends Controller
         return redirect()->route('admin.customers.index')->with('success', 'Cliente registrado exitosamente.');
     }
 
-    public function edit(Customer $customer)
+    // Autocompleta nombre (y dirección, en RUC) desde RENIEC/SUNAT vía APIPERU.
+    public function consultarDocumento(Request $request, ApiPeruService $apiPeru)
     {
-        return Inertia::render('Admin/Customers/Edit', [
-            'customer' => $customer,
+        $request->validate([
+            'tipo' => 'required|in:DNI,RUC',
+            'numero' => 'required|digits_between:8,11',
+            'excluir' => 'nullable|integer',
         ]);
+
+        if (! $this->documentoValido($request->tipo, $request->numero)) {
+            return response()->json(['message' => 'El número no corresponde al tipo de documento.'], 422);
+        }
+
+        $existente = Customer::where('document_number', $request->numero)
+            ->when($request->excluir, fn ($q, $id) => $q->where('id', '!=', $id))
+            ->first();
+        if ($existente) {
+            return response()->json(['message' => "Ya existe un cliente con ese documento: {$existente->name}."], 409);
+        }
+
+        try {
+            $datos = $request->tipo === 'DNI'
+                ? $apiPeru->dni($request->numero)
+                : $apiPeru->ruc($request->numero);
+        } catch (Throwable $e) {
+            report($e);
+            return response()->json(['message' => 'No se pudo consultar el documento. Ingresa los datos manualmente.'], 422);
+        }
+
+        return response()->json($datos);
+    }
+
+    private function documentoValido(?string $tipo, ?string $numero): bool
+    {
+        if ($numero === null || $numero === '') {
+            return true;
+        }
+
+        return match ($tipo) {
+            'DNI' => preg_match('/^\d{8}$/', $numero) === 1,
+            'RUC' => preg_match('/^(10|20)\d{9}$/', $numero) === 1,
+            default => false,
+        };
+    }
+
+    // La edición se hace desde un modal en el índice; esta ruta se deja por si algo la
+    // visita directamente (la genera Route::resource), pero no tiene vista propia.
+    public function edit()
+    {
+        return redirect()->route('admin.customers.index');
     }
 
     // Historial de compras de un cliente, para el botón aparte en la tabla de Clientes
@@ -121,9 +179,21 @@ class CustomerAdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'document_type' => 'nullable|in:DNI,RUC|required_with:document_number',
+            'document_number' => [
+                'nullable',
+                'digits_between:8,11',
+                Rule::unique('customers', 'document_number')->ignore($customer->id),
+                fn ($attr, $value, $fail) => $this->documentoValido($request->input('document_type'), $value) ?: $fail('El número no corresponde al tipo de documento.'),
+            ],
             'email' => 'nullable|email|unique:customers,email,' . $customer->id,
             'phone' => 'nullable|string|max:20',
         ]);
+
+        if (empty($validated['document_number'])) {
+            $validated['document_type'] = null;
+            $validated['document_number'] = null;
+        }
 
         $customer->update($validated);
 

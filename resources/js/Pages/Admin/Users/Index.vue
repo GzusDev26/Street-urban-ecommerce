@@ -8,106 +8,78 @@
       <div v-if="page.props.flash?.success" class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2">
         <i class="fa-solid fa-circle-check"></i> {{ page.props.flash.success }}
       </div>
-      <div v-if="page.props.errors?.error" class="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2">
-        <i class="fa-solid fa-circle-exclamation"></i> {{ page.props.errors.error }}
-      </div>
 
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">Usuarios del Staff</h3>
-            <p class="text-xs text-gray-400">Quién puede entrar al panel, y qué rol tiene</p>
-          </div>
-          <button
-            @click="showModal = true"
-            class="bg-[#ff8c42] hover:bg-[#ff7a24] text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2"
-          >
-            <i class="fa-solid fa-plus text-xs"></i> Nuevo Usuario
-          </button>
-        </div>
+      <ListCard title="Usuarios del panel" subtitle="Personas de tu equipo con acceso al panel de administración">
+        <template #action>
+          <PrimaryButton @click="showModal = true">Nuevo usuario</PrimaryButton>
+        </template>
 
-        <div class="flex flex-wrap items-center gap-3 mb-5">
-          <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre o email..." class="w-full sm:w-72" />
-          <button
-            v-if="filtroTexto"
-            @click="filtroTexto = ''"
-            class="text-sm font-semibold text-gray-400 hover:text-gray-600 px-3 py-2"
-          >
-            <i class="fa-solid fa-xmark text-xs"></i> Limpiar
-          </button>
-        </div>
+        <template #toolbar>
+          <TabFilter v-model="filtroRol" :tabs="tabs" />
+          <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre o email" class="w-full sm:w-80" />
+        </template>
 
-        <div v-if="usuariosFiltrados.length > 0" class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="border-b border-gray-200">
-              <tr>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Nombre</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Email</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Rol</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="usuario in usuariosPaginados" :key="usuario.id" class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                <td class="py-3 px-4">
-                  <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold text-xs flex-shrink-0 overflow-hidden">
-                      <img v-if="usuario.avatarUrl" :src="usuario.avatarUrl" class="w-full h-full object-cover" />
-                      <template v-else>{{ usuario.name.charAt(0).toUpperCase() }}</template>
-                    </div>
-                    <span class="text-gray-900 font-medium">
-                      {{ usuario.name }}
-                      <span v-if="usuario.esYo" class="text-[11px] text-gray-400 font-normal">(tú)</span>
-                    </span>
-                  </div>
-                </td>
-                <td class="py-3 px-4 text-gray-600">{{ usuario.email }}</td>
-                <td class="py-3 px-4 text-center">
-                  <span
-                    :class="[
-                      'text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap',
-                      usuario.role === 'admin' ? 'bg-orange-100 text-[#ff8c42]' : 'bg-blue-100 text-blue-600',
-                    ]"
-                  >
-                    {{ usuario.role === 'admin' ? 'Administrador' : 'Vendedor' }}
-                  </span>
-                </td>
-                <td class="py-3 px-4">
-                  <div class="flex items-center justify-center gap-2">
-                    <Link
-                      :href="route('admin.users.edit', usuario.id)"
-                      title="Editar"
-                      class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 flex items-center justify-center transition-colors"
-                    >
-                      <i class="fa-solid fa-pen text-xs"></i>
-                    </Link>
-                    <button
-                      v-if="!usuario.esYo"
-                      @click="eliminar(usuario)"
-                      title="Eliminar"
-                      class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 flex items-center justify-center transition-colors"
-                    >
-                      <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <DataTable v-if="usuariosFiltrados.length > 0">
+          <template #head>
+            <tr>
+              <th class="text-left">Usuario</th>
+              <th class="text-left">Rol</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </template>
 
-          <Pagination v-model="paginaActual" :total-items="usuariosFiltrados.length" :per-page="perPage" />
-        </div>
+          <tr v-for="usuario in usuariosPaginados" :key="usuario.id">
+            <td>
+              <div class="flex items-center gap-3.5 min-w-0">
+                <InitialsAvatar :name="usuario.name" :id="usuario.id" :src="usuario.avatarUrl" tone="bg-[#ff8c42] text-white" />
+                <div class="min-w-0">
+                  <p class="font-semibold text-gray-900 truncate max-w-[16rem]">
+                    {{ usuario.name }}
+                    <span v-if="usuario.esYo" class="ml-1 text-[11px] font-semibold text-[#e67e2d] bg-orange-50 rounded px-1.5 py-0.5 align-middle">Tú</span>
+                  </p>
+                  <p class="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5 truncate max-w-[16rem]">
+                    <i class="fa-regular fa-envelope text-gray-400"></i>{{ usuario.email }}
+                  </p>
+                </div>
+              </div>
+            </td>
 
-        <div v-else-if="users.length === 0" class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-user-shield text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Aún no hay usuarios registrados.</p>
-        </div>
+            <td>
+              <StatusPill :tone="usuario.role === 'admin' ? 'orange' : 'blue'">
+                {{ usuario.role === 'admin' ? 'Administrador' : 'Vendedor' }}
+              </StatusPill>
+            </td>
 
-        <div v-else class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Ningún usuario coincide con tu búsqueda.</p>
-        </div>
-      </div>
+            <td>
+              <div class="flex items-center justify-end gap-1">
+                <ActionButton icon="fa-solid fa-pen" label="Editar" tone="blue" @click="editarUsuario(usuario)" />
+                <ActionButton v-if="!usuario.esYo" icon="fa-solid fa-trash" label="Eliminar" tone="red" @click="eliminar(usuario)" />
+              </div>
+            </td>
+          </tr>
+
+          <template #footer>
+            <Pagination v-model="paginaActual" :total-items="usuariosFiltrados.length" :per-page="perPage" />
+          </template>
+        </DataTable>
+
+        <EmptyState
+          v-else-if="users.length === 0"
+          icon="fa-solid fa-user-shield"
+          title="Aún no hay usuarios registrados"
+        >
+          <PrimaryButton @click="showModal = true">Nuevo usuario</PrimaryButton>
+        </EmptyState>
+
+        <EmptyState
+          v-else
+          icon="fa-solid fa-filter-circle-xmark"
+          title="Ningún usuario coincide"
+          text="Prueba con otra búsqueda o cambia el filtro."
+        >
+          <button @click="limpiarFiltros" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar filtros</button>
+        </EmptyState>
+      </ListCard>
     </div>
 
     <ConfirmModal
@@ -123,16 +95,26 @@
     />
 
     <RegistrarUsuarioModal v-if="showModal" @close="showModal = false" />
+    <EditarUsuarioModal v-if="usuarioEditando" :usuario="usuarioEditando" @close="usuarioEditando = null" />
   </AdminLayout>
 </template>
 
 <script setup>
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import ListCard from '@/Components/Admin/ListCard.vue';
+import PrimaryButton from '@/Components/Admin/PrimaryButton.vue';
+import DataTable from '@/Components/Admin/DataTable.vue';
+import ActionButton from '@/Components/Admin/ActionButton.vue';
+import StatusPill from '@/Components/Admin/StatusPill.vue';
+import InitialsAvatar from '@/Components/Admin/InitialsAvatar.vue';
+import EmptyState from '@/Components/Admin/EmptyState.vue';
+import TabFilter from '@/Components/Admin/TabFilter.vue';
 import SearchInput from '@/Components/Admin/SearchInput.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
 import RegistrarUsuarioModal from './RegistrarUsuarioModal.vue';
+import EditarUsuarioModal from './EditarUsuarioModal.vue';
 import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
@@ -142,21 +124,39 @@ const props = defineProps({
 const page = usePage();
 const filtroTexto = ref('');
 const showModal = ref(false);
+const usuarioEditando = ref(null);
+const editarUsuario = (usuario) => {
+  usuarioEditando.value = usuario;
+};
+
+const filtroRol = ref('todos');
+
+const tabs = computed(() => [
+  { value: 'todos', label: 'Todos', count: props.users.length },
+  { value: 'admin', label: 'Administradores', count: props.users.filter((u) => u.role === 'admin').length },
+  { value: 'vendedor', label: 'Vendedores', count: props.users.filter((u) => u.role === 'vendedor').length },
+]);
 
 const usuariosFiltrados = computed(() => {
   const texto = filtroTexto.value.trim().toLowerCase();
-  if (!texto) return props.users;
 
-  return props.users.filter((u) =>
-    u.name.toLowerCase().includes(texto) ||
-    u.email.toLowerCase().includes(texto)
-  );
+  return props.users.filter((u) => {
+    if (filtroRol.value !== 'todos' && u.role !== filtroRol.value) return false;
+    if (!texto) return true;
+
+    return u.name.toLowerCase().includes(texto) || u.email.toLowerCase().includes(texto);
+  });
 });
+
+const limpiarFiltros = () => {
+  filtroTexto.value = '';
+  filtroRol.value = 'todos';
+};
 
 const perPage = 15;
 const paginaActual = ref(1);
 
-watch(filtroTexto, () => {
+watch([filtroTexto, filtroRol], () => {
   paginaActual.value = 1;
 });
 

@@ -41,31 +41,43 @@ const ocultarConRetraso = () => {
       :disabled="disabled"
       @focus="showDropdown = true"
       @blur="ocultarConRetraso"
+      @keydown.esc.stop="showDropdown = false"
       type="text"
+      autocomplete="off"
       :placeholder="placeholder"
-      class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white disabled:bg-gray-100 disabled:text-gray-500"
+      class="w-full h-11 px-4 pr-24 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-500"
     >
+
+    <span
+      v-if="esNuevo"
+      class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[11px] font-bold text-[#e67e2d] bg-orange-50 rounded-md px-2 py-1 pointer-events-none"
+    >
+      <i class="fa-solid fa-circle-plus"></i> Nuevo
+    </span>
 
     <div
       v-if="showDropdown && !disabled"
-      class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-56 overflow-y-auto"
+      role="listbox"
+      class="absolute z-20 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-56 overflow-y-auto"
     >
       <button
-        v-for="(op, idx) in opcionesFiltradas"
+        v-for="op in opcionesFiltradas"
         :key="op"
         type="button"
+        role="option"
+        :aria-selected="model === op"
         @mousedown.prevent="seleccionar(op)"
-        :class="['w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50', idx > 0 ? 'border-t border-gray-50' : '', model === op ? 'text-[#ff8c42] font-semibold' : 'text-gray-600']"
+        :class="[
+          'w-full flex items-center justify-between gap-2 text-left px-3 py-2 rounded-lg text-sm transition-colors',
+          model === op ? 'bg-orange-50 text-[#ff8c42] font-semibold' : 'text-gray-700 hover:bg-gray-50',
+        ]"
       >
-        {{ op }}
+        <span class="truncate">{{ op }}</span>
+        <i v-if="model === op" class="fa-solid fa-check text-xs flex-shrink-0"></i>
       </button>
-      <div v-if="opcionesFiltradas.length === 0" class="px-4 py-3 text-xs text-gray-400">
-        No hay coincidencias
+      <div v-if="opcionesFiltradas.length === 0" class="px-3 py-2.5 text-xs text-gray-400">
+        No hay coincidencias. Se creará como nuevo.
       </div>
     </div>
-
-    <p v-if="esNuevo" class="text-xs text-[#ff8c42] mt-1">
-      <i class="fa-solid fa-circle-plus"></i> Se creará como nuevo
-    </p>
   </div>
 </template>

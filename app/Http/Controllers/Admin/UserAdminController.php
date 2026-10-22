@@ -61,17 +61,11 @@ class UserAdminController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Usuario registrado exitosamente.');
     }
 
-    public function edit(User $user)
+    // La edición se hace desde un modal en el índice; esta ruta se deja por si algo la
+    // visita directamente (la genera Route::resource), pero no tiene vista propia.
+    public function edit()
     {
-        return Inertia::render('Admin/Users/Edit', [
-            'usuario' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-            ],
-            'esYo' => $user->id === Auth::id(),
-        ]);
+        return redirect()->route('admin.users.index');
     }
 
     public function update(Request $request, User $user)

@@ -53,163 +53,153 @@
       </div>
 
       <!-- Table -->
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">Inventario Comprado</h3>
-            <p class="text-xs text-gray-400">Productos y variantes registrados por compras</p>
+      <ListCard title="Inventario comprado" subtitle="Productos y variantes registrados por compras">
+        <template #action>
+          <PrimaryButton @click="showModal = true">Registrar nueva compra</PrimaryButton>
+        </template>
+
+        <template v-if="variants.length > 0" #toolbar>
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <SearchInput v-model="filtroTexto" placeholder="Buscar por modelo o marca" class="w-full sm:w-72" />
+            <SelectDropdown v-model="filtroCategoria" :options="opcionesCategoria" size="sm" class="min-w-[190px]" />
+            <SelectDropdown v-model="filtroStock" :options="opcionesStock" size="sm" class="min-w-[170px]" />
+            <button
+              v-if="hayFiltrosActivos"
+              @click="limpiarFiltros"
+              class="text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
+            >
+              <i class="fa-solid fa-xmark text-xs"></i> Limpiar
+            </button>
           </div>
-          <button
-            @click="showModal = true"
-            class="bg-[#ff8c42] hover:bg-[#ff7a24] text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2"
-          >
-            <i class="fa-solid fa-plus text-xs"></i> Registrar Nueva Compra
-          </button>
-        </div>
+        </template>
 
-        <!-- Filtros -->
-        <div v-if="variants.length > 0" class="flex flex-wrap items-center gap-3 mb-5">
-          <SearchInput
-            v-model="filtroTexto"
-            placeholder="Buscar por modelo o marca..."
-            class="w-full sm:w-64"
-          />
+        <DataTable v-if="variantesFiltradas.length > 0">
+          <template #head>
+            <tr>
+              <th class="text-left">Producto</th>
+              <th class="text-left">Talla</th>
+              <th class="text-left hidden md:table-cell">Color</th>
+              <th class="text-left">Stock</th>
+              <th class="text-right hidden lg:table-cell">Último costo</th>
+              <th class="text-right">P. venta</th>
+              <th class="text-right">Lotes</th>
+            </tr>
+          </template>
 
-          <SelectDropdown
-            v-model="filtroCategoria"
-            :options="opcionesCategoria"
-            class="min-w-[190px]"
-          />
+          <template v-for="v in variantesPaginadas" :key="v.id">
+            <tr>
+              <td>
+                <p class="font-semibold text-gray-900 truncate max-w-[18rem]">{{ v.producto }}</p>
+                <p class="text-xs text-gray-500 mt-0.5 truncate max-w-[18rem]">{{ v.marca }} <span class="text-gray-300">·</span> {{ v.categoria }}</p>
+              </td>
 
-          <SelectDropdown
-            v-model="filtroStock"
-            :options="opcionesStock"
-            class="min-w-[170px]"
-          />
+              <td>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">{{ v.talla }}</span>
+              </td>
 
-          <button
-            v-if="hayFiltrosActivos"
-            @click="limpiarFiltros"
-            class="text-sm font-semibold text-gray-400 hover:text-gray-600 px-3 py-2 flex items-center gap-1.5"
-          >
-            <i class="fa-solid fa-xmark text-xs"></i> Limpiar
-          </button>
-        </div>
+              <td class="hidden md:table-cell">
+                <div class="flex items-center gap-2">
+                  <ColorSwatch :hex="v.colorHex" class="w-5 h-5 rounded-full border border-gray-200" />
+                  <span class="text-gray-700">{{ v.color }}</span>
+                </div>
+              </td>
 
-        <div v-if="variantesFiltradas.length > 0" class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="border-b border-gray-200">
-              <tr>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Categoría</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Marca</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Modelo</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Talla</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Color</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Stock</th>
-                <th class="text-right py-3 px-4 font-semibold text-gray-500">Último Costo</th>
-                <th class="text-right py-3 px-4 font-semibold text-gray-500">P.Venta</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Lotes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="v in variantesPaginadas" :key="v.id">
-                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td class="py-3 px-4 text-gray-600">{{ v.categoria }}</td>
-                  <td class="py-3 px-4 text-gray-600">{{ v.marca }}</td>
-                  <td class="py-3 px-4 text-gray-900 font-medium">{{ v.producto }}</td>
-                  <td class="py-3 px-4 text-gray-600">{{ v.talla }}</td>
-                  <td class="py-3 px-4">
-                    <div class="flex items-center gap-2">
-                      <ColorSwatch :hex="v.colorHex" class="w-5 h-5 rounded-full border border-gray-200" />
-                      <span class="text-gray-600">{{ v.color }}</span>
-                    </div>
-                  </td>
-                  <td class="py-3 px-4 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                      <span
-                        :class="[
-                          'text-xs font-bold px-2.5 py-1 rounded-full',
-                          v.stock === 0 ? 'bg-red-100 text-red-500' : v.stock < umbralStockBajo.value ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600',
-                        ]"
-                      >
-                        {{ v.stock === 0 ? 'Sin stock' : v.stock }}
-                      </span>
-                      <button
-                        @click="reabastecer(v)"
-                        title="Reabastecer stock"
-                        class="w-6 h-6 rounded-full bg-orange-50 hover:bg-[#ff8c42] text-[#ff8c42] hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                      >
-                        <i class="fa-solid fa-plus text-[10px]"></i>
-                      </button>
-                    </div>
-                  </td>
-                  <td class="py-3 px-4 text-right text-gray-900">S/ {{ v.precioCompra.toFixed(2) }}</td>
-                  <td class="py-3 px-4 text-right text-gray-900 font-semibold">S/ {{ v.precioVenta.toFixed(2) }}</td>
-                  <td class="py-3 px-4 text-center">
-                    <button
-                      @click="toggleLotes(v.id)"
-                      class="text-gray-400 hover:text-[#ff8c42] transition-colors"
-                      title="Ver lotes de compra"
-                    >
-                      <i :class="['fa-solid', expandedVariantId === v.id ? 'fa-chevron-up' : 'fa-layer-group']"></i>
-                    </button>
-                  </td>
-                </tr>
+              <td>
+                <div class="flex items-center gap-2">
+                  <span
+                    :class="[
+                      'text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap',
+                      v.stock === 0 ? 'bg-red-100 text-red-500' : v.stock < umbralStockBajo ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600',
+                    ]"
+                  >
+                    {{ v.stock === 0 ? 'Sin stock' : v.stock }}
+                  </span>
+                  <button
+                    @click="reabastecer(v)"
+                    title="Reabastecer stock"
+                    aria-label="Reabastecer stock"
+                    class="w-6 h-6 rounded-full bg-orange-50 hover:bg-[#ff8c42] text-[#ff8c42] hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                  >
+                    <i class="fa-solid fa-plus text-[10px]"></i>
+                  </button>
+                </div>
+              </td>
 
-                <tr v-if="expandedVariantId === v.id" class="bg-gray-50">
-                  <td colspan="9" class="px-6 py-4">
-                    <div v-if="loadingLotes" class="text-xs text-gray-400 py-2">Cargando lotes...</div>
-                    <div v-else-if="(lotesCache[v.id] || []).length === 0" class="text-xs text-gray-400 py-2">
-                      Sin lotes registrados.
-                    </div>
-                    <table v-else class="w-full text-xs">
-                      <thead>
-                        <tr class="text-gray-400">
-                          <th class="text-left py-1.5 pr-4 font-semibold">N° Compra</th>
-                          <th class="text-left py-1.5 pr-4 font-semibold">Fecha</th>
-                          <th class="text-left py-1.5 pr-4 font-semibold">Proveedor</th>
-                          <th class="text-center py-1.5 pr-4 font-semibold">Comprado</th>
-                          <th class="text-center py-1.5 pr-4 font-semibold">Restante</th>
-                          <th class="text-right py-1.5 font-semibold">Costo Unit.</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="lote in lotesCache[v.id]" :key="lote.id" class="border-t border-gray-100">
-                          <td class="py-2 pr-4">
-                            <span class="font-mono text-[11px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{{ lote.numeroCompra }}</span>
-                          </td>
-                          <td class="py-2 pr-4 text-gray-600">{{ lote.fecha }}</td>
-                          <td class="py-2 pr-4 text-gray-600">{{ lote.proveedor || '—' }}</td>
-                          <td class="py-2 pr-4 text-center text-gray-900">{{ lote.cantidad }}</td>
-                          <td class="py-2 pr-4 text-center font-semibold" :class="lote.cantidadRestante === 0 ? 'text-red-400' : 'text-gray-900'">
-                            {{ lote.cantidadRestante }}
-                          </td>
-                          <td class="py-2 text-right text-gray-900">S/ {{ lote.costoUnitario.toFixed(2) }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
+              <td class="text-right text-gray-600 tabular-nums whitespace-nowrap hidden lg:table-cell">S/ {{ v.precioCompra.toFixed(2) }}</td>
+              <td class="text-right text-gray-900 font-semibold tabular-nums whitespace-nowrap">S/ {{ v.precioVenta.toFixed(2) }}</td>
 
-          <Pagination v-model="paginaActual" :total-items="variantesFiltradas.length" :per-page="perPage" />
-        </div>
+              <td>
+                <div class="flex justify-end">
+                  <ActionButton
+                    :icon="expandedVariantId === v.id ? 'fa-solid fa-chevron-up' : 'fa-solid fa-layer-group'"
+                    label="Ver lotes de compra"
+                    tone="gray"
+                    :aria-expanded="expandedVariantId === v.id"
+                    @click="toggleLotes(v.id)"
+                  />
+                </div>
+              </td>
+            </tr>
 
-        <div v-else-if="variants.length === 0" class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-box text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Aún no hay productos registrados por compra.</p>
-        </div>
+            <tr v-if="expandedVariantId === v.id" class="!bg-gray-50/70">
+              <td colspan="7" class="!px-6 !py-4">
+                <div v-if="loadingLotes" class="text-xs text-gray-400 py-2">Cargando lotes...</div>
+                <div v-else-if="(lotesCache[v.id] || []).length === 0" class="text-xs text-gray-400 py-2">
+                  Sin lotes registrados.
+                </div>
+                <table v-else class="w-full text-xs">
+                  <thead>
+                    <tr class="text-gray-400">
+                      <th class="text-left py-1.5 pr-4 font-semibold">N° Compra</th>
+                      <th class="text-left py-1.5 pr-4 font-semibold">Fecha</th>
+                      <th class="text-left py-1.5 pr-4 font-semibold">Proveedor</th>
+                      <th class="text-center py-1.5 pr-4 font-semibold">Comprado</th>
+                      <th class="text-center py-1.5 pr-4 font-semibold">Restante</th>
+                      <th class="text-right py-1.5 font-semibold">Costo Unit.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="lote in lotesCache[v.id]" :key="lote.id" class="border-t border-gray-100">
+                      <td class="py-2 pr-4">
+                        <span class="font-mono text-[11px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{{ lote.numeroCompra }}</span>
+                      </td>
+                      <td class="py-2 pr-4 text-gray-600">{{ lote.fecha }}</td>
+                      <td class="py-2 pr-4 text-gray-600">{{ lote.proveedor || '—' }}</td>
+                      <td class="py-2 pr-4 text-center text-gray-900">{{ lote.cantidad }}</td>
+                      <td class="py-2 pr-4 text-center font-semibold" :class="lote.cantidadRestante === 0 ? 'text-red-400' : 'text-gray-900'">
+                        {{ lote.cantidadRestante }}
+                      </td>
+                      <td class="py-2 text-right text-gray-900">S/ {{ lote.costoUnitario.toFixed(2) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </template>
 
-        <div v-else class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Ningún producto coincide con estos filtros.</p>
-          <button @click="limpiarFiltros" class="text-sm font-semibold text-[#ff8c42] hover:text-[#ff7a24] mt-2">
-            Limpiar filtros
-          </button>
-        </div>
-      </div>
+          <template #footer>
+            <Pagination v-model="paginaActual" :total-items="variantesFiltradas.length" :per-page="perPage" />
+          </template>
+        </DataTable>
+
+        <EmptyState
+          v-else-if="variants.length === 0"
+          icon="fa-solid fa-box"
+          title="Aún no hay productos registrados por compra"
+          text="Registra tu primera compra para empezar a llenar el inventario."
+        >
+          <PrimaryButton @click="showModal = true">Registrar nueva compra</PrimaryButton>
+        </EmptyState>
+
+        <EmptyState
+          v-else
+          icon="fa-solid fa-filter-circle-xmark"
+          title="Ningún producto coincide"
+          text="Prueba con otra búsqueda o cambia los filtros."
+        >
+          <button @click="limpiarFiltros" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar filtros</button>
+        </EmptyState>
+      </ListCard>
     </div>
 
     <RegistrarCompraModal v-if="showModal" :categorias-existentes="categorias" :marcas-existentes="marcas" :prefill="prefillData" @close="cerrarModal" />
@@ -221,6 +211,11 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import RegistrarCompraModal from './RegistrarCompraModal.vue';
 import { ref, computed, watch } from 'vue';
 import { Head, usePage, Link } from '@inertiajs/vue3';
+import ListCard from '@/Components/Admin/ListCard.vue';
+import PrimaryButton from '@/Components/Admin/PrimaryButton.vue';
+import DataTable from '@/Components/Admin/DataTable.vue';
+import ActionButton from '@/Components/Admin/ActionButton.vue';
+import EmptyState from '@/Components/Admin/EmptyState.vue';
 import SearchInput from '@/Components/Admin/SearchInput.vue';
 import SelectDropdown from '@/Components/Admin/SelectDropdown.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';

@@ -2,6 +2,10 @@
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import SearchCreateInput from '@/Components/Admin/SearchCreateInput.vue';
+import ModalShell from '@/Components/Admin/ModalShell.vue';
+import FormField from '@/Components/Admin/FormField.vue';
+import FormInput from '@/Components/Admin/FormInput.vue';
+import FormTextarea from '@/Components/Admin/FormTextarea.vue';
 
 const props = defineProps({
   categoriasExistentes: { type: Array, default: () => [] },
@@ -71,105 +75,83 @@ const guardar = () => {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="emit('close')">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+  <ModalShell
+    :title="editando ? 'Editar modelo' : 'Nuevo modelo'"
+    subtitle="Categoría, marca y modelo: la identidad del producto"
+    :icon="editando ? 'fa-solid fa-pen' : 'fa-solid fa-shirt'"
+    :submit-text="editando ? 'Guardar cambios' : 'Registrar modelo'"
+    :saving="isSaving"
+    :error="error"
+    @close="emit('close')"
+    @submit="guardar"
+  >
+    <FormField label="Categoría">
+      <SearchCreateInput v-model="form.categoria" :options="categoriasExistentes" placeholder="Ej: Calzado" />
+      <FormTextarea
+        v-if="categoriaEsNueva"
+        v-model="form.categoriaDescripcion"
+        placeholder="Descripción de la categoría (opcional)"
+        rows="2"
+        class="mt-2"
+      />
+    </FormField>
+
+    <FormField label="Marca">
+      <SearchCreateInput v-model="form.marca" :options="marcasExistentes" placeholder="Ej: Adidas" />
+      <FormTextarea
+        v-if="marcaEsNueva"
+        v-model="form.marcaDescripcion"
+        placeholder="Descripción de la marca (opcional)"
+        rows="2"
+        class="mt-2"
+      />
+    </FormField>
+
+    <FormField label="Modelo">
+      <FormInput v-model="form.nombre" type="text" placeholder="Ej: All Star" />
+      <FormTextarea
+        v-model="form.descripcion"
+        placeholder="Descripción del modelo (opcional)"
+        rows="2"
+        class="mt-2"
+      />
+    </FormField>
+
+    <section v-if="!editando" class="rounded-2xl bg-gray-50 border border-gray-100 p-4 space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-white text-[#ff8c42] shadow-sm flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-layer-group text-sm"></i>
+        </div>
         <div>
-          <h2 class="text-xl font-bold text-gray-900">{{ editando ? 'Editar Modelo' : 'Registrar Nuevo Modelo' }}</h2>
-          <p class="text-xs text-gray-400">Categoría, marca y modelo — la identidad del producto</p>
-        </div>
-        <button @click="emit('close')" class="p-2 hover:bg-gray-100 rounded-lg transition">
-          <i class="fa-solid fa-xmark text-gray-500"></i>
-        </button>
-      </div>
-
-      <div class="p-6 space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
-          <SearchCreateInput v-model="form.categoria" :options="categoriasExistentes" placeholder="Ej: Calzado" />
-          <textarea
-            v-if="categoriaEsNueva"
-            v-model="form.categoriaDescripcion"
-            placeholder="Descripción de la categoría (opcional)"
-            rows="2"
-            class="w-full mt-2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white resize-none"
-          ></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Marca</label>
-          <SearchCreateInput v-model="form.marca" :options="marcasExistentes" placeholder="Ej: Adidas" />
-          <textarea
-            v-if="marcaEsNueva"
-            v-model="form.marcaDescripcion"
-            placeholder="Descripción de la marca (opcional)"
-            rows="2"
-            class="w-full mt-2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white resize-none"
-          ></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Modelo</label>
-          <input
-            v-model="form.nombre"
-            type="text"
-            placeholder="Ej: All Star"
-            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
-          >
-          <textarea
-            v-model="form.descripcion"
-            placeholder="Descripción del modelo (opcional)"
-            rows="2"
-            class="w-full mt-2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white resize-none"
-          ></textarea>
-        </div>
-
-        <div v-if="!editando" class="border-t border-gray-100 pt-5 space-y-4">
-          <div>
-            <h3 class="text-sm font-bold text-gray-800">Variante inicial</h3>
-            <p class="text-xs text-gray-400 mt-1">Si el producto es de tipo único, conserva los valores predeterminados.</p>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
-              <input v-model="form.color" required maxlength="50" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Código de color (opcional)</label>
-              <input v-model="form.colorHex" type="color" class="w-full h-10 px-1 border border-gray-200 rounded-lg bg-white">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Talla</label>
-              <input v-model="form.talla" required maxlength="20" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Precio de venta (S/)</label>
-              <input v-model="form.precio" type="number" min="0.01" step="0.01" required class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Stock inicial</label>
-              <input v-model="form.stock" type="number" min="0" step="1" required class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white">
-            </div>
-          </div>
-        </div>
-
-        <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 text-sm">
-          {{ error }}
+          <h3 class="text-sm font-bold text-gray-900">Variante inicial</h3>
+          <p class="text-xs text-gray-500 mt-0.5">Si el producto es de tipo único, conserva los valores predeterminados.</p>
         </div>
       </div>
 
-      <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-        <button @click="emit('close')" :disabled="isSaving" class="text-sm font-semibold text-gray-500 hover:text-gray-700 disabled:opacity-50 px-5 py-3 rounded-xl hover:bg-gray-100 transition-colors">
-          Cancelar
-        </button>
-        <button
-          @click="guardar"
-          :disabled="isSaving"
-          class="flex items-center gap-2 bg-gradient-to-r from-[#ff8c42] to-[#e67e2d] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm py-3 px-8 rounded-xl transition-all duration-200 shadow-sm"
-        >
-          <i class="fa-solid fa-save"></i> {{ isSaving ? 'Guardando...' : 'Guardar' }}
-        </button>
+      <div class="grid grid-cols-2 gap-3">
+        <FormField label="Color">
+          <FormInput v-model="form.color" required maxlength="50" />
+        </FormField>
+
+        <FormField label="Código de color" optional>
+          <label class="flex items-center gap-2.5 h-11 px-2.5 rounded-xl border border-gray-200 bg-white hover:border-gray-300 cursor-pointer transition">
+            <input v-model="form.colorHex" type="color" class="w-7 h-7 rounded-lg border-0 p-0 bg-transparent cursor-pointer">
+            <span class="text-sm text-gray-600 font-mono uppercase">{{ form.colorHex }}</span>
+          </label>
+        </FormField>
+
+        <FormField label="Talla">
+          <FormInput v-model="form.talla" required maxlength="20" />
+        </FormField>
+
+        <FormField label="Precio de venta">
+          <FormInput v-model="form.precio" type="number" min="0.01" step="0.01" required placeholder="0.00" prefix="S/" />
+        </FormField>
+
+        <FormField label="Stock inicial" class="col-span-2">
+          <FormInput v-model="form.stock" type="number" min="0" step="1" required />
+        </FormField>
       </div>
-    </div>
-  </div>
+    </section>
+  </ModalShell>
 </template>

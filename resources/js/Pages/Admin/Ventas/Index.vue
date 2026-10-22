@@ -56,29 +56,16 @@
       </div>
 
       <!-- List -->
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">Ventas Registradas</h3>
-            <p class="text-xs text-gray-400">Historial de ventas y prendas despachadas</p>
-          </div>
-          <Link
-            :href="route('admin.sales.create')"
-            class="bg-[#ff8c42] hover:bg-[#ff7a24] text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2"
-          >
-            <i class="fa-solid fa-plus text-xs"></i> Registrar Venta
-          </Link>
-        </div>
+      <ListCard title="Ventas registradas" subtitle="Historial de ventas y prendas despachadas">
+        <template #action>
+          <PrimaryButton :href="route('admin.sales.create')">Registrar venta</PrimaryButton>
+        </template>
 
-        <div class="mb-5">
-          <SearchInput
-            v-model="filtroTexto"
-            placeholder="Buscar por producto, cliente o N° de venta..."
-            class="w-full sm:w-80"
-          />
-        </div>
+        <template #toolbar>
+          <SearchInput v-model="filtroTexto" placeholder="Buscar por producto, cliente o N° de venta" class="w-full sm:w-96" />
+        </template>
 
-        <div v-if="ventasFiltradas.length > 0" class="space-y-3">
+        <div v-if="ventasFiltradas.length > 0" class="space-y-3 px-6 pb-6">
           <div
             v-for="venta in ventasPaginadas"
             :key="venta.id"
@@ -91,7 +78,7 @@
           >
             <button
               @click="toggleExpand(venta.id)"
-              class="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors text-left"
+              class="w-full flex items-center justify-between px-5 py-4 hover:bg-orange-50/40 transition-colors text-left"
             >
               <div class="flex items-center gap-4 min-w-0">
                 <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded flex-shrink-0">{{ venta.numero }}</span>
@@ -201,16 +188,24 @@
           <Pagination v-model="paginaActual" :total-items="ventasFiltradas.length" :per-page="perPage" />
         </div>
 
-        <div v-else-if="ventas.length === 0" class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-cash-register text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Aún no hay ventas registradas.</p>
-        </div>
+        <EmptyState
+          v-else-if="ventas.length === 0"
+          icon="fa-solid fa-cash-register"
+          title="Aún no hay ventas registradas"
+          text="Cuando registres la primera venta aparecerá aquí."
+        >
+          <PrimaryButton :href="route('admin.sales.create')">Registrar venta</PrimaryButton>
+        </EmptyState>
 
-        <div v-else class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Ninguna venta coincide con tu búsqueda.</p>
-        </div>
-      </div>
+        <EmptyState
+          v-else
+          icon="fa-solid fa-filter-circle-xmark"
+          title="Ninguna venta coincide"
+          text="Prueba con otra búsqueda."
+        >
+          <button @click="filtroTexto = ''" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar búsqueda</button>
+        </EmptyState>
+      </ListCard>
     </div>
 
     <ConfirmModal
@@ -231,6 +226,9 @@
 
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import ListCard from '@/Components/Admin/ListCard.vue';
+import PrimaryButton from '@/Components/Admin/PrimaryButton.vue';
+import EmptyState from '@/Components/Admin/EmptyState.vue';
 import SearchInput from '@/Components/Admin/SearchInput.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';

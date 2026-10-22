@@ -13,198 +13,179 @@
         <i class="fa-solid fa-circle-exclamation"></i> {{ page.props.errors.error }}
       </div>
 
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">Modelos Registrados</h3>
-            <p class="text-xs text-gray-400">Categoría, marca y modelo de cada producto — la identidad base del catálogo</p>
+      <ListCard title="Modelos registrados" subtitle="Categoría, marca y modelo de cada producto: la identidad base del catálogo">
+        <template #action>
+          <PrimaryButton @click="abrirCrear">Registrar modelo</PrimaryButton>
+        </template>
+
+        <template #toolbar>
+          <div class="flex flex-wrap items-center gap-3 w-full">
+            <SearchInput v-model="filtroTexto" placeholder="Buscar por modelo o marca" class="w-full sm:w-72" />
+            <SelectDropdown v-model="filtroCategoria" :options="opcionesCategoria" size="sm" class="min-w-[190px]" />
+            <SelectDropdown v-model="filtroMarca" :options="opcionesMarca" size="sm" class="min-w-[170px]" />
+            <button
+              v-if="filtroTexto || filtroCategoria || filtroMarca"
+              @click="filtroTexto = ''; filtroCategoria = ''; filtroMarca = ''"
+              class="text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
+            >
+              <i class="fa-solid fa-xmark text-xs"></i> Limpiar
+            </button>
           </div>
-          <button
-            @click="abrirCrear"
-            class="bg-[#ff8c42] hover:bg-[#ff7a24] text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2"
-          >
-            <i class="fa-solid fa-plus text-xs"></i> Registrar Modelo
-          </button>
-        </div>
+        </template>
 
-        <!-- Filtros -->
-        <div class="flex flex-wrap items-center gap-3 mb-5">
-          <SearchInput v-model="filtroTexto" placeholder="Buscar por modelo o marca..." class="w-full sm:w-64" />
-          <SelectDropdown v-model="filtroCategoria" :options="opcionesCategoria" class="min-w-[190px]" />
-          <SelectDropdown v-model="filtroMarca" :options="opcionesMarca" class="min-w-[170px]" />
-          <button
-            v-if="filtroTexto || filtroCategoria || filtroMarca"
-            @click="filtroTexto = ''; filtroCategoria = ''; filtroMarca = ''"
-            class="text-sm font-semibold text-gray-400 hover:text-gray-600 px-3 py-2"
-          >
-            <i class="fa-solid fa-xmark text-xs"></i> Limpiar
-          </button>
-        </div>
+        <DataTable v-if="productosFiltrados.length > 0">
+          <template #head>
+            <tr>
+              <th class="text-left">Modelo</th>
+              <th class="text-left hidden md:table-cell">Tallas</th>
+              <th class="text-left">Colores</th>
+              <th class="text-left">Stock</th>
+              <th class="text-right hidden sm:table-cell">P. venta</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </template>
 
-        <div v-if="productosFiltrados.length > 0" class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="border-b border-gray-200">
-              <tr>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Categoría</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Marca</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Modelo</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Tallas</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Variantes</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Stock Total</th>
-                <th class="text-right py-3 px-4 font-semibold text-gray-500">P.Venta</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="p in productosPaginados" :key="p.id">
-                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td class="py-3 px-4 text-gray-600">{{ p.categoria }}</td>
-                  <td class="py-3 px-4 text-gray-600">{{ p.marca }}</td>
-                  <td class="py-3 px-4 text-gray-900 font-medium">{{ p.nombre }}</td>
-                  <td class="py-3 px-4">
-                    <div v-if="p.tallas.length > 0" class="flex flex-wrap gap-1">
-                      <span
-                        v-for="talla in p.tallas"
-                        :key="talla"
-                        class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500"
-                      >
-                        {{ talla }}
-                      </span>
-                    </div>
-                    <span v-else class="text-xs text-gray-300">—</span>
-                  </td>
-                  <td class="py-3 px-4 text-center">
+          <template v-for="p in productosPaginados" :key="p.id">
+            <tr :class="!p.activo ? 'opacity-60' : ''">
+              <td>
+                <div class="min-w-0">
+                  <p class="font-semibold text-gray-900 truncate max-w-[18rem]">
+                    {{ p.nombre }}
+                    <span v-if="!p.activo" class="ml-1 text-[10px] font-bold text-gray-500 bg-gray-100 rounded px-1.5 py-0.5 align-middle">De baja</span>
+                  </p>
+                  <p class="text-xs text-gray-500 mt-0.5 truncate max-w-[18rem]">{{ p.marca }} <span class="text-gray-300">·</span> {{ p.categoria }}</p>
+                </div>
+              </td>
+
+              <td class="hidden md:table-cell">
+                <div v-if="p.tallas.length > 0" class="flex flex-wrap gap-1 max-w-[14rem]">
+                  <span
+                    v-for="talla in p.tallas"
+                    :key="talla"
+                    class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600"
+                  >
+                    {{ talla }}
+                  </span>
+                </div>
+                <span v-else class="text-gray-300">—</span>
+              </td>
+
+              <td>
+                <button
+                  @click="toggleVariantes(p.id)"
+                  :aria-expanded="expandedProductId === p.id"
+                  class="inline-flex items-center gap-2 text-gray-700 hover:text-[#ff8c42] hover:bg-orange-50 -mx-2 px-2 py-1 rounded-lg transition-colors"
+                  title="Ver colores registrados"
+                >
+                  {{ p.variantes }} color{{ p.variantes === 1 ? '' : 'es' }}
+                  <i :class="['fa-solid fa-chevron-down text-[10px] transition-transform duration-150', expandedProductId === p.id ? 'rotate-180' : '']"></i>
+                </button>
+              </td>
+
+              <td>
+                <span :class="['text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap', claseStock(p.stock)]">
+                  {{ p.stock === 0 ? 'Sin stock' : p.stock }}
+                </span>
+              </td>
+
+              <td class="text-right text-gray-900 font-medium tabular-nums whitespace-nowrap hidden sm:table-cell">
+                S/ {{ p.precioVenta.toFixed(2) }}<span v-if="p.precioVentaMax" class="text-gray-400 font-normal"> – {{ p.precioVentaMax.toFixed(2) }}</span>
+              </td>
+
+              <td>
+                <div class="flex items-center justify-end gap-1">
+                  <ActionButton icon="fa-solid fa-palette" label="Colores" tone="purple" @click="abrirColores(p)" />
+                  <ActionButton icon="fa-solid fa-pen" label="Editar" tone="blue" @click="abrirEditar(p)" />
+                  <ActionButton v-if="p.activo" icon="fa-solid fa-box-archive" label="Dar de baja" tone="red" @click="darDeBaja(p)" />
+                  <ActionButton v-else icon="fa-solid fa-rotate-left" label="Restaurar producto" tone="gray" @click="restaurar(p)" />
+                </div>
+              </td>
+            </tr>
+
+            <tr v-if="expandedProductId === p.id" class="!bg-gray-50/70">
+              <td colspan="6" class="!px-6 !py-4">
+                <div v-if="loadingVariantes" class="text-xs text-gray-400 py-2">Cargando variantes...</div>
+                <div v-else-if="(variantesCache[p.id] || []).length === 0" class="text-xs text-gray-400 py-2">
+                  Este modelo aún no tiene colores registrados — agrégalos desde el ícono de paleta.
+                </div>
+                <div v-else class="space-y-2">
+                  <div v-for="c in variantesCache[p.id]" :key="c.id" class="bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <button
-                      @click="toggleVariantes(p.id)"
-                      class="inline-flex items-center gap-1.5 text-gray-600 hover:text-[#ff8c42] transition-colors"
-                      title="Ver colores registrados"
+                      @click="expandedColorId = expandedColorId === c.id ? null : c.id"
+                      class="w-full flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
                     >
-                      {{ p.variantes }} color{{ p.variantes === 1 ? '' : 'es' }}
-                      <i :class="['fa-solid text-xs', expandedProductId === p.id ? 'fa-chevron-up' : 'fa-layer-group']"></i>
-                    </button>
-                  </td>
-                  <td class="py-3 px-4 text-center">
-                    <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', claseStock(p.stock)]">
-                      {{ p.stock === 0 ? 'Sin stock' : p.stock }}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 text-right text-gray-900">
-                    S/ {{ p.precioVenta.toFixed(2) }}<span v-if="p.precioVentaMax"> - {{ p.precioVentaMax.toFixed(2) }}</span>
-                  </td>
-                  <td class="py-3 px-4">
-                    <div class="flex items-center justify-center gap-2">
-                      <button
-                        @click="abrirColores(p)"
-                        title="Colores"
-                        class="w-8 h-8 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-500 hover:text-purple-600 flex items-center justify-center transition-colors"
-                      >
-                        <i class="fa-solid fa-palette text-xs"></i>
-                      </button>
-                      <button
-                        @click="abrirEditar(p)"
-                        title="Editar"
-                        class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 flex items-center justify-center transition-colors"
-                      >
-                        <i class="fa-solid fa-pen text-xs"></i>
-                      </button>
-                      <button
-                        v-if="p.activo"
-                        @click="darDeBaja(p)"
-                        title="Dar de baja"
-                        class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 flex items-center justify-center transition-colors"
-                      >
-                        <i class="fa-solid fa-box-archive text-xs"></i>
-                      </button>
-                      <button
-                        v-else
-                        @click="restaurar(p)"
-                        title="Restaurar producto"
-                        class="w-8 h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center transition-colors"
-                      >
-                        <i class="fa-solid fa-rotate-left text-xs"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr v-if="expandedProductId === p.id" class="bg-gray-50">
-                  <td colspan="8" class="px-6 py-4">
-                    <div v-if="loadingVariantes" class="text-xs text-gray-400 py-2">Cargando variantes...</div>
-                    <div v-else-if="(variantesCache[p.id] || []).length === 0" class="text-xs text-gray-400 py-2">
-                      Este modelo aún no tiene colores registrados — agrégalos desde el ícono de paleta.
-                    </div>
-                    <div v-else class="space-y-2">
-                      <div v-for="c in variantesCache[p.id]" :key="c.id" class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                        <button
-                          @click="expandedColorId = expandedColorId === c.id ? null : c.id"
-                          class="w-full flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
-                        >
-                          <div class="flex items-center gap-2 flex-wrap min-w-0">
-                            <ColorSwatch :hex="c.hex" class="w-3.5 h-3.5 rounded-full border border-gray-200 flex-shrink-0" />
-                            <span class="text-sm font-medium text-gray-800 flex-shrink-0">{{ c.nombre }}</span>
-                            <div v-if="c.tallas.length > 0" class="flex flex-wrap gap-1">
-                              <span
-                                v-for="t in c.tallas"
-                                :key="t.id"
-                                class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500"
-                              >
-                                {{ t.talla }}
-                              </span>
-                            </div>
-                            <span v-else class="text-xs text-gray-400">Sin tallas</span>
-                          </div>
-                          <div class="flex items-center gap-3 flex-shrink-0">
-                            <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', claseStock(c.stockTotal)]">
-                              {{ c.stockTotal === 0 ? 'Sin stock' : c.stockTotal }}
-                            </span>
-                            <i :class="['fa-solid text-xs text-gray-400', expandedColorId === c.id ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-                          </div>
-                        </button>
-
-                        <table v-if="expandedColorId === c.id" class="w-full text-xs border-t border-gray-100">
-                          <thead>
-                            <tr class="text-gray-400">
-                              <th class="text-left py-1.5 px-4 font-semibold">Talla</th>
-                              <th class="text-center py-1.5 px-4 font-semibold">Stock</th>
-                              <th class="text-right py-1.5 px-4 font-semibold">Costo Ref.</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr v-if="c.tallas.length === 0">
-                              <td colspan="3" class="py-2 px-4 text-gray-400">Sin tallas registradas — se crean al registrar una compra.</td>
-                            </tr>
-                            <tr v-for="t in c.tallas" :key="t.id" class="border-t border-gray-50">
-                              <td class="py-2 px-4 text-gray-900 font-medium">{{ t.talla }}</td>
-                              <td class="py-2 px-4 text-center">
-                                <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', claseStock(t.stock)]">
-                                  {{ t.stock === 0 ? 'Sin stock' : t.stock }}
-                                </span>
-                              </td>
-                              <td class="py-2 px-4 text-right text-gray-900">S/ {{ t.costo.toFixed(2) }}</td>
-                            </tr>
-                          </tbody>
-                        </table>
+                      <div class="flex items-center gap-2 flex-wrap min-w-0">
+                        <ColorSwatch :hex="c.hex" class="w-3.5 h-3.5 rounded-full border border-gray-200 flex-shrink-0" />
+                        <span class="text-sm font-medium text-gray-800 flex-shrink-0">{{ c.nombre }}</span>
+                        <div v-if="c.tallas.length > 0" class="flex flex-wrap gap-1">
+                          <span
+                            v-for="t in c.tallas"
+                            :key="t.id"
+                            class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500"
+                          >
+                            {{ t.talla }}
+                          </span>
+                        </div>
+                        <span v-else class="text-xs text-gray-400">Sin tallas</span>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
+                      <div class="flex items-center gap-3 flex-shrink-0">
+                        <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', claseStock(c.stockTotal)]">
+                          {{ c.stockTotal === 0 ? 'Sin stock' : c.stockTotal }}
+                        </span>
+                        <i :class="['fa-solid text-xs text-gray-400', expandedColorId === c.id ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+                      </div>
+                    </button>
 
-          <Pagination v-model="paginaActual" :total-items="productosFiltrados.length" :per-page="perPage" />
-        </div>
+                    <table v-if="expandedColorId === c.id" class="w-full text-xs border-t border-gray-100">
+                      <thead>
+                        <tr class="text-gray-400">
+                          <th class="text-left py-1.5 px-4 font-semibold">Talla</th>
+                          <th class="text-center py-1.5 px-4 font-semibold">Stock</th>
+                          <th class="text-right py-1.5 px-4 font-semibold">Costo Ref.</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-if="c.tallas.length === 0">
+                          <td colspan="3" class="py-2 px-4 text-gray-400">Sin tallas registradas — se crean al registrar una compra.</td>
+                        </tr>
+                        <tr v-for="t in c.tallas" :key="t.id" class="border-t border-gray-50">
+                          <td class="py-2 px-4 text-gray-900 font-medium">{{ t.talla }}</td>
+                          <td class="py-2 px-4 text-center">
+                            <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', claseStock(t.stock)]">
+                              {{ t.stock === 0 ? 'Sin stock' : t.stock }}
+                            </span>
+                          </td>
+                          <td class="py-2 px-4 text-right text-gray-900">S/ {{ t.costo.toFixed(2) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </template>
 
-        <div v-else-if="productos.length === 0" class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-book text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Aún no hay modelos registrados en el catálogo.</p>
-        </div>
+          <template #footer>
+            <Pagination v-model="paginaActual" :total-items="productosFiltrados.length" :per-page="perPage" />
+          </template>
+        </DataTable>
 
-        <div v-else class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Ningún modelo coincide con estos filtros.</p>
-        </div>
-      </div>
+        <EmptyState
+          v-else-if="productos.length === 0"
+          icon="fa-solid fa-book"
+          title="Aún no hay modelos registrados"
+          text="Registra el primer modelo para empezar a armar el catálogo."
+        >
+          <PrimaryButton @click="abrirCrear">Registrar modelo</PrimaryButton>
+        </EmptyState>
+
+        <EmptyState
+          v-else
+          icon="fa-solid fa-filter-circle-xmark"
+          title="Ningún modelo coincide"
+          text="Prueba con otra búsqueda o cambia los filtros."
+        />
+      </ListCard>
     </div>
 
     <RegistrarModeloModal
@@ -227,6 +208,11 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import RegistrarModeloModal from './RegistrarModeloModal.vue';
 import GestionarColoresModal from './GestionarColoresModal.vue';
+import ListCard from '@/Components/Admin/ListCard.vue';
+import PrimaryButton from '@/Components/Admin/PrimaryButton.vue';
+import DataTable from '@/Components/Admin/DataTable.vue';
+import ActionButton from '@/Components/Admin/ActionButton.vue';
+import EmptyState from '@/Components/Admin/EmptyState.vue';
 import SearchInput from '@/Components/Admin/SearchInput.vue';
 import SelectDropdown from '@/Components/Admin/SelectDropdown.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';

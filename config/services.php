@@ -18,6 +18,11 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    'apiperu' => [
+        'token' => env('APIPERU_TOKEN'),
+        'url' => 'https://dniruc.apisperu.com/api/v1',
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],

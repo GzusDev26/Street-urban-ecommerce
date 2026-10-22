@@ -9,91 +9,92 @@
         <i class="fa-solid fa-circle-check"></i> {{ page.props.flash.success }}
       </div>
 
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">Proveedores Registrados</h3>
-            <p class="text-xs text-gray-400">Tiendas/proveedores a los que les compras mercadería</p>
-          </div>
-          <button
-            @click="showModal = true"
-            class="bg-[#ff8c42] hover:bg-[#ff7a24] text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2"
-          >
-            <i class="fa-solid fa-plus text-xs"></i> Nuevo Proveedor
-          </button>
-        </div>
+      <ListCard title="Proveedores registrados" subtitle="Tiendas y proveedores a los que les compras mercadería">
+        <template #action>
+          <PrimaryButton @click="showModal = true">Nuevo proveedor</PrimaryButton>
+        </template>
 
-        <!-- Filtros -->
-        <div class="flex flex-wrap items-center gap-3 mb-5">
-          <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre, email o teléfono..." class="w-full sm:w-72" />
-          <button
-            v-if="filtroTexto"
-            @click="filtroTexto = ''"
-            class="text-sm font-semibold text-gray-400 hover:text-gray-600 px-3 py-2"
-          >
-            <i class="fa-solid fa-xmark text-xs"></i> Limpiar
-          </button>
-        </div>
+        <template #toolbar>
+          <span class="text-sm text-gray-500">
+            <strong class="text-gray-900">{{ proveedoresFiltrados.length }}</strong>
+            {{ proveedoresFiltrados.length === 1 ? 'proveedor' : 'proveedores' }}
+          </span>
+          <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre, email o teléfono" class="w-full sm:w-80" />
+        </template>
 
-        <div v-if="proveedoresFiltrados.length > 0" class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="border-b border-gray-200">
-              <tr>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Proveedor</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Email</th>
-                <th class="text-left py-3 px-4 font-semibold text-gray-500">Teléfono</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Registro</th>
-                <th class="text-center py-3 px-4 font-semibold text-gray-500">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="proveedor in proveedoresPaginados" :key="proveedor.id" class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                <td class="py-3 px-4 text-gray-900 font-medium">{{ proveedor.name }}</td>
-                <td class="py-3 px-4 text-gray-600">{{ proveedor.email || '—' }}</td>
-                <td class="py-3 px-4 text-gray-600">{{ proveedor.phone || '—' }}</td>
-                <td class="py-3 px-4 text-center text-gray-500">{{ proveedor.registrado }}</td>
-                <td class="py-3 px-4">
-                  <div class="flex items-center justify-center gap-2">
-                    <button
-                      @click="verHistorial(proveedor)"
-                      title="Historial de Compras"
-                      class="w-8 h-8 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-500 hover:text-purple-600 flex items-center justify-center transition-colors"
-                    >
-                      <i class="fa-solid fa-receipt text-xs"></i>
-                    </button>
-                    <Link
-                      :href="route('admin.suppliers.edit', proveedor.id)"
-                      title="Editar"
-                      class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 flex items-center justify-center transition-colors"
-                    >
-                      <i class="fa-solid fa-pen text-xs"></i>
-                    </Link>
-                    <button
-                      @click="eliminar(proveedor)"
-                      title="Eliminar"
-                      class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 flex items-center justify-center transition-colors"
-                    >
-                      <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <DataTable v-if="proveedoresFiltrados.length > 0">
+          <template #head>
+            <tr>
+              <th class="text-left">Proveedor</th>
+              <th class="text-left hidden lg:table-cell">Contacto</th>
+              <th class="text-left hidden md:table-cell">Registro</th>
+              <th class="text-right">Acciones</th>
+            </tr>
+          </template>
 
-          <Pagination v-model="paginaActual" :total-items="proveedoresFiltrados.length" :per-page="perPage" />
-        </div>
+          <tr v-for="proveedor in proveedoresPaginados" :key="proveedor.id">
+            <td>
+              <div class="flex items-center gap-3.5 min-w-0">
+                <InitialsAvatar :name="proveedor.name" :id="proveedor.id" icon="fa-solid fa-store" />
+                <div class="min-w-0">
+                  <p class="font-semibold text-gray-900 truncate max-w-[16rem]">{{ proveedor.name }}</p>
+                  <p v-if="proveedor.address" class="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5 truncate max-w-[16rem]">
+                    <i class="fa-solid fa-location-dot text-gray-400"></i>{{ proveedor.address }}
+                  </p>
+                  <p v-else class="text-xs text-gray-400 mt-0.5">Sin dirección</p>
+                  <p v-if="proveedor.email || proveedor.phone" class="lg:hidden text-xs text-gray-500 mt-1 truncate">
+                    {{ [proveedor.email, proveedor.phone].filter(Boolean).join(' · ') }}
+                  </p>
+                </div>
+              </div>
+            </td>
 
-        <div v-else-if="suppliers.length === 0" class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-truck-fast text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Aún no hay proveedores registrados.</p>
-        </div>
+            <td class="hidden lg:table-cell">
+              <div v-if="proveedor.email || proveedor.phone" class="space-y-1">
+                <p v-if="proveedor.email" class="flex items-center gap-2 text-gray-700">
+                  <i class="fa-regular fa-envelope text-gray-400 text-xs w-3.5"></i>{{ proveedor.email }}
+                </p>
+                <p v-if="proveedor.phone" class="flex items-center gap-2 text-gray-700">
+                  <i class="fa-solid fa-phone text-gray-400 text-xs w-3.5"></i>{{ proveedor.phone }}
+                </p>
+              </div>
+              <span v-else class="text-gray-300">—</span>
+            </td>
 
-        <div v-else class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Ningún proveedor coincide con tu búsqueda.</p>
-        </div>
-      </div>
+            <td class="text-gray-500 tabular-nums whitespace-nowrap hidden md:table-cell">{{ proveedor.registrado }}</td>
+
+            <td>
+              <div class="flex items-center justify-end gap-1">
+                <ActionButton icon="fa-solid fa-receipt" label="Historial de compras" tone="purple" @click="verHistorial(proveedor)" />
+                <ActionButton icon="fa-solid fa-pen" label="Editar" tone="blue" @click="editarProveedor(proveedor)" />
+                <ActionButton icon="fa-solid fa-trash" label="Eliminar" tone="red" @click="eliminar(proveedor)" />
+              </div>
+            </td>
+          </tr>
+
+          <template #footer>
+            <Pagination v-model="paginaActual" :total-items="proveedoresFiltrados.length" :per-page="perPage" />
+          </template>
+        </DataTable>
+
+        <EmptyState
+          v-else-if="suppliers.length === 0"
+          icon="fa-solid fa-truck-field"
+          title="Aún no hay proveedores registrados"
+          text="Registra la tienda o proveedor al que le compras mercadería."
+        >
+          <PrimaryButton @click="showModal = true">Nuevo proveedor</PrimaryButton>
+        </EmptyState>
+
+        <EmptyState
+          v-else
+          icon="fa-solid fa-filter-circle-xmark"
+          title="Ningún proveedor coincide"
+          text="Prueba con otra búsqueda."
+        >
+          <button @click="filtroTexto = ''" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar búsqueda</button>
+        </EmptyState>
+      </ListCard>
     </div>
 
     <ConfirmModal
@@ -109,6 +110,7 @@
     />
 
     <RegistrarProveedorModal v-if="showModal" @close="showModal = false" />
+    <EditarProveedorModal v-if="proveedorEditando" :proveedor="proveedorEditando" @close="proveedorEditando = null" />
 
     <HistorialProveedorModal
       v-if="proveedorHistorial"
@@ -119,12 +121,19 @@
 </template>
 
 <script setup>
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import ListCard from '@/Components/Admin/ListCard.vue';
+import PrimaryButton from '@/Components/Admin/PrimaryButton.vue';
+import DataTable from '@/Components/Admin/DataTable.vue';
+import ActionButton from '@/Components/Admin/ActionButton.vue';
+import InitialsAvatar from '@/Components/Admin/InitialsAvatar.vue';
+import EmptyState from '@/Components/Admin/EmptyState.vue';
 import SearchInput from '@/Components/Admin/SearchInput.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
 import RegistrarProveedorModal from './RegistrarProveedorModal.vue';
+import EditarProveedorModal from './EditarProveedorModal.vue';
 import HistorialProveedorModal from './HistorialProveedorModal.vue';
 import { ref, computed, watch } from 'vue';
 
@@ -135,6 +144,10 @@ const props = defineProps({
 const page = usePage();
 const filtroTexto = ref('');
 const showModal = ref(false);
+const proveedorEditando = ref(null);
+const editarProveedor = (proveedor) => {
+  proveedorEditando.value = proveedor;
+};
 const proveedorHistorial = ref(null);
 
 const verHistorial = (proveedor) => {

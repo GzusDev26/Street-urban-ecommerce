@@ -32,6 +32,7 @@ use App\Http\Controllers\Auth\LogoutController;
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
+    Route::get('/customers/consultar-documento', [CustomerAdminController::class, 'consultarDocumento'])->name('admin.customers.consultar-documento');
     Route::resource('customers', CustomerAdminController::class, ['as' => 'admin']);
     Route::get('/customers/{customer}/historial', [CustomerAdminController::class, 'historial'])->name('admin.customers.historial');
 

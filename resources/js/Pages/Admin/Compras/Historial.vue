@@ -51,16 +51,12 @@
       </div>
 
       <!-- List -->
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div class="mb-5">
-          <SearchInput
-            v-model="filtroTexto"
-            placeholder="Buscar por producto, proveedor, factura o N° de compra..."
-            class="w-full sm:w-80"
-          />
-        </div>
+      <ListCard title="Compras registradas" subtitle="Historial de compras de mercadería a tus proveedores">
+        <template #toolbar>
+          <SearchInput v-model="filtroTexto" placeholder="Buscar por producto, proveedor, factura o N° de compra" class="w-full sm:w-96" />
+        </template>
 
-        <div v-if="comprasFiltradas.length > 0" class="space-y-3">
+        <div v-if="comprasFiltradas.length > 0" class="space-y-3 px-6 pb-6">
           <div
             v-for="compra in comprasPaginadas"
             :key="compra.id"
@@ -73,7 +69,7 @@
           >
             <button
               @click="toggleExpand(compra.id)"
-              class="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors text-left"
+              class="w-full flex items-center justify-between px-5 py-4 hover:bg-orange-50/40 transition-colors text-left"
             >
               <div class="flex items-center gap-4 min-w-0">
                 <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded flex-shrink-0">{{ compra.numero }}</span>
@@ -147,16 +143,22 @@
           <Pagination v-model="paginaActual" :total-items="comprasFiltradas.length" :per-page="perPage" />
         </div>
 
-        <div v-else-if="compras.length === 0" class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-receipt text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Aún no hay compras registradas.</p>
-        </div>
+        <EmptyState
+          v-else-if="compras.length === 0"
+          icon="fa-solid fa-receipt"
+          title="Aún no hay compras registradas"
+          text="Registra tu primera compra desde la pestaña Inventario."
+        />
 
-        <div v-else class="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
-          <i class="fa-solid fa-filter-circle-xmark text-4xl text-gray-300 mb-3"></i>
-          <p class="text-gray-500">Ninguna compra coincide con tu búsqueda.</p>
-        </div>
-      </div>
+        <EmptyState
+          v-else
+          icon="fa-solid fa-filter-circle-xmark"
+          title="Ninguna compra coincide"
+          text="Prueba con otra búsqueda."
+        >
+          <button @click="filtroTexto = ''" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar búsqueda</button>
+        </EmptyState>
+      </ListCard>
     </div>
 
     <ConfirmModal
@@ -175,6 +177,8 @@
 
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import ListCard from '@/Components/Admin/ListCard.vue';
+import EmptyState from '@/Components/Admin/EmptyState.vue';
 import SearchInput from '@/Components/Admin/SearchInput.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
