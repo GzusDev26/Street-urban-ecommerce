@@ -110,7 +110,7 @@ const goBackToEmail = () => {
 };
 
 // Login
-const handleLogin = () => {
+const handleLogin = async () => {
   if (!email.value || !password.value) {
     error.value = 'Por favor completa email y contraseña';
     return;
@@ -119,27 +119,32 @@ const handleLogin = () => {
   isLoading.value = true;
   error.value = '';
 
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = '/auth/login-action';
-  form.style.display = 'none';
+  try {
+    const response = await fetch('/auth/login-action', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
+      },
+      body: JSON.stringify({ email: email.value, password: password.value })
+    });
 
-  const fields = {
-    email: email.value,
-    password: password.value,
-    _token: document.querySelector('meta[name="csrf-token"]')?.content || '',
-  };
+    const data = await response.json();
 
-  for (const [name, value] of Object.entries(fields)) {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
+    if (!response.ok || !data.success) {
+      error.value = data.message || 'No se pudo iniciar sesión. Intenta de nuevo.';
+      isLoading.value = false;
+      return;
+    }
+
+    // Recarga completa: la sesión cambió y la página necesita el nuevo token CSRF y usuario.
+    window.location.href = data.redirect;
+  } catch (e) {
+    error.value = 'Error de conexión. Intenta de nuevo.';
+    isLoading.value = false;
+    console.error('Error:', e);
   }
-
-  document.body.appendChild(form);
-  form.submit();
 };
 
 // Cambiar tab

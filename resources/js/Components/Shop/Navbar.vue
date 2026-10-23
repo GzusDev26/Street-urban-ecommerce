@@ -93,6 +93,23 @@ const closeUserMenu = () => {
   userMenuOpen.value = false;
 };
 
+// /profile solo existe para el staff (admin/vendedor); el cliente aún no tiene página de perfil,
+// así que a cada uno se le ofrecen solo destinos que existen.
+const ICON_USER = 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z';
+const ICON_PANEL = 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z';
+const ICON_HEART = 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z';
+const ICON_CART = 'M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z';
+
+const userMenuItems = computed(() => (isCustomer.value
+  ? [
+      { label: 'Lista de deseos', hint: 'Productos que guardaste', href: route('shop.wishlist'), icon: ICON_HEART },
+      { label: 'Mi carrito', hint: 'Revisa tu compra', href: route('shop.carrito'), icon: ICON_CART },
+    ]
+  : [
+      { label: 'Mi Perfil', hint: 'Administra tu información', href: route('profile.edit'), icon: ICON_USER },
+      { label: 'Panel de gestión', hint: 'Ventas, compras e inventario', href: route('admin.dashboard'), icon: ICON_PANEL },
+    ]));
+
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
@@ -232,33 +249,23 @@ watch(() => page.url, () => {
 
             <!-- Menu Items -->
             <div class="py-3 space-y-1 px-2">
-              <button
+              <Link
+                v-for="item in userMenuItems"
+                :key="item.label"
+                :href="item.href"
                 class="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center gap-3 group"
+                @click="closeUserMenu"
               >
                 <div class="w-9 h-9 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
                   </svg>
                 </div>
                 <div class="flex-1">
-                  <p class="font-medium text-white group-hover:text-white">Mi Perfil</p>
-                  <p class="text-xs text-gray-500">Administra tu información</p>
+                  <p class="font-medium text-white group-hover:text-white">{{ item.label }}</p>
+                  <p class="text-xs text-gray-500">{{ item.hint }}</p>
                 </div>
-              </button>
-
-              <button
-                class="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-white/10 rounded-lg transition-all duration-200 flex items-center gap-3 group"
-              >
-                <div class="w-9 h-9 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.592a.75.75 0 010 1.5h-.191l.213 2.139a12.04 12.04 0 01-7.746 15.23 12.04 12.04 0 106.838-10.488l1.538-4.649h-2.591a.75.75 0 010-1.5h2.591a1.5 1.5 0 011.422 1.11l1.579 4.746a1.5 1.5 0 002.422 1.422l4.15-2.912a1.5 1.5 0 00.12-2.45L15.608 3.94a1.5 1.5 0 00-2.272.252l-1.742 2.748zM12 12a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <p class="font-medium text-white group-hover:text-white">Configuración</p>
-                  <p class="text-xs text-gray-500">Preferencias y privacidad</p>
-                </div>
-              </button>
+              </Link>
             </div>
 
             <!-- Divider -->

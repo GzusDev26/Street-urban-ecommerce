@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, watch } from 'vue';
+import { avisar } from '@/alerts';
 import { router, usePage } from '@inertiajs/vue3';
 import SearchCreateInput from '@/Components/Admin/SearchCreateInput.vue';
 import SearchSelect from '@/Components/Admin/SearchSelect.vue';
@@ -527,24 +528,35 @@ const agregarPrenda = (repetir = false) => {
   const f = prendaForm.value;
 
   if (!f.productId) {
-    alert('Elige un modelo de la lista, o créalo con "+ Nuevo modelo".');
+    avisar('Elige un modelo de la lista, o créalo con "+ Nuevo modelo".', { titulo: 'Falta el modelo' });
     return;
   }
 
-  const faltanCampos = !f.nombre
-    || !f.categoria
-    || !f.marca
-    || f.precioCompra === '' || f.precioCompra == null || f.precioCompra < 0
-    || f.precioVenta === '' || f.precioVenta == null || f.precioVenta < 0;
+  // Se nombra solo lo que falta, para no pedir datos que ya están completos.
+  const precioVacio = (p) => p === '' || p == null || p < 0;
+  const faltantes = [
+    !f.categoria && 'la categoría',
+    !f.marca && 'la marca',
+    !f.nombre && 'el modelo',
+    precioVacio(f.precioCompra) && 'el precio de compra',
+    precioVacio(f.precioVenta) && 'el precio de venta',
+  ].filter(Boolean);
 
-  if (faltanCampos) {
-    alert('Completa categoría, marca, modelo y los precios de compra y venta.');
+  if (faltantes.length) {
+    const lista = faltantes.length === 1
+      ? faltantes[0]
+      : `${faltantes.slice(0, -1).join(', ')} y ${faltantes.at(-1)}`;
+    const soloPrecios = faltantes.every((c) => c.startsWith('el precio'));
+    let titulo = 'Faltan datos de la prenda';
+    if (faltantes.length === 1) titulo = `Falta ${faltantes[0]}`;
+    else if (soloPrecios) titulo = 'Faltan los precios';
+    avisar(`Completa ${lista} para agregar esta prenda.`, { titulo });
     return;
   }
 
   const tallasConCantidad = Object.entries(grilla.value).filter(([, n]) => n > 0);
   if (tallasConCantidad.length === 0) {
-    alert('Indica la cantidad de al menos una talla.');
+    avisar('Indica la cantidad de al menos una talla.', { titulo: 'Faltan cantidades' });
     return;
   }
 
@@ -650,7 +662,7 @@ const totalPrendas = () => prendas.value.reduce((sum, p) => sum + p.cantidad, 0)
 
 const guardarCompra = () => {
   if (prendas.value.length === 0) {
-    alert('Agrega al menos una prenda');
+    avisar('Agrega al menos una prenda antes de guardar la compra.', { titulo: 'La compra está vacía' });
     return;
   }
 
@@ -668,7 +680,7 @@ const guardarCompra = () => {
     },
     onError: (errors) => {
       const primerError = Object.values(errors)[0];
-      alert(primerError || 'Ocurrió un error al guardar la compra. Revisa los datos e intenta de nuevo.');
+      avisar(primerError || 'Ocurrió un error al guardar la compra. Revisa los datos e intenta de nuevo.', { titulo: 'No se pudo guardar la compra', tipo: 'error' });
     },
     onFinish: () => {
       isSaving.value = false;

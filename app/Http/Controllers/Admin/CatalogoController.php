@@ -290,6 +290,29 @@ class CatalogoController extends Controller
         return back()->with('success', 'Color actualizado.');
     }
 
+    // Sube o reemplaza solo la foto del color, sin pedir nombre ni color de referencia:
+    // es lo que usa la foto clicable del inventario y del modal de colores.
+    public function updateColorPhoto(Request $request, ProductColor $color)
+    {
+        $request->validate([
+            'imagen' => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ], [
+            'imagen.required' => 'Elige una foto.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La foto debe ser JPG, PNG o WEBP.',
+            'imagen.max' => 'La foto no puede pesar más de 4 MB.',
+        ]);
+
+        $anterior = $color->image_url;
+        $color->update(['image_url' => $request->file('imagen')->store('product-colors', 'public')]);
+
+        if ($anterior) {
+            Storage::disk('public')->delete($anterior);
+        }
+
+        return back()->with('success', "Foto de {$color->name} actualizada.");
+    }
+
     public function destroyColor(ProductColor $color)
     {
         if ($color->variants()->exists()) {

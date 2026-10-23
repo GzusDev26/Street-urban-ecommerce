@@ -453,6 +453,7 @@
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { avisar } from '@/alerts';
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
@@ -803,7 +804,7 @@ const guardarVenta = () => {
   if (prendas.value.length === 0) return;
 
   if (prendas.value.some((p) => !precioValido(p.precioVenta))) {
-    alert('Revisa los precios: todas las prendas del ticket necesitan un precio de venta.');
+    avisar('Todas las prendas del ticket necesitan un precio de venta.', { titulo: 'Revisa los precios' });
     return;
   }
 
@@ -839,7 +840,7 @@ const guardarVenta = () => {
     },
     onError: (errors) => {
       const primerError = Object.values(errors)[0];
-      alert(primerError || 'Ocurrió un error al guardar la venta. Revisa los datos e intenta de nuevo.');
+      avisar(primerError || 'Ocurrió un error al guardar la venta. Revisa los datos e intenta de nuevo.', { titulo: 'No se pudo guardar la venta', tipo: 'error' });
     },
     onFinish: () => {
       isSaving.value = false;

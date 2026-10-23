@@ -67,6 +67,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/catalogo/{producto}/colores', [CatalogoController::class, 'storeColor'])->name('admin.catalogo.colores.store');
         Route::post('/catalogo/{producto}/colores/varios', [CatalogoController::class, 'storeColores'])->name('admin.catalogo.colores.store-many');
         Route::post('/catalogo/colores/{color}', [CatalogoController::class, 'updateColor'])->name('admin.catalogo.colores.update');
+        Route::post('/catalogo/colores/{color}/foto', [CatalogoController::class, 'updateColorPhoto'])->name('admin.catalogo.colores.foto');
         Route::delete('/catalogo/colores/{color}', [CatalogoController::class, 'destroyColor'])->name('admin.catalogo.colores.destroy');
         Route::patch('/catalogo/{producto}', [CatalogoController::class, 'update'])->name('admin.catalogo.update');
         Route::patch('/catalogo/{producto}/restore', [CatalogoController::class, 'restore'])->name('admin.catalogo.restore');

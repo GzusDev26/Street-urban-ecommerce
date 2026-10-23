@@ -7,6 +7,7 @@ import FormField from '@/Components/Admin/FormField.vue';
 import FormInput from '@/Components/Admin/FormInput.vue';
 import ActionButton from '@/Components/Admin/ActionButton.vue';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
+import ColorPhoto from '@/Components/Admin/ColorPhoto.vue';
 import { GRUPOS_COLOR, PALETA, esColorClaro } from '@/Components/Admin/colores';
 
 const props = defineProps({
@@ -244,18 +245,13 @@ const confirmarEliminacion = () => {
           :key="c.id"
           class="flex items-center gap-3.5 border border-gray-100 rounded-2xl p-3 hover:border-gray-200 hover:bg-gray-50/60 transition-colors"
         >
-          <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 ring-1 ring-black/5">
-            <img v-if="c.imagenUrl" :src="c.imagenUrl" :alt="c.nombre" class="w-full h-full object-cover">
-            <div v-else class="w-full h-full flex items-center justify-center">
-              <ColorSwatch :hex="c.hex" class="w-7 h-7 rounded-full border border-gray-300" />
-            </div>
-          </div>
+          <ColorPhoto :color="c" editable @uploaded="cargarColores" />
 
           <div class="min-w-0 flex-1">
             <p class="text-sm font-semibold text-gray-900 truncate">{{ c.nombre }}</p>
-            <p class="flex items-center gap-1.5 text-xs text-gray-400 mt-0.5">
+            <p class="flex items-center gap-1.5 text-xs mt-0.5" :class="c.imagenUrl ? 'text-gray-400' : 'text-[#e67e2d] font-semibold'">
               <ColorSwatch :hex="c.hex" class="w-2.5 h-2.5 rounded-full border border-gray-200" />
-              {{ c.imagenUrl ? 'Con foto' : 'Sin foto' }}
+              {{ c.imagenUrl ? 'Toca la foto para cambiarla' : 'Sin foto · toca el recuadro para subirla' }}
             </p>
           </div>
 
@@ -296,7 +292,7 @@ const confirmarEliminacion = () => {
       <section v-if="showForm && modoVarios && !editandoColor" class="rounded-2xl bg-gray-50 border border-gray-100 p-4 space-y-4">
         <div>
           <h3 class="text-sm font-bold text-gray-900">Elige los colores</h3>
-          <p class="text-xs text-gray-500 mt-0.5">Marca todos los que quieras, de cualquier grupo; desplázate para ver los demás. Las fotos puedes subirlas después, editando cada color.</p>
+          <p class="text-xs text-gray-500 mt-0.5">Marca todos los que quieras, de cualquier grupo; desplázate para ver los demás. Después, toca el recuadro de cada color en la lista para subir su foto.</p>
         </div>
 
         <div class="max-h-80 overflow-y-auto pr-1 space-y-4">

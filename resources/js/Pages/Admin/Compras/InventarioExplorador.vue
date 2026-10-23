@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { confirmar } from '@/alerts';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
 import ActionButton from '@/Components/Admin/ActionButton.vue';
@@ -10,6 +11,7 @@ import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
 import { ORDEN_TALLAS, grupoDeTallas } from '@/Components/Admin/tallas';
 import EditarModeloModal from './EditarModeloModal.vue';
 import GestionarColoresModal from './GestionarColoresModal.vue';
+import ColorPhoto from '@/Components/Admin/ColorPhoto.vue';
 import NuevaCategoriaModal from './NuevaCategoriaModal.vue';
 import AgregarMarcaModal from './AgregarMarcaModal.vue';
 import NuevoModeloModal from './NuevoModeloModal.vue';
@@ -174,9 +176,15 @@ const abrirEditar = (m) => {
   editando.value = { id: m.id, nombre: m.nombre, marca: m.marca, categoria: m.categoria, descripcion: m.descripcion };
 };
 const abrirColores = (m) => { modeloColores.value = { id: m.id, nombre: m.nombre, marca: m.marca }; };
+const coloresSinFoto = (m) => m.colores.filter((c) => !c.imagenUrl).length;
 
-const darDeBaja = (m) => {
-  if (!confirm(`¿Dar de baja "${m.nombre}" (${m.marca})? Se conservará su historial y podrás restaurarlo después.`)) return;
+const darDeBaja = async (m) => {
+  const ok = await confirmar(`"${m.nombre}" (${m.marca}) dejará de mostrarse. Se conserva su historial y puedes restaurarlo después.`, {
+    titulo: '¿Dar de baja este modelo?',
+    confirmarTexto: 'Sí, dar de baja',
+    peligro: true,
+  });
+  if (!ok) return;
   router.patch(route('admin.catalogo.deactivate', m.id), {}, { preserveScroll: true });
 };
 const restaurar = (m) => router.patch(route('admin.catalogo.restore', m.id), {}, { preserveScroll: true });
@@ -458,6 +466,13 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
                     <ColorSwatch v-else :hex="c.hex" class="w-full h-full" />
                   </span>
                   <span v-if="m.colores.length > 6" class="text-xs text-gray-400">+{{ m.colores.length - 6 }}</span>
+                  <span
+                    v-if="esAdmin && coloresSinFoto(m) > 0"
+                    class="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[#e67e2d] bg-orange-50 rounded-full px-2 py-0.5"
+                  >
+                    <i class="fa-solid fa-camera text-[9px]" aria-hidden="true"></i>
+                    {{ coloresSinFoto(m) }} sin foto
+                  </span>
                 </template>
                 <span v-else class="text-xs text-gray-400">Sin colores todavía</span>
               </div>
@@ -519,6 +534,19 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           </div>
         </div>
 
+        <div
+          v-if="esAdmin && tallasDelModelo.length && coloresSinFoto(modeloActual) > 0"
+          class="flex items-center gap-3 mb-4 rounded-xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-sm text-gray-700"
+        >
+          <span class="w-8 h-8 rounded-lg bg-white text-[#ff8c42] flex items-center justify-center flex-shrink-0 shadow-sm">
+            <i class="fa-solid fa-camera" aria-hidden="true"></i>
+          </span>
+          <p>
+            <strong class="font-bold text-gray-900">{{ coloresSinFoto(modeloActual) === 1 ? '1 color no tiene foto' : `${coloresSinFoto(modeloActual)} colores no tienen foto` }}.</strong>
+            Toca el recuadro <span class="font-semibold text-[#e67e2d]">Subir</span> de cada color, o arrastra la imagen encima. Así se verá en la tienda.
+          </p>
+        </div>
+
         <div v-if="modeloActual.colores.length && tallasDelModelo.length" class="overflow-x-auto rounded-xl border border-gray-100">
           <table class="w-full text-sm">
             <thead class="bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500">
@@ -532,11 +560,11 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
               <tr v-for="c in modeloActual.colores" :key="c.id">
                 <td class="py-3 px-5">
                   <div class="flex items-center gap-3">
-                    <span class="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5 flex-shrink-0 flex items-center justify-center">
-                      <img v-if="c.imagenUrl" :src="c.imagenUrl" :alt="c.nombre" class="w-full h-full object-cover">
-                      <ColorSwatch v-else :hex="c.hex" class="w-5 h-5 rounded-full border border-gray-300" />
-                    </span>
-                    <span class="font-semibold text-gray-900">{{ c.nombre }}</span>
+                    <ColorPhoto :color="c" :editable="esAdmin" />
+                    <div class="min-w-0">
+                      <p class="font-semibold text-gray-900 truncate">{{ c.nombre }}</p>
+                      <p v-if="esAdmin && !c.imagenUrl" class="text-[11px] font-semibold text-[#e67e2d]">Sin foto</p>
+                    </div>
                   </div>
                 </td>
 
