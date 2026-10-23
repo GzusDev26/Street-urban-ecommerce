@@ -68,8 +68,11 @@ class ProductController extends Controller
     {
         $vendidos = $this->getVendidosPorProducto();
 
+        // Un modelo recién creado en el inventario todavía no tiene precio (eso entra con la primera
+        // compra): no se muestra en la tienda hasta tener al menos una variante con precio.
         return Product::with(['brand', 'category', 'colors.variants'])
             ->where('active', true)
+            ->whereHas('variants', fn ($q) => $q->whereNotNull('price'))
             ->orderByDesc('created_at')
             ->get()
             ->map(fn ($p) => $this->mapProduct($p, $vendidos->toArray()));

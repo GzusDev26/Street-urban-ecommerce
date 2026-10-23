@@ -5,18 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\PurchaseItem;
 use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\SaleItemBatch;
 use App\Models\SaleItemReturn;
+use App\Services\ApiPeruService;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Throwable;
 
 class SaleController extends Controller
 {
@@ -34,6 +37,7 @@ class SaleController extends Controller
             'fecha' => $v->sale_date->format('d/m/Y'),
             'cliente' => $v->customer_name,
             'clienteId' => $v->customer_id,
+            'clienteDocumento' => $v->relationLoaded('customer') && $v->customer?->document_number ? "{$v->customer->document_type} {$v->customer->document_number}" : null,
             'notas' => $v->notes,
             'total' => (float) $v->total,
             'totalNeto' => $totalNeto,
@@ -93,7 +97,7 @@ class SaleController extends Controller
 
     public function boleta(Sale $venta)
     {
-        $venta->load(['items.variant.product.brand', 'items.variant.productColor', 'user']);
+        $venta->load(['items.variant.product.brand', 'items.variant.productColor', 'user', 'customer']);
 
         return Inertia::render('Admin/Ventas/Boleta', [
             'venta' => $this->mapVenta($venta),
@@ -201,6 +205,9 @@ class SaleController extends Controller
 
     // Solo se pueden vender variantes que ya existen con stock disponible — a diferencia de
     // Compras, aquí no se crean productos/colores nuevos.
+    // Busca MODELOS con stock y devuelve, de cada uno, todas sus variantes (color × talla) disponibles:
+    // la pantalla muestra una tarjeta por modelo y una cuadrícula de colores × tallas para elegir.
+    // Se busca por nombre del modelo, marca o color, y por categoría.
     public function searchVariants(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
@@ -210,33 +217,37 @@ class SaleController extends Controller
             return response()->json([]);
         }
 
-        $query = ProductVariant::with(['product.brand', 'product.category', 'productColor'])
-            ->where('stock', '>', 0);
+        $productos = Product::with([
+                'brand',
+                'category',
+                'variants' => fn ($v) => $v->where('stock', '>', 0)->with('productColor'),
+            ])
+            ->whereHas('variants', fn ($v) => $v->where('stock', '>', 0))
+            ->when($q, fn ($pq) => $pq->where(function ($w) use ($q) {
+                $w->where('name', 'like', "%{$q}%")
+                    ->orWhereHas('brand', fn ($bq) => $bq->where('name', 'like', "%{$q}%"))
+                    ->orWhereHas('colors', fn ($cq) => $cq->where('name', 'like', "%{$q}%"));
+            }))
+            ->when($categoria, fn ($pq) => $pq->whereHas('category', fn ($cq) => $cq->where('name', $categoria)))
+            ->orderBy('name')
+            ->limit(30)
+            ->get()
+            ->map(fn ($p) => [
+                'productId' => $p->id,
+                'producto' => $p->name,
+                'marca' => $p->brand->name ?? '-',
+                'categoria' => $p->category->name ?? '-',
+                'variantes' => $p->variants->map(fn ($v) => [
+                    'variantId' => $v->id,
+                    'talla' => $v->size,
+                    'color' => $v->productColor->name ?? '-',
+                    'colorHex' => $v->productColor->hex ?? null,
+                    'stock' => (int) $v->stock,
+                    'precioVenta' => (float) ($v->price ?? $p->price),
+                ])->values(),
+            ]);
 
-        if ($q) {
-            $query->whereHas('product', function ($pq) use ($q) {
-                $pq->where('name', 'like', "%{$q}%")
-                    ->orWhereHas('brand', fn ($bq) => $bq->where('name', 'like', "%{$q}%"));
-            });
-        }
-
-        if ($categoria) {
-            $query->whereHas('product.category', fn ($cq) => $cq->where('name', $categoria));
-        }
-
-        $variantes = $query->limit(20)->get()->map(fn ($v) => [
-            'variantId' => $v->id,
-            'producto' => $v->product->name,
-            'marca' => $v->product->brand->name ?? '-',
-            'categoria' => $v->product->category->name ?? '-',
-            'talla' => $v->size,
-            'color' => $v->productColor->name ?? '-',
-            'colorHex' => $v->productColor->hex ?? null,
-            'stock' => $v->stock,
-            'precioVenta' => (float) ($v->price ?? $v->product->price),
-        ]);
-
-        return response()->json($variantes);
+        return response()->json($productos);
     }
 
     // Busca entre los clientes con cuenta registrada, para poder vincular la venta a su
@@ -260,12 +271,56 @@ class SaleController extends Controller
         return response()->json($clientes);
     }
 
-    public function store(Request $request)
+    // Al escribir un DNI/RUC en el ticket: primero se mira si ya es cliente; si no, se consulta
+    // RENIEC/SUNAT solo para traer el nombre. NO se crea nada aquí: el cliente nuevo se registra
+    // al guardar la venta (así cancelar el ticket no deja clientes sueltos).
+    public function buscarDocumento(Request $request, ApiPeruService $apiPeru)
+    {
+        $request->validate([
+            'tipo' => 'required|in:DNI,RUC',
+            'numero' => 'required|digits_between:8,11',
+        ]);
+
+        if (! $this->documentoValido($request->tipo, $request->numero)) {
+            return response()->json(['message' => 'El número no corresponde al tipo de documento.'], 422);
+        }
+
+        $existente = Customer::where('document_number', $request->numero)->first(['id', 'name', 'email', 'phone', 'document_type', 'document_number']);
+        if ($existente) {
+            return response()->json(['existe' => true, 'cliente' => $existente]);
+        }
+
+        try {
+            $datos = $request->tipo === 'DNI' ? $apiPeru->dni($request->numero) : $apiPeru->ruc($request->numero);
+        } catch (Throwable $e) {
+            report($e);
+            return response()->json(['message' => 'No se pudo consultar el documento. Escribe el nombre a mano.'], 422);
+        }
+
+        return response()->json(['existe' => false, 'nombre' => $datos['nombre']]);
+    }
+
+    private function documentoValido(?string $tipo, ?string $numero): bool
+    {
+        return match ($tipo) {
+            'DNI' => preg_match('/^\d{8}$/', (string) $numero) === 1,
+            'RUC' => preg_match('/^(10|20)\d{9}$/', (string) $numero) === 1,
+            default => false,
+        };
+    }
+
+    public function store(Request $request, InventoryService $inventario)
     {
         $validated = $request->validate([
             'fecha' => 'required|date',
             'cliente' => 'nullable|string|max:255',
             'clienteId' => 'nullable|integer|exists:customers,id',
+            'documentoTipo' => 'nullable|in:DNI,RUC|required_with:documentoNumero',
+            'documentoNumero' => [
+                'nullable',
+                'string',
+                fn ($attr, $value, $fail) => $this->documentoValido($request->input('documentoTipo'), $value) ?: $fail('El número de documento no es válido.'),
+            ],
             'notas' => 'nullable|string',
             'prendas' => 'required|array|min:1',
             'prendas.*.variantId' => 'required|integer|exists:product_variants,id',
@@ -280,7 +335,7 @@ class SaleController extends Controller
             ->map(fn ($grupo) => $grupo->sum('cantidad'));
 
         try {
-            $sale = DB::transaction(function () use ($validated, $cantidadesPorVariante) {
+            $sale = DB::transaction(function () use ($validated, $cantidadesPorVariante, $inventario) {
                 // Bloquea las variantes involucradas (en orden fijo por id, para que dos
                 // ventas simultáneas con las mismas prendas no se hagan deadlock entre sí)
                 // y recién con el lock tomado valida el stock — así dos ventas al mismo
@@ -304,6 +359,24 @@ class SaleController extends Controller
 
                 if (!empty($validated['clienteId'])) {
                     $clienteVinculado = Customer::find($validated['clienteId']);
+                } elseif (!empty($validated['documentoNumero'])) {
+                    // Cliente identificado por documento: si ya está registrado se reutiliza;
+                    // si no, se crea ahora (recién al guardar la venta) con el nombre del ticket.
+                    $clienteVinculado = Customer::where('document_number', $validated['documentoNumero'])->first();
+
+                    if (!$clienteVinculado) {
+                        $nombre = trim((string) ($validated['cliente'] ?? ''));
+                        if ($nombre === '') {
+                            throw new \RuntimeException('Escribe el nombre del cliente para registrarlo con ese documento.');
+                        }
+
+                        $clienteVinculado = Customer::create([
+                            'name' => $nombre,
+                            'document_type' => $validated['documentoTipo'],
+                            'document_number' => $validated['documentoNumero'],
+                            'password' => Hash::make(Str::random(40)),
+                        ]);
+                    }
                 } elseif (!empty($validated['cliente'])) {
                     $nombreCliente = trim($validated['cliente']);
 
@@ -335,55 +408,7 @@ class SaleController extends Controller
                     $variant = $variantesBloqueadas->get($item['variantId']);
                     $cantidad = $item['cantidad'];
 
-                    $variant->decrement('stock', $cantidad);
-                    $variant->product->decrement('stock', $cantidad);
-
-                    $saleItem = SaleItem::create([
-                        'sale_id' => $sale->id,
-                        'product_variant_id' => $variant->id,
-                        'quantity' => $cantidad,
-                        'unit_price' => $item['precioVenta'],
-                        'unit_cost' => 0,
-                        'subtotal' => $cantidad * $item['precioVenta'],
-                    ]);
-
-                    // Consumo FIFO de los lotes de compra, para que el valor de inventario
-                    // (Compras > Inventario) siga reflejando solo lo que realmente queda. Se
-                    // registra de qué lote(s) salió cada unidad, para poder revertirlo si la
-                    // venta se cancela.
-                    $porConsumir = $cantidad;
-                    $costoConsumido = 0;
-
-                    $lotes = PurchaseItem::where('product_variant_id', $variant->id)
-                        ->where('quantity_remaining', '>', 0)
-                        ->orderBy('created_at')
-                        ->get();
-
-                    foreach ($lotes as $lote) {
-                        if ($porConsumir <= 0) {
-                            break;
-                        }
-
-                        $tomar = min($porConsumir, $lote->quantity_remaining);
-                        $lote->decrement('quantity_remaining', $tomar);
-                        $costoConsumido += $tomar * $lote->unit_cost;
-                        $porConsumir -= $tomar;
-
-                        SaleItemBatch::create([
-                            'sale_item_id' => $saleItem->id,
-                            'purchase_item_id' => $lote->id,
-                            'quantity' => $tomar,
-                        ]);
-                    }
-
-                    // Si no hay lotes suficientes registrados (ej. stock inicial sin compra
-                    // asociada), se usa el costo de referencia de la variante para lo restante
-                    // — esa porción no queda ligada a ningún lote porque no salió de ninguno.
-                    if ($porConsumir > 0) {
-                        $costoConsumido += $porConsumir * $variant->cost;
-                    }
-
-                    $saleItem->update(['unit_cost' => $cantidad > 0 ? $costoConsumido / $cantidad : 0]);
+                    $inventario->sell($sale, $variant, $cantidad, (float) $item['precioVenta']);
                 }
 
                 return $sale;

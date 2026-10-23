@@ -2,7 +2,7 @@
 defineProps({
   icon: { type: String, required: true },
   label: { type: String, required: true },
-  tone: { type: String, default: 'gray' }, // 'gray' | 'purple' | 'blue' | 'red'
+  tone: { type: String, default: 'gray' }, // 'gray' | 'purple' | 'blue' | 'red' | 'green'
 });
 
 const TONOS = {
@@ -10,6 +10,7 @@ const TONOS = {
   purple: 'hover:text-purple-600 hover:bg-purple-50',
   blue: 'hover:text-blue-600 hover:bg-blue-50',
   red: 'hover:text-red-600 hover:bg-red-50',
+  green: 'hover:text-green-600 hover:bg-green-50',
 };
 </script>
 

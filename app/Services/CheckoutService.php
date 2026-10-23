@@ -7,13 +7,16 @@ use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\ProductVariant;
 use App\Models\Sale;
-use App\Models\SaleItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class CheckoutService
 {
+    public function __construct(private readonly InventoryService $inventory)
+    {
+    }
+
     public function confirm(?Customer $customer, array $payload): array
     {
         return DB::transaction(function () use ($customer, $payload) {
@@ -114,17 +117,7 @@ class CheckoutService
                 $variant = $item['variant'];
                 $quantity = $item['quantity'];
 
-                $variant->decrement('stock', $quantity);
-                $variant->product->decrement('stock', $quantity);
-
-                SaleItem::create([
-                    'sale_id' => $sale->id,
-                    'product_variant_id' => $variant->id,
-                    'quantity' => $quantity,
-                    'unit_price' => $item['unit_price'],
-                    'unit_cost' => $variant->cost ?? 0,
-                    'subtotal' => $item['subtotal'],
-                ]);
+                $this->inventory->sell($sale, $variant, $quantity, $item['unit_price']);
             }
 
             if ($cart) {

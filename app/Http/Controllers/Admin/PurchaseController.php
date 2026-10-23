@@ -11,10 +11,12 @@ use App\Models\ProductVariant;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Supplier;
+use App\Support\NameMatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class PurchaseController extends Controller
@@ -61,8 +63,18 @@ class PurchaseController extends Controller
 
         return Inertia::render('Admin/Compras/Index', [
             'variants' => $variants,
+            'modelos' => $this->modelosParaArbol(),
             'categorias' => Category::orderBy('name')->pluck('name'),
+            'categoriasInfo' => Category::with('brands')->orderBy('name')->get()->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'sizeType' => $c->size_type,
+                // Marcas dentro de la categoría, tengan modelos o no todavía.
+                'marcas' => $c->brands->sortBy('name')->map(fn ($b) => ['id' => $b->id, 'name' => $b->name])->values(),
+            ]),
             'marcas' => Brand::orderBy('name')->pluck('name'),
+            // Marcas de todo el negocio (una sola "Nike" sirve para polos, zapatillas...).
+            'marcasInfo' => Brand::orderBy('name')->get(['id', 'name']),
             'stats' => [
                 'totalProductos' => Product::count(),
                 'totalVariantes' => $variants->count(),
@@ -70,6 +82,46 @@ class PurchaseController extends Controller
                 'valorInventario' => $valorInventario,
             ],
         ]);
+    }
+
+    // Todo el inventario agrupable por categoría → marca → modelo → color × talla. El árbol se arma
+    // en el navegador a partir de esta lista plana: la marca no depende de la categoría (Nike vende
+    // polos y shorts), solo aparece bajo cada categoría donde tiene modelos.
+    private function modelosParaArbol(): array
+    {
+        return Product::with(['category', 'brand', 'colors.variants' => fn ($q) => $q->orderBy('size')])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($p) {
+                $variantes = $p->colors->flatMap->variants;
+
+                return [
+                    'id' => $p->id,
+                    'nombre' => $p->name,
+                    'descripcion' => $p->description,
+                    'activo' => (bool) $p->active,
+                    'categoriaId' => $p->category_id,
+                    'categoria' => $p->category->name ?? '-',
+                    'marcaId' => $p->brand_id,
+                    'marca' => $p->brand->name ?? 'Sin marca',
+                    'stock' => (int) $variantes->sum('stock'),
+                    'precioMin' => $variantes->count() ? (float) $variantes->min('price') : null,
+                    'precioMax' => $variantes->count() ? (float) $variantes->max('price') : null,
+                    'colores' => $p->colors->map(fn ($c) => [
+                        'id' => $c->id,
+                        'nombre' => $c->name,
+                        'hex' => $c->hex,
+                        'imagenUrl' => $c->image_url ? \Illuminate\Support\Facades\Storage::url($c->image_url) : null,
+                        'variantes' => $c->variants->map(fn ($v) => [
+                            'id' => $v->id,
+                            'talla' => $v->size,
+                            'stock' => (int) $v->stock,
+                            'costo' => (float) $v->cost,
+                            'precio' => (float) $v->price,
+                        ])->values(),
+                    ])->values(),
+                ];
+            })->values()->all();
     }
 
     private function mapCompra(Purchase $p): array
@@ -385,16 +437,30 @@ class PurchaseController extends Controller
                 if (!$product) {
                     // Solo se crean/usan categoría y marca cuando realmente se está creando un producto nuevo.
                     if (!$brand) {
+                        // Una marca casi igual a otra ya registrada ("Nikes" y "Nike") es casi seguro un error.
+                        if ($parecida = NameMatcher::similar(Brand::class, $item['marca'])) {
+                            throw ValidationException::withMessages([
+                                'prendas' => "La marca «{$item['marca']}» se parece a «{$parecida->name}». Elige esa de la lista.",
+                            ]);
+                        }
+
                         $brand = Brand::firstOrCreate(
                             ['slug' => Str::slug($item['marca'])],
                             ['name' => trim($item['marca']), 'active' => true]
                         );
                     }
 
-                    $category = Category::firstOrCreate(
-                        ['slug' => Str::slug($item['categoria'])],
-                        ['name' => $item['categoria'], 'active' => true]
-                    );
+                    // Las categorías no se crean escribiendo: se eligen de la lista (o se crean a propósito
+                    // desde el formulario con "Nueva categoría" / en Categorías y Marcas).
+                    $category = Category::whereRaw(self::NAME_MATCH, [mb_strtolower(trim($item['categoria']))])->first();
+
+                    if (!$category) {
+                        throw ValidationException::withMessages([
+                            'prendas' => "La categoría «{$item['categoria']}» no existe. Elígela de la lista o créala antes.",
+                        ]);
+                    }
+
+                    $category->brands()->syncWithoutDetaching([$brand->id]);
 
                     $product = Product::create([
                         'name' => trim($item['nombre']),

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 
 defineProps({
   title: { type: String, required: true },
@@ -14,6 +14,10 @@ defineProps({
 });
 
 const emit = defineEmits(['close', 'submit']);
+
+// El fondo solo cierra el modal si el clic EMPEZÓ en el fondo. Si se pulsó sobre un elemento que desaparece
+// al instante (ej. una opción de un menú), algunos navegadores registran el clic sobre el fondo y cerraban todo.
+const pulsoEnElFondo = ref(false);
 
 const alTeclear = (e) => {
   if (e.key === 'Escape') emit('close');
@@ -33,7 +37,8 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
-    @click.self="emit('close')"
+    @mousedown="pulsoEnElFondo = $event.target === $event.currentTarget"
+    @click.self="pulsoEnElFondo && emit('close')"
   >
     <form
       role="dialog"

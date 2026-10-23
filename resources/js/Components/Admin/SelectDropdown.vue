@@ -6,9 +6,11 @@ const props = defineProps({
   options: { type: Array, required: true }, // [{ value, label }]
   placeholder: { type: String, default: 'Selecciona...' },
   size: { type: String, default: 'md' }, // 'md' para formularios, 'sm' para barras de filtros
+  id: { type: String, default: undefined }, // id del botón, para asociarlo a una <label for>
 });
 
-const fieldId = useFieldId();
+const campoId = useFieldId();
+const fieldId = computed(() => props.id ?? campoId);
 const model = defineModel({ type: String, default: '' });
 
 const isOpen = ref(false);

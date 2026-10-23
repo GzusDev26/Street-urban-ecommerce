@@ -102,13 +102,13 @@
               </Link>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Link
-                  :href="route('admin.catalogo.index')"
+                  :href="route('admin.purchases.index')"
                   class="flex flex-col items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 py-3 rounded-xl transition-colors"
                 >
                   <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center text-sm">
                     <i class="fa-solid fa-cubes"></i>
                   </span>
-                  <span class="text-[11px] font-semibold">Catálogo</span>
+                  <span class="text-[11px] font-semibold">Inventario</span>
                 </Link>
                 <Link
                   :href="route('admin.sales.index')"

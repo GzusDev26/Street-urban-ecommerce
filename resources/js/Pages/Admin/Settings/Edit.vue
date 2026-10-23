@@ -112,7 +112,7 @@
                   required
                 />
                 <p class="text-[11px] text-gray-400 mt-1.5">
-                  Cuando una prenda tenga menos unidades que este número, se marcará en amarillo en Catálogo y Compras.
+                  Cuando una prenda tenga menos unidades que este número, se marcará en amarillo en el inventario de Compras.
                 </p>
                 <p v-if="validationErrors.low_stock_threshold" class="text-red-500 text-xs mt-1">{{ validationErrors.low_stock_threshold[0] }}</p>
               </div>

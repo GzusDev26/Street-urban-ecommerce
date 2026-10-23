@@ -18,6 +18,10 @@ class LoginController extends Controller
 
         $user = User::where('email', $email)->first();
         if ($user && Hash::check($password, $user->password)) {
+            if (! $user->active) {
+                return redirect('/')->with('error', 'Tu cuenta está desactivada. Contacta al administrador.');
+            }
+
             Auth::guard('web')->login($user, true);
             return redirect('/admin/dashboard');
         }

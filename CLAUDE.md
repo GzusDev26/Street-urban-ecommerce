@@ -60,8 +60,8 @@ app/
 ├── Models/
 │   ├── User.php               # User model
 │   ├── Product.php            # Product model
-│   ├── Order.php              # Order model
-│   ├── OrderItem.php          # Order items
+│   ├── Sale.php               # Ventas (mostrador y web)
+│   ├── SaleItem.php           # Líneas de venta, con costo real por lote
 │   ├── Category.php           # Product categories
 │   ├── Customer.php           # Customer information
 │   └── Contact.php            # Contact form submissions
@@ -90,7 +90,7 @@ resources/
 
 routes/
 ├── web.php                   # Web routes (frontend routes via Inertia)
-└── api.php                   # API routes
+└── api.php                   # (eliminado: no se cargaba; los endpoints /api/* viven en web.php)
 
 database/
 ├── migrations/               # Database schema migrations
@@ -130,8 +130,7 @@ Core models are in `app/Models/`:
 
 - **User** - Authenticated users (admins and customers)
 - **Product** - Products with pricing, stock, categories
-- **Order** - Customer orders
-- **OrderItem** - Line items in orders
+- **Sale** / **SaleItem** - Ventas (mostrador y web); el costo sale de los lotes de compra (`PurchaseItem`) vía `InventoryService`
 - **Category** - Product categories
 - **Customer** - Customer profile information
 - **Contact** - Contact form submissions
@@ -225,7 +224,7 @@ php artisan db:seed        # Run seeders
 1. **Database**: Create migration with `php artisan make:migration create_table_name`
 2. **Model**: Create model with `php artisan make:model ModelName`
 3. **Controller**: Create controller with `php artisan make:controller ControllerName`
-4. **Route**: Add route in `routes/web.php` or `routes/api.php`
+4. **Route**: Add route in `routes/web.php` (`routes/api.php` no existe: los endpoints `/api/*` se definen en web.php)
 5. **View**: Create Vue component in `resources/js/Pages/` or component in `resources/js/Components/`
 6. **Validation**: Create form request with `php artisan make:request FormNameRequest`
 

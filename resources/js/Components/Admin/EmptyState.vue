@@ -14,7 +14,7 @@ defineProps({
       </div>
       <p class="font-semibold text-gray-700">{{ title }}</p>
       <p v-if="text" class="text-sm text-gray-500 mt-1">{{ text }}</p>
-      <div v-if="$slots.default" class="mt-5"><slot /></div>
+      <div v-if="$slots.default" class="mt-5 flex justify-center"><slot /></div>
     </div>
   </div>
 </template>

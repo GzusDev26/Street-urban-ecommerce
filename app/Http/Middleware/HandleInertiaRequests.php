@@ -17,6 +17,19 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
+     * Con Vite en modo desarrollo (existe public/hot) los assets cambian en caliente: una versión
+     * fija evita que Inertia responda 409 y recargue la página entera (cerrando modales abiertos).
+     */
+    public function version(Request $request): ?string
+    {
+        if (file_exists(public_path('hot'))) {
+            return 'dev';
+        }
+
+        return parent::version($request);
+    }
+
+    /**
      * Define the props that are shared by default.
      *
      * @return array<string, mixed>
@@ -35,6 +48,9 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
+            // Token CSRF vigente. Al cerrar sesión se regenera, pero la página (navegación interna,
+            // sin recarga) conserva el de la etiqueta <meta>; app.js la actualiza con este valor.
+            'csrfToken' => fn () => csrf_token(),
             'auth' => [
                 'user' => $staff ?? $customer,
                 'type' => $type,

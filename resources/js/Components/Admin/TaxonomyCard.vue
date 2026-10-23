@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
+import { GRUPOS_TALLA } from '@/Components/Admin/tallas';
 
 const props = defineProps({
   title: String,
@@ -9,8 +10,13 @@ const props = defineProps({
   entityLabel: String, // 'categoría' | 'marca'
   items: Array,
   routes: Object, // { store, update, destroy }
+  withSizeType: { type: Boolean, default: false }, // categorías: cada una define qué tallas se ofrecen al comprar
 });
 
+const TIPOS_TALLA = GRUPOS_TALLA;
+const nombreTipo = (id) => TIPOS_TALLA.find((t) => t.id === id)?.nombre ?? 'Ropa';
+
+const nuevoTipo = ref('ropa');
 const nuevoNombre = ref('');
 const nuevaDescripcion = ref('');
 const creando = ref(false);
@@ -19,7 +25,7 @@ const agregar = () => {
   if (!nuevoNombre.value.trim()) return;
   creando.value = true;
 
-  router.post(props.routes.store, { name: nuevoNombre.value.trim(), description: nuevaDescripcion.value.trim() || null }, {
+  router.post(props.routes.store, { name: nuevoNombre.value.trim(), description: nuevaDescripcion.value.trim() || null, ...(props.withSizeType ? { size_type: nuevoTipo.value } : {}) }, {
     preserveScroll: true,
     onSuccess: () => {
       nuevoNombre.value = '';
@@ -34,12 +40,14 @@ const agregar = () => {
 const editandoId = ref(null);
 const editName = ref('');
 const editDescription = ref('');
+const editTipo = ref('ropa');
 const guardando = ref(false);
 
 const editar = (item) => {
   editandoId.value = item.id;
   editName.value = item.name;
   editDescription.value = item.description || '';
+  editTipo.value = item.size_type || 'ropa';
 };
 
 const cancelarEdicion = () => {
@@ -50,7 +58,7 @@ const guardar = (item) => {
   if (!editName.value.trim()) return;
   guardando.value = true;
 
-  router.patch(props.routes.update(item.id), { name: editName.value.trim(), description: editDescription.value.trim() || null }, {
+  router.patch(props.routes.update(item.id), { name: editName.value.trim(), description: editDescription.value.trim() || null, ...(props.withSizeType ? { size_type: editTipo.value } : {}) }, {
     preserveScroll: true,
     onSuccess: () => {
       editandoId.value = null;
@@ -104,6 +112,14 @@ const confirmarEliminacion = () => {
         placeholder="Descripción (opcional)"
         class="flex-1 min-w-[140px] px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
       />
+      <select
+        v-if="withSizeType"
+        v-model="nuevoTipo"
+        aria-label="Tipo de tallas de la nueva categoría"
+        class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
+      >
+        <option v-for="t in TIPOS_TALLA" :key="t.id" :value="t.id">Tallas de {{ t.nombre.toLowerCase() }} ({{ t.ejemplo }})</option>
+      </select>
       <button
         type="submit"
         :disabled="creando || !nuevoNombre.trim()"
@@ -132,6 +148,14 @@ const confirmarEliminacion = () => {
               class="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
               @keyup.enter="guardar(item)"
             />
+            <select
+              v-if="withSizeType"
+              v-model="editTipo"
+              aria-label="Tipo de tallas"
+              class="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
+            >
+              <option v-for="t in TIPOS_TALLA" :key="t.id" :value="t.id">Tallas de {{ t.nombre.toLowerCase() }} ({{ t.ejemplo }})</option>
+            </select>
           </div>
           <div class="flex items-center gap-1.5 flex-shrink-0 pt-1">
             <button
@@ -157,6 +181,9 @@ const confirmarEliminacion = () => {
             <p class="text-sm font-semibold text-gray-900 truncate">{{ item.name }}</p>
             <p v-if="item.description" class="text-xs text-gray-400 truncate">{{ item.description }}</p>
           </div>
+          <span v-if="withSizeType" class="text-[11px] font-semibold px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 bg-orange-50 text-[#e67e2d]" title="Tallas que se ofrecen al comprar">
+            Tallas: {{ nombreTipo(item.size_type) }}
+          </span>
           <span
             :class="[
               'text-[11px] font-semibold px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0',

@@ -8,6 +8,9 @@
       <div v-if="page.props.flash?.success" class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2">
         <i class="fa-solid fa-circle-check"></i> {{ page.props.flash.success }}
       </div>
+      <div v-if="page.props.errors?.error" class="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ page.props.errors.error }}
+      </div>
 
       <ListCard title="Usuarios del panel" subtitle="Personas de tu equipo con acceso al panel de administración">
         <template #action>
@@ -24,11 +27,12 @@
             <tr>
               <th class="text-left">Usuario</th>
               <th class="text-left">Rol</th>
+              <th class="text-left">Estado</th>
               <th class="text-right">Acciones</th>
             </tr>
           </template>
 
-          <tr v-for="usuario in usuariosPaginados" :key="usuario.id">
+          <tr v-for="usuario in usuariosPaginados" :key="usuario.id" :class="!usuario.active ? 'opacity-60' : ''">
             <td>
               <div class="flex items-center gap-3.5 min-w-0">
                 <InitialsAvatar :name="usuario.name" :id="usuario.id" :src="usuario.avatarUrl" tone="bg-[#ff8c42] text-white" />
@@ -51,8 +55,26 @@
             </td>
 
             <td>
+              <StatusPill :tone="usuario.active ? 'green' : 'gray'">{{ usuario.active ? 'Activo' : 'Inactivo' }}</StatusPill>
+            </td>
+
+            <td>
               <div class="flex items-center justify-end gap-1">
                 <ActionButton icon="fa-solid fa-pen" label="Editar" tone="blue" @click="editarUsuario(usuario)" />
+                <ActionButton
+                  v-if="!usuario.esYo && usuario.active"
+                  icon="fa-solid fa-user-slash"
+                  label="Desactivar acceso"
+                  tone="gray"
+                  @click="usuarioPendienteDesactivar = usuario"
+                />
+                <ActionButton
+                  v-else-if="!usuario.esYo"
+                  icon="fa-solid fa-user-check"
+                  label="Reactivar acceso"
+                  tone="green"
+                  @click="cambiarEstado(usuario)"
+                />
                 <ActionButton v-if="!usuario.esYo" icon="fa-solid fa-trash" label="Eliminar" tone="red" @click="eliminar(usuario)" />
               </div>
             </td>
@@ -92,6 +114,18 @@
       :loading="eliminando"
       @confirm="confirmarEliminacion"
       @close="usuarioPendienteEliminar = null"
+    />
+
+    <ConfirmModal
+      v-if="usuarioPendienteDesactivar"
+      title="Desactivar usuario"
+      :message="`¿Desactivar a ${usuarioPendienteDesactivar.name}? Ya no podrá entrar al panel, pero sus ventas y compras se conservan. Podrás reactivarlo cuando quieras.`"
+      confirm-text="Sí, desactivar"
+      cancel-text="Cancelar"
+      variant="danger"
+      :loading="cambiandoEstado"
+      @confirm="cambiarEstado(usuarioPendienteDesactivar)"
+      @close="usuarioPendienteDesactivar = null"
     />
 
     <RegistrarUsuarioModal v-if="showModal" @close="showModal = false" />
@@ -135,13 +169,18 @@ const tabs = computed(() => [
   { value: 'todos', label: 'Todos', count: props.users.length },
   { value: 'admin', label: 'Administradores', count: props.users.filter((u) => u.role === 'admin').length },
   { value: 'vendedor', label: 'Vendedores', count: props.users.filter((u) => u.role === 'vendedor').length },
+  { value: 'inactivo', label: 'Inactivos', count: props.users.filter((u) => !u.active).length },
 ]);
 
 const usuariosFiltrados = computed(() => {
   const texto = filtroTexto.value.trim().toLowerCase();
 
   return props.users.filter((u) => {
-    if (filtroRol.value !== 'todos' && u.role !== filtroRol.value) return false;
+    if (filtroRol.value === 'inactivo') {
+      if (u.active) return false;
+    } else if (filtroRol.value !== 'todos' && u.role !== filtroRol.value) {
+      return false;
+    }
     if (!texto) return true;
 
     return u.name.toLowerCase().includes(texto) || u.email.toLowerCase().includes(texto);
@@ -169,6 +208,21 @@ const usuariosPaginados = computed(() => {
   const inicio = (paginaActual.value - 1) * perPage;
   return usuariosFiltrados.value.slice(inicio, inicio + perPage);
 });
+
+const usuarioPendienteDesactivar = ref(null);
+const cambiandoEstado = ref(false);
+
+const cambiarEstado = (usuario) => {
+  cambiandoEstado.value = true;
+
+  router.patch(route('admin.users.toggle-active', usuario.id), {}, {
+    preserveScroll: true,
+    onFinish: () => {
+      cambiandoEstado.value = false;
+      usuarioPendienteDesactivar.value = null;
+    },
+  });
+};
 
 const usuarioPendienteEliminar = ref(null);
 const eliminando = ref(false);

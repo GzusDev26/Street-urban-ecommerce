@@ -13,7 +13,7 @@
       </div>
 
       <p class="text-xs text-gray-400">
-        Estas son las categorías y marcas que aparecen al registrar un modelo nuevo en Catálogo o Compras. Solo puedes eliminar las que no tengan productos asociados.
+        Las categorías se crean aquí a propósito (no escribiéndolas al comprar) para evitar duplicados como «Polo» y «Polos»; cada una define las tallas que se ofrecen al comprar. Solo puedes eliminar las que no tengan productos asociados.
       </p>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -21,6 +21,7 @@
           title="Categorías"
           icon="fa-layer-group"
           entity-label="categoría"
+          with-size-type
           :items="categorias"
           :routes="{
             store: route('admin.categories.store'),

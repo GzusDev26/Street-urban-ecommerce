@@ -145,7 +145,6 @@ const menuGroups = computed(() => [
   {
     label: 'Inventario',
     items: [
-      { name: 'Catálogo', href: route('admin.catalogo.index'), active: 'admin.catalogo.*', icon: 'fa-book' },
       { name: 'Compras', href: route('admin.purchases.index'), active: 'admin.purchases.*', icon: 'fa-cart-shopping' },
       { name: 'Órdenes', href: null, active: null, icon: 'fa-receipt' },
     ],

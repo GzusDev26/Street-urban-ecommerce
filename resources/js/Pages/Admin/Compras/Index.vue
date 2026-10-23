@@ -52,10 +52,48 @@
         </div>
       </div>
 
-      <!-- Table -->
-      <ListCard title="Inventario comprado" subtitle="Productos y variantes registrados por compras">
+      <!-- Explorar: categoría → marca → modelo → colores × tallas -->
+      <ListCard v-if="vista === 'arbol'" title="Inventario" subtitle="Recorre tus categorías, marcas y modelos; toca una talla para comprar más">
         <template #action>
-          <PrimaryButton @click="showModal = true">Registrar nueva compra</PrimaryButton>
+          <div class="inline-flex p-1 bg-gray-100 rounded-xl" role="tablist" aria-label="Vista del inventario">
+            <button
+              v-for="op in VISTAS"
+              :key="op.id"
+              type="button"
+              role="tab"
+              :aria-selected="vista === op.id"
+              @click="cambiarVista(op.id)"
+              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+            >
+              <i :class="op.icono" class="text-xs"></i> {{ op.nombre }}
+            </button>
+          </div>
+        </template>
+
+        <InventarioExplorador
+          :modelos="modelos"
+          :categorias-info="categoriasInfo"
+          :marcas="marcas"
+          @comprar="comprarDesdeInventario"
+        />
+      </ListCard>
+
+      <!-- Lista plana de variantes (con sus lotes) -->
+      <ListCard v-else title="Inventario comprado" subtitle="Productos y variantes registrados por compras">
+        <template #action>
+          <div class="inline-flex p-1 bg-gray-100 rounded-xl" role="tablist" aria-label="Vista del inventario">
+            <button
+              v-for="op in VISTAS"
+              :key="op.id"
+              type="button"
+              role="tab"
+              :aria-selected="vista === op.id"
+              @click="cambiarVista(op.id)"
+              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+            >
+              <i :class="op.icono" class="text-xs"></i> {{ op.nombre }}
+            </button>
+          </div>
         </template>
 
         <template v-if="variants.length > 0" #toolbar>
@@ -70,6 +108,7 @@
             >
               <i class="fa-solid fa-xmark text-xs"></i> Limpiar
             </button>
+            <PrimaryButton class="lg:ml-auto" @click="showModal = true">Registrar nueva compra</PrimaryButton>
           </div>
         </template>
 
@@ -202,13 +241,14 @@
       </ListCard>
     </div>
 
-    <RegistrarCompraModal v-if="showModal" :categorias-existentes="categorias" :marcas-existentes="marcas" :prefill="prefillData" @close="cerrarModal" />
+    <RegistrarCompraModal v-if="showModal" :categorias-existentes="categorias" :categorias-info="categoriasInfo" :marcas-info="marcasInfo" :marcas-existentes="marcas" :prefill="prefillData" @close="cerrarModal" />
   </AdminLayout>
 </template>
 
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import RegistrarCompraModal from './RegistrarCompraModal.vue';
+import InventarioExplorador from './InventarioExplorador.vue';
 import { ref, computed, watch } from 'vue';
 import { Head, usePage, Link } from '@inertiajs/vue3';
 import ListCard from '@/Components/Admin/ListCard.vue';
@@ -223,15 +263,51 @@ import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
 
 const props = defineProps({
   variants: Array,
+  modelos: Array,
   stats: Object,
   categorias: Array,
+  categoriasInfo: Array,
   marcas: Array,
+  marcasInfo: Array,
 });
 
 const page = usePage();
 const umbralStockBajo = computed(() => page.props.business?.low_stock_threshold ?? 5);
 const showModal = ref(false);
+
+// Vista del inventario: "Explorar" (árbol por categoría) o "Lista" (variantes con sus lotes).
+const VISTAS = [
+  { id: 'arbol', nombre: 'Explorar', icono: 'fa-solid fa-sitemap' },
+  { id: 'lista', nombre: 'Lista', icono: 'fa-solid fa-list' },
+];
+const CLAVE_VISTA = 'inventario.vista';
+
+const leerVista = () => {
+  try {
+    return localStorage.getItem(CLAVE_VISTA) === 'lista' ? 'lista' : 'arbol';
+  } catch {
+    return 'arbol';
+  }
+};
+
+const vista = ref(leerVista());
+
+const cambiarVista = (id) => {
+  vista.value = id;
+  try {
+    localStorage.setItem(CLAVE_VISTA, id);
+  } catch {
+    // Sin almacenamiento disponible: la vista simplemente no se recuerda.
+  }
+};
+
 const prefillData = ref(null);
+
+// "Comprar" desde el árbol: abre el formulario con lo que ya se sabe (categoría, marca, modelo...).
+const comprarDesdeInventario = (prefill) => {
+  prefillData.value = prefill;
+  showModal.value = true;
+};
 
 const reabastecer = (variant) => {
   prefillData.value = {

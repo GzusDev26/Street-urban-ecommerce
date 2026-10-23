@@ -52,6 +52,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/ventas', [SaleController::class, 'store'])->name('admin.sales.store');
     Route::get('/ventas/buscar-variantes', [SaleController::class, 'searchVariants'])->name('admin.sales.search');
     Route::get('/ventas/buscar-clientes', [SaleController::class, 'searchClientes'])->name('admin.sales.search-clientes');
+    Route::get('/ventas/buscar-documento', [SaleController::class, 'buscarDocumento'])->name('admin.sales.buscar-documento');
     Route::get('/ventas/reportes', [SaleController::class, 'reportes'])->name('admin.sales.reportes');
     Route::get('/ventas/{venta}/boleta', [SaleController::class, 'boleta'])->name('admin.sales.boleta');
     Route::patch('/ventas/{venta}/cancelar', [SaleController::class, 'cancel'])->name('admin.sales.cancel');
@@ -61,9 +62,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::middleware(['admin.only'])->group(function () {
         Route::get('/catalogo', [CatalogoController::class, 'index'])->name('admin.catalogo.index');
         Route::post('/catalogo', [CatalogoController::class, 'store'])->name('admin.catalogo.store');
-        Route::get('/catalogo/{producto}/variantes', [CatalogoController::class, 'variantes'])->name('admin.catalogo.variantes');
+        Route::post('/catalogo/{producto}/tallas', [CatalogoController::class, 'storeTallas'])->name('admin.catalogo.tallas.store');
         Route::get('/catalogo/{producto}/colores', [CatalogoController::class, 'colores'])->name('admin.catalogo.colores.index');
         Route::post('/catalogo/{producto}/colores', [CatalogoController::class, 'storeColor'])->name('admin.catalogo.colores.store');
+        Route::post('/catalogo/{producto}/colores/varios', [CatalogoController::class, 'storeColores'])->name('admin.catalogo.colores.store-many');
         Route::post('/catalogo/colores/{color}', [CatalogoController::class, 'updateColor'])->name('admin.catalogo.colores.update');
         Route::delete('/catalogo/colores/{color}', [CatalogoController::class, 'destroyColor'])->name('admin.catalogo.colores.destroy');
         Route::patch('/catalogo/{producto}', [CatalogoController::class, 'update'])->name('admin.catalogo.update');
@@ -77,23 +79,27 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
         // URLs heredadas de lectura llevan al catálogo canónico. Se preservan los nombres
         // de ruta y se responde 410 a escrituras para no fingir que el cambio fue aplicado.
-        Route::get('/products', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.index');
-        Route::get('/products/create', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.create');
+        Route::get('/products', fn () => redirect()->route('admin.purchases.index'))->name('admin.products.index');
+        Route::get('/products/create', fn () => redirect()->route('admin.purchases.index'))->name('admin.products.create');
         Route::post('/products', fn () => abort(410, $mensajeProductosMovidos))->name('admin.products.store');
-        Route::get($rutaProducto, fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.show');
-        Route::get('/products/{product}/edit', fn () => redirect()->route('admin.catalogo.index'))->name('admin.products.edit');
+        Route::get($rutaProducto, fn () => redirect()->route('admin.purchases.index'))->name('admin.products.show');
+        Route::get('/products/{product}/edit', fn () => redirect()->route('admin.purchases.index'))->name('admin.products.edit');
         Route::match(['put', 'patch'], $rutaProducto, fn () => abort(410, $mensajeProductosMovidos))->name('admin.products.update');
         Route::delete($rutaProducto, fn () => abort(410, $mensajeProductosMovidos))->name('admin.products.destroy');
     });
 
     // Gestión de usuarios/roles y datos del negocio — solo un administrador puede entrar aquí.
     Route::middleware(['admin.only'])->group(function () {
+        Route::patch('/users/{user}/active', [UserAdminController::class, 'toggleActive'])->name('admin.users.toggle-active');
         Route::resource('users', UserAdminController::class, ['as' => 'admin']);
         Route::get('/settings', [BusinessSettingController::class, 'edit'])->name('admin.settings.edit');
         Route::patch('/settings', [BusinessSettingController::class, 'update'])->name('admin.settings.update');
 
         Route::get('/categorias-marcas', [CategoryBrandController::class, 'index'])->name('admin.taxonomies.index');
         Route::post('/categorias', [CategoryBrandController::class, 'storeCategory'])->name('admin.categories.store');
+        Route::post('/categorias/rapida', [CategoryBrandController::class, 'quickStoreCategory'])->name('admin.categories.quick-store');
+        Route::post('/categorias/{category}/marcas', [CategoryBrandController::class, 'attachBrand'])->name('admin.categories.brands.attach');
+        Route::delete('/categorias/{category}/marcas/{brand}', [CategoryBrandController::class, 'detachBrand'])->name('admin.categories.brands.detach');
         Route::patch('/categorias/{category}', [CategoryBrandController::class, 'updateCategory'])->name('admin.categories.update');
         Route::delete('/categorias/{category}', [CategoryBrandController::class, 'destroyCategory'])->name('admin.categories.destroy');
         Route::post('/marcas', [CategoryBrandController::class, 'storeBrand'])->name('admin.brands.store');

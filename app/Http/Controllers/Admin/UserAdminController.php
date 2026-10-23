@@ -24,6 +24,7 @@ class UserAdminController extends Controller
                 'name' => $u->name,
                 'email' => $u->email,
                 'role' => $u->role,
+                'active' => $u->active,
                 'avatarUrl' => $u->avatar_url,
                 'esYo' => $u->id === Auth::id(),
             ]);
@@ -98,6 +99,27 @@ class UserAdminController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Usuario actualizado exitosamente.');
     }
 
+    // Quita o devuelve el acceso al panel sin tocar su historial de ventas y compras.
+    public function toggleActive(User $user)
+    {
+        if ($user->id === Auth::id()) {
+            return back()->withErrors(['error' => 'No puedes desactivar tu propia cuenta.']);
+        }
+
+        if ($user->active && $user->role === 'admin') {
+            $quedanOtrosAdmins = User::where('role', 'admin')->where('active', true)->where('id', '!=', $user->id)->exists();
+            if (!$quedanOtrosAdmins) {
+                return back()->withErrors(['error' => 'No puedes desactivar al único administrador activo.']);
+            }
+        }
+
+        $user->update(['active' => !$user->active]);
+
+        return back()->with('success', $user->active
+            ? "{$user->name} fue reactivado y ya puede entrar al panel."
+            : "{$user->name} fue desactivado. Ya no puede entrar, y su historial se conserva.");
+    }
+
     public function destroy(User $user)
     {
         if ($user->id === Auth::id()) {
@@ -109,6 +131,20 @@ class UserAdminController extends Controller
             if (!$quedanOtrosAdmins) {
                 return back()->withErrors(['error' => 'No puedes eliminar al único administrador.']);
             }
+        }
+
+        // Sus ventas y compras llevan su nombre como responsable: borrarlo las dejaría huérfanas
+        // (la base de datos también lo impide, esto solo explica el motivo).
+        $ventas = $user->sales()->count();
+        $compras = $user->purchases()->count();
+
+        if ($ventas > 0 || $compras > 0) {
+            $detalle = collect([
+                $ventas > 0 ? "{$ventas} " . ($ventas === 1 ? 'venta' : 'ventas') : null,
+                $compras > 0 ? "{$compras} " . ($compras === 1 ? 'compra' : 'compras') : null,
+            ])->filter()->implode(' y ');
+
+            return back()->withErrors(['error' => "No se puede eliminar a {$user->name}: tiene {$detalle} registradas. Se conserva para no perder el historial: desactívalo para quitarle el acceso."]);
         }
 
         $user->delete();

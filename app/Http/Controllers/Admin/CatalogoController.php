@@ -7,6 +7,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductColor;
+use App\Models\ProductVariant;
+use App\Support\NameMatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -17,127 +19,102 @@ class CatalogoController extends Controller
 {
     private const NAME_MATCH = 'LOWER(TRIM(name)) = ?';
 
+    // El catálogo vive dentro de Compras > Inventario (árbol categoría → marca → modelo).
     public function index()
     {
-        $productos = Product::with(['category', 'brand', 'variants'])
-            ->withCount('colors')
-            ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
-            ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
-            ->orderBy('categories.name')
-            ->orderBy('brands.name')
-            ->orderBy('products.name')
-            ->addSelect('products.*')
-            ->get()
-            ->map(function ($p) {
-                // El precio de venta vive por variante (cada color/talla puede costar distinto,
-                // ej. una edición limitada). Si aún no hay variantes se usa el precio base del modelo.
-                $precioMin = $p->variants->min('price');
-                $precioMax = $p->variants->max('price');
-
-                // Tallas únicas entre todos los colores, en el mismo orden que se usa al
-                // registrar (RegistrarModeloModal/RegistrarCompraModal) — solo para tener
-                // una vista previa rápida, sin tener que expandir el modelo.
-                $ordenTallas = ['Único', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', '38', '40'];
-                $tallas = $p->variants->pluck('size')->unique()
-                    ->sortBy(fn ($talla) => ($idx = array_search($talla, $ordenTallas)) === false ? 999 : $idx)
-                    ->values();
-
-                return [
-                    'id' => $p->id,
-                    'nombre' => $p->name,
-                    'marca' => $p->brand->name ?? '-',
-                    'categoria' => $p->category->name ?? '-',
-                    'descripcion' => $p->description,
-                    'stock' => $p->stock,
-                    'activo' => $p->active,
-                    'precioVenta' => (float) ($precioMin ?? $p->price),
-                    'precioVentaMax' => ($precioMax !== null && (float) $precioMax !== (float) ($precioMin ?? $p->price)) ? (float) $precioMax : null,
-                    // "Variantes" = colores del modelo (ej. blanco vs negro). Las tallas son
-                    // el desglose dentro de cada color, no una variante en sí misma.
-                    'variantes' => $p->colors_count,
-                    'tallas' => $tallas,
-                ];
-            });
-
-        return Inertia::render('Admin/Catalogo/Index', [
-            'productos' => $productos,
-            'categorias' => Category::orderBy('name')->pluck('name'),
-            'marcas' => Brand::orderBy('name')->pluck('name'),
-        ]);
+        return redirect()->route('admin.purchases.index');
     }
 
+    // Crea un modelo dentro de una categoría y marca ya elegidas en el árbol (sin colores, tallas
+    // ni stock: los colores se agregan después y el stock entra por Compras).
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'categoria_id' => 'required|exists:categories,id',
+            'marca_id' => 'required|exists:brands,id',
             'nombre' => 'required|string|max:255',
-            'marca' => 'required|string|max:255',
-            'marcaDescripcion' => 'nullable|string|max:1000',
-            'categoria' => 'required|string|max:255',
-            'categoriaDescripcion' => 'nullable|string|max:1000',
             'descripcion' => 'nullable|string|max:2000',
-            'color' => 'required|string|max:50',
-            'colorHex' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
-            'talla' => 'required|string|max:20',
-            'precio' => 'required|numeric|min:0.01',
-            'stock' => 'required|integer|min:0',
         ]);
 
-        $product = DB::transaction(function () use ($validated) {
-            $brand = Brand::firstOrCreate(
-                ['slug' => Str::slug(trim($validated['marca']))],
-                ['name' => trim($validated['marca']), 'description' => $validated['marcaDescripcion'] ?? null, 'active' => true]
-            );
+        $category = Category::findOrFail($validated['categoria_id']);
+        $brand = Brand::findOrFail($validated['marca_id']);
+        $nombre = trim($validated['nombre']);
 
-            $exists = Product::where('brand_id', $brand->id)
-                ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['nombre']))])
-                ->exists();
+        $existe = Product::where('brand_id', $brand->id)
+            ->whereRaw(self::NAME_MATCH, [mb_strtolower($nombre)])
+            ->exists();
 
-            if ($exists) {
-                return null;
-            }
+        if ($existe) {
+            $mensaje = "{$brand->name} ya tiene un modelo llamado «{$nombre}».";
 
-            $category = Category::firstOrCreate(
-                ['slug' => Str::slug(trim($validated['categoria']))],
-                ['name' => trim($validated['categoria']), 'description' => $validated['categoriaDescripcion'] ?? null, 'active' => true]
-            );
-
-            $sku = strtoupper(Str::slug($validated['nombre'].'-'.$validated['marca'])).'-'.Str::random(6);
-            $product = Product::create([
-                'name' => trim($validated['nombre']),
-                'brand_id' => $brand->id,
-                'category_id' => $category->id,
-                'description' => $validated['descripcion'] ?? '',
-                'sku' => $sku,
-                'price' => $validated['precio'],
-                'cost' => 0,
-                'stock' => $validated['stock'],
-                'image_url' => null,
-                'active' => true,
-            ]);
-
-            $color = $product->colors()->create([
-                'name' => trim($validated['color']),
-                'hex' => $validated['colorHex'] ?? null,
-                'image_url' => null,
-            ]);
-
-            $product->variants()->create([
-                'product_color_id' => $color->id,
-                'size' => trim($validated['talla']),
-                'sku' => strtoupper($sku.'-'.Str::slug($validated['color']).'-'.Str::slug($validated['talla'])),
-                'price' => $validated['precio'],
-                'cost' => 0,
-                'stock' => $validated['stock'],
-            ]);
-
-            return $product;
-        });
-
-        if (!$product) {
-            return back()->withErrors(['nombre' => 'Ya existe un modelo con ese nombre y esa marca.']);
+            return $request->expectsJson()
+                ? response()->json(['message' => $mensaje], 422)
+                : back()->withErrors(['nombre' => $mensaje]);
         }
 
-        return redirect()->route('admin.catalogo.index')->with('success', 'Producto y variante inicial registrados.');
+        $producto = Product::create([
+            'name' => $nombre,
+            'brand_id' => $brand->id,
+            'category_id' => $category->id,
+            'description' => $validated['descripcion'] ?? '',
+            'sku' => strtoupper(Str::slug($nombre.'-'.$brand->name)).'-'.Str::random(6),
+            'price' => 0,
+            'cost' => 0,
+            'stock' => 0,
+            'image_url' => null,
+            'active' => true,
+        ]);
+
+        $category->brands()->syncWithoutDetaching([$brand->id]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'id' => $producto->id,
+                'nombre' => $producto->name,
+                'marca' => $brand->name,
+                'categoria' => $category->name,
+                'stock' => 0,
+            ], 201);
+        }
+
+        return back()->with('success', "Modelo «{$nombre}» creado en {$category->name} › {$brand->name}.");
+    }
+
+    // Agrega tallas al modelo: crea la combinación talla × color de cada color existente, con 0 de
+    // stock. Sirve para dejar la estructura lista; el stock y los precios entran con la compra.
+    public function storeTallas(Request $request, Product $producto)
+    {
+        $validated = $request->validate([
+            'tallas' => 'required|array|min:1|max:30',
+            'tallas.*' => 'required|string|max:20',
+        ]);
+
+        $colores = $producto->colors;
+
+        if ($colores->isEmpty()) {
+            return back()->withErrors(['tallas' => 'Agrega al menos un color antes de agregar tallas.']);
+        }
+
+        $creadas = 0;
+
+        DB::transaction(function () use ($validated, $producto, $colores, &$creadas) {
+            foreach ($colores as $color) {
+                foreach (array_unique(array_map('trim', $validated['tallas'])) as $talla) {
+                    $variante = ProductVariant::firstOrCreate(
+                        ['product_id' => $producto->id, 'size' => $talla, 'product_color_id' => $color->id],
+                        ['sku' => strtoupper($producto->sku.'-'.$talla.'-'.Str::slug($color->name)).'-'.Str::random(3), 'stock' => 0],
+                    );
+
+                    if ($variante->wasRecentlyCreated) {
+                        $creadas++;
+                    }
+                }
+            }
+        });
+
+        return back()->with('success', $creadas === 0
+            ? 'Esas tallas ya estaban registradas.'
+            : "{$creadas} combinaci".($creadas === 1 ? 'ón' : 'ones').' de talla y color creadas.');
     }
 
     public function update(Request $request, Product $producto)
@@ -151,10 +128,18 @@ class CatalogoController extends Controller
             'descripcion' => 'nullable|string|max:2000',
         ]);
 
-        $brand = Brand::firstOrCreate(
-            ['slug' => Str::slug($validated['marca'])],
-            ['name' => trim($validated['marca']), 'description' => $validated['marcaDescripcion'] ?? null, 'active' => true]
-        );
+        $marcaExistente = Brand::whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['marca']))])->first();
+
+        if (!$marcaExistente && ($parecida = NameMatcher::similar(Brand::class, $validated['marca']))) {
+            return back()->withErrors(['marca' => "La marca «{$validated['marca']}» se parece a «{$parecida->name}». Elige esa de la lista."]);
+        }
+
+        $brand = $marcaExistente ?? Brand::create([
+            'slug' => Str::slug($validated['marca']),
+            'name' => trim($validated['marca']),
+            'description' => $validated['marcaDescripcion'] ?? null,
+            'active' => true,
+        ]);
 
         $existe = Product::where('brand_id', $brand->id)
             ->whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['nombre']))])
@@ -165,10 +150,12 @@ class CatalogoController extends Controller
             return back()->withErrors(['nombre' => 'Ya existe otro modelo con ese nombre y esa marca.']);
         }
 
-        $category = Category::firstOrCreate(
-            ['slug' => Str::slug($validated['categoria'])],
-            ['name' => $validated['categoria'], 'description' => $validated['categoriaDescripcion'] ?? null, 'active' => true]
-        );
+        // Las categorías no se crean desde aquí: se elige una existente.
+        $category = Category::whereRaw(self::NAME_MATCH, [mb_strtolower(trim($validated['categoria']))])->first();
+
+        if (!$category) {
+            return back()->withErrors(['categoria' => 'Esa categoría no existe. Elige una de la lista.']);
+        }
 
         $producto->update([
             'name' => trim($validated['nombre']),
@@ -177,31 +164,9 @@ class CatalogoController extends Controller
             'description' => $validated['descripcion'] ?? '',
         ]);
 
-        return redirect()->route('admin.catalogo.index')->with('success', 'Modelo actualizado.');
-    }
+        $category->brands()->syncWithoutDetaching([$brand->id]);
 
-    // Agrupa por color (la "variante" real del modelo) y anida las tallas dentro
-    // de cada uno, ya que la talla es solo el desglose de stock de ese color.
-    public function variantes(Product $producto)
-    {
-        $colores = $producto->colors()
-            ->with(['variants' => fn ($q) => $q->orderBy('size')])
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($c) => [
-                'id' => $c->id,
-                'nombre' => $c->name,
-                'hex' => $c->hex,
-                'stockTotal' => $c->variants->sum('stock'),
-                'tallas' => $c->variants->map(fn ($v) => [
-                    'id' => $v->id,
-                    'talla' => $v->size,
-                    'stock' => $v->stock,
-                    'costo' => (float) $v->cost,
-                ])->values(),
-            ]);
-
-        return response()->json($colores);
+        return back()->with('success', 'Modelo actualizado.');
     }
 
     public function colores(Product $producto)
@@ -246,6 +211,49 @@ class CatalogoController extends Controller
         ]);
 
         return back()->with('success', 'Color agregado.');
+    }
+
+    // Alta rápida de varios colores a la vez (solo nombre y color de referencia; las fotos se
+    // suben después, editando cada color). Los que el modelo ya tiene se omiten, sin error.
+    public function storeColores(Request $request, Product $producto)
+    {
+        $validated = $request->validate([
+            'colores' => 'required|array|min:1|max:30',
+            'colores.*.nombre' => 'required|string|max:50',
+            'colores.*.hex' => 'nullable|string|max:7',
+        ]);
+
+        $creados = 0;
+        $omitidos = 0;
+
+        DB::transaction(function () use ($validated, $producto, &$creados, &$omitidos) {
+            foreach ($validated['colores'] as $color) {
+                $nombre = trim($color['nombre']);
+
+                $existe = $producto->colors()
+                    ->whereRaw(self::NAME_MATCH, [mb_strtolower($nombre)])
+                    ->exists();
+
+                if ($existe) {
+                    $omitidos++;
+                    continue;
+                }
+
+                $producto->colors()->create([
+                    'name' => $nombre,
+                    'hex' => $color['hex'] ?? null,
+                    'image_url' => null,
+                ]);
+                $creados++;
+            }
+        });
+
+        $mensaje = $creados === 1 ? '1 color agregado.' : "{$creados} colores agregados.";
+        if ($omitidos > 0) {
+            $mensaje .= ' ' . ($omitidos === 1 ? '1 ya existía y se omitió.' : "{$omitidos} ya existían y se omitieron.");
+        }
+
+        return back()->with('success', $mensaje);
     }
 
     public function updateColor(Request $request, ProductColor $color)
@@ -306,13 +314,13 @@ class CatalogoController extends Controller
     {
         $producto->update(['active' => false]);
 
-        return redirect()->route('admin.catalogo.index')->with('success', 'Producto dado de baja; sus ventas y compras se conservaron.');
+        return back()->with('success', 'Producto dado de baja; sus ventas y compras se conservaron.');
     }
 
     public function restore(Product $producto)
     {
         $producto->update(['active' => true]);
 
-        return redirect()->route('admin.catalogo.index')->with('success', 'Producto reactivado en el catálogo.');
+        return back()->with('success', 'Producto reactivado en el catálogo.');
     }
 }
