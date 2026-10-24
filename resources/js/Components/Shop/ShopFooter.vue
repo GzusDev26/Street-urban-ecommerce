@@ -12,9 +12,7 @@ const business = computed(() => page.props.business);
       
       <!-- Brand Section -->
       <div class="space-y-6">
-        <h2 class="text-2xl font-black uppercase tracking-tighter italic">
-          Street <span class="text-white/50">Urban</span>
-        </h2>
+        <img src="/image/logo/street-urban-logo-dark.png" alt="Street Urban" class="h-20 w-auto" />
         <p class="text-gray-400 text-sm leading-relaxed">
           Llevamos la cultura urbana a otro nivel. Calidad premium, diseño disruptivo y la esencia de la calle en cada prenda.
         </p>

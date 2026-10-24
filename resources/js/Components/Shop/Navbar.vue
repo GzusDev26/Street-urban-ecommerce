@@ -123,13 +123,18 @@ watch(() => page.url, () => {
 
 <template>
   <nav
-    class="fixed top-0 left-0 w-full z-50 px-6 md:px-12 transition-all duration-500 flex justify-between items-center"
-    :class="scrolled ? 'py-5 bg-[#111111]/95 backdrop-blur-md shadow-lg shadow-black/20' : 'py-7 bg-transparent'"
+    class="fixed top-0 left-0 w-full z-50 transition-all duration-500 flex justify-between items-center"
+    :class="scrolled ? 'py-4 pr-5 pl-6 md:pl-12 bg-[#111111]/95 backdrop-blur-md shadow-lg shadow-black/20' : 'py-6 pr-7 pl-6 md:pl-12 bg-transparent'"
   >
 
-    <div class="text-2xl md:text-3xl font-black italic tracking-tighter uppercase shrink-0 text-white">
-      Street <span class="font-light">Urban</span>
-    </div>
+    <Link :href="route('shop.home')" class="shrink-0 block" aria-label="Street Urban - Inicio">
+      <img
+        src="/image/logo/street-urban-logo-dark.png"
+        alt="Street Urban"
+        class="object-fill transition-all duration-500"
+        :class="scrolled ? 'h-14 w-[7.5rem] md:h-16 md:w-[8.75rem]' : 'h-16 w-[8.5rem] md:h-[4.5rem] md:w-[10rem]'"
+      />
+    </Link>
 
     <!-- Desktop Menu -->
     <div class="hidden lg:flex space-x-12 text-xs font-semibold tracking-widest uppercase text-gray-300">

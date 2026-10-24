@@ -190,7 +190,7 @@ const closeAndReset = () => {
       <div class="sticky top-0 bg-[#111111] z-10">
         <div class="px-8 py-6 flex justify-between items-center border-b border-gray-800">
           <div class="w-6"></div>
-          <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Street Urban</h3>
+          <img src="/image/logo/street-urban-logo-dark.png" alt="Street Urban" class="h-12 w-auto" />
           <button
             @click="emit('close')"
             class="p-2 hover:bg-gray-800 rounded-lg transition"

@@ -55,6 +55,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/ventas/buscar-documento', [SaleController::class, 'buscarDocumento'])->name('admin.sales.buscar-documento');
     Route::get('/ventas/reportes', [SaleController::class, 'reportes'])->name('admin.sales.reportes');
     Route::get('/ventas/{venta}/boleta', [SaleController::class, 'boleta'])->name('admin.sales.boleta');
+    Route::get('/ventas/{venta}/boleta/datos', [SaleController::class, 'boletaDatos'])->name('admin.sales.boleta.datos');
     Route::patch('/ventas/{venta}/cancelar', [SaleController::class, 'cancel'])->name('admin.sales.cancel');
     Route::post('/ventas/items/{item}/devolver', [SaleController::class, 'returnItem'])->name('admin.sales.items.return');
 

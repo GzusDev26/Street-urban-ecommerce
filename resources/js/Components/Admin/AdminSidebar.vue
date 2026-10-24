@@ -5,10 +5,12 @@
     aria-label="Menú del panel"
   >
     <!-- Marca (el botón para contraer el aside vive en AdminTopbar) -->
-    <div class="h-[72px] flex items-center gap-3 border-b border-white/[0.06]" :class="rail ? 'justify-center px-0' : 'px-5'">
-      <div class="relative w-9 h-9 flex-shrink-0 rounded-[10px] bg-gradient-to-br from-[#ffa463] to-[#f2701d] flex items-center justify-center font-black text-white text-[15px] shadow-[0_4px_14px_-4px_rgba(255,140,66,0.6)] ring-1 ring-inset ring-white/20">
-        {{ brand.initial }}
-      </div>
+    <div class="h-[72px] flex items-center gap-3 border-b border-white/[0.06]" :class="rail ? 'justify-center px-0' : 'pl-7 pr-5'">
+      <img
+        src="/image/logo/street-urban-icono-dark.png"
+        :alt="`Logo de ${brand.name}`"
+        class="w-14 h-12 flex-shrink-0 object-fill"
+      />
       <div v-if="!rail" class="min-w-0 flex-1 leading-tight">
         <p class="text-[15px] font-bold tracking-tight text-white truncate">{{ brand.name }}</p>
         <p class="text-[11px] font-medium text-white/50 truncate">Panel de gestión</p>

@@ -104,6 +104,14 @@ class SaleController extends Controller
         ]);
     }
 
+    // Mismos datos que la boleta, en JSON: el modal de "Registrar venta" la dibuja sin salir de la página.
+    public function boletaDatos(Sale $venta)
+    {
+        $venta->load(['items.variant.product.brand', 'items.variant.productColor', 'user', 'customer']);
+
+        return response()->json($this->mapVenta($venta));
+    }
+
     public function reportes(Request $request)
     {
         $desde = $request->query('desde');

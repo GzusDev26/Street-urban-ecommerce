@@ -446,17 +446,23 @@
         </aside>
       </div>
     </div>
+    <BoletaModal
+      v-if="boletaAbierta"
+      :venta-id="boletaAbierta.ventaId"
+      :resumen="boletaAbierta.resumen"
+      @close="boletaAbierta = null"
+    />
   </AdminLayout>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import { avisar } from '@/alerts';
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
+import BoletaModal from './BoletaModal.vue';
 import EmptyHero from '@/Components/Admin/EmptyHero.vue';
 import { ORDEN_TALLAS } from '@/Components/Admin/tallas';
 
@@ -764,40 +770,14 @@ const subtotalDe = (p) => p.cantidad * (Number(p.precioVenta) || 0);
 const totalVenta = () => prendas.value.reduce((sum, p) => sum + subtotalDe(p), 0);
 const totalPrendas = () => prendas.value.reduce((sum, p) => sum + p.cantidad, 0);
 
-const escapar = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+// Al guardar se abre la boleta en un modal (con imprimir, ver en historial o seguir vendiendo).
+const boletaAbierta = ref(null); // { ventaId, resumen }
 
-// Aviso al guardar: resume la venta y ofrece lo siguiente (imprimir, ver en historial o seguir vendiendo).
 const avisarVentaGuardada = (resumen) => {
   const ventaId = page.props.flash?.ventaId;
   if (!ventaId) return;
 
-  Swal.fire({
-    icon: 'success',
-    iconColor: '#22c55e',
-    title: '¡Venta registrada!',
-    html: `
-      <p class="text-3xl font-black text-[#ff8c42] tabular-nums mt-1">S/ ${resumen.total.toFixed(2)}</p>
-      <p class="text-sm text-gray-500 mt-2">${resumen.prendas} prenda${resumen.prendas === 1 ? '' : 's'}${resumen.cliente ? ` · ${escapar(resumen.cliente)}` : ''}</p>`,
-    showDenyButton: true,
-    showCancelButton: true,
-    confirmButtonText: '<i class="fa-solid fa-print"></i>&nbsp; Imprimir boleta',
-    denyButtonText: '<i class="fa-solid fa-receipt"></i>&nbsp; Ver en historial',
-    cancelButtonText: 'Seguir vendiendo',
-    buttonsStyling: false,
-    reverseButtons: true,
-    focusConfirm: true,
-    customClass: {
-      popup: '!rounded-3xl !p-8',
-      title: '!text-2xl !font-bold !text-gray-900',
-      actions: '!w-full !flex !flex-col-reverse !gap-2 !mt-6',
-      confirmButton: '!w-full !h-12 !rounded-xl !bg-[#ff8c42] hover:!bg-[#f27d30] !text-white !font-bold !text-sm !shadow-md !shadow-orange-200 !m-0',
-      denyButton: '!w-full !h-11 !rounded-xl !bg-white !border !border-gray-200 hover:!bg-gray-50 !text-gray-700 !font-semibold !text-sm !m-0',
-      cancelButton: '!w-full !h-10 !bg-transparent !text-gray-400 hover:!text-gray-600 !font-semibold !text-sm !m-0',
-    },
-  }).then((r) => {
-    if (r.isConfirmed) window.open(route('admin.sales.boleta', ventaId), '_blank');
-    else if (r.isDenied) router.visit(`${route('admin.sales.index')}?venta=${ventaId}`);
-  });
+  boletaAbierta.value = { ventaId, resumen };
 };
 
 const guardarVenta = () => {

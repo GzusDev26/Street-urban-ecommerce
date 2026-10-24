@@ -37,21 +37,14 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Total de Ventas</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalVentas }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Ingresos Totales</p>
-          <p class="text-3xl font-black text-[#ff8c42] mt-1">S/ {{ stats.totalIngresos.toFixed(2) }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Prendas Vendidas</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.prendasVendidas }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Promedio por Venta</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">S/ {{ stats.promedioVenta.toFixed(2) }}</p>
+        <div v-for="stat in tarjetas" :key="stat.label" class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex items-center gap-4">
+          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', stat.fondo]">
+            <i :class="['fa-solid text-lg', stat.icono, stat.color]"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm text-gray-400 font-medium">{{ stat.label }}</p>
+            <p :class="['text-2xl font-black mt-0.5 truncate', stat.destacado ? 'text-[#ff8c42]' : 'text-gray-900']">{{ stat.valor }}</p>
+          </div>
         </div>
       </div>
 
@@ -63,127 +56,197 @@
 
         <template #toolbar>
           <SearchInput v-model="filtroTexto" placeholder="Buscar por producto, cliente o N° de venta" class="w-full sm:w-96" />
+          <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado">
+            <button
+              v-for="f in filtrosEstado"
+              :key="f.value"
+              @click="filtroEstado = f.value"
+              :aria-pressed="filtroEstado === f.value"
+              :class="[
+                'text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50',
+                filtroEstado === f.value
+                  ? 'bg-[#ff8c42] border-[#ff8c42] text-white shadow-sm'
+                  : 'bg-white border-gray-200 text-gray-500 hover:border-[#ff8c42]/50 hover:text-[#ff8c42]',
+              ]"
+            >
+              {{ f.label }}
+              <span :class="['ml-1 tabular-nums', filtroEstado === f.value ? 'text-white/80' : 'text-gray-300']">{{ f.cantidad }}</span>
+            </button>
+          </div>
         </template>
 
-        <div v-if="ventasFiltradas.length > 0" class="space-y-3 px-6 pb-6">
-          <div
-            v-for="venta in ventasPaginadas"
-            :key="venta.id"
-            :id="`venta-${venta.id}`"
-            :class="[
-              'border rounded-xl overflow-hidden transition-colors',
-              venta.id === ventaDestacada ? 'border-[#ff8c42] ring-2 ring-[#ff8c42]/30' : 'border-gray-100',
-              venta.cancelada ? 'opacity-60' : '',
-            ]"
-          >
-            <button
-              @click="toggleExpand(venta.id)"
-              class="w-full flex items-center justify-between px-5 py-4 hover:bg-orange-50/40 transition-colors text-left"
-            >
-              <div class="flex items-center gap-4 min-w-0">
-                <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded flex-shrink-0">{{ venta.numero }}</span>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <p :class="['text-sm font-semibold text-gray-900 truncate', venta.cancelada ? 'line-through' : '']">{{ tituloVenta(venta) }}</p>
-                    <span
+        <div v-if="ventasFiltradas.length > 0" class="px-6 pb-6">
+          <section v-for="grupo in gruposPaginados" :key="grupo.fecha" class="mb-6 last:mb-0">
+            <!-- Cabecera del día -->
+            <div class="flex items-center gap-3 mb-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500">{{ grupo.etiqueta }}</h4>
+              <span class="flex-1 h-px bg-gray-100"></span>
+              <p class="text-xs text-gray-400 whitespace-nowrap">
+                {{ grupo.cantidadVentas }} venta{{ grupo.cantidadVentas === 1 ? '' : 's' }}
+                <span class="mx-1 text-gray-200">|</span>
+                <span class="font-bold text-gray-700">S/ {{ grupo.total.toFixed(2) }}</span>
+              </p>
+            </div>
+
+            <div class="space-y-3">
+              <article
+                v-for="venta in grupo.ventas"
+                :key="venta.id"
+                :id="`venta-${venta.id}`"
+                :class="[
+                  'rounded-2xl border bg-white overflow-hidden transition-all duration-200 border-l-4',
+                  acentoEstado(venta),
+                  venta.id === ventaDestacada ? 'ring-2 ring-[#ff8c42]/30 border-[#ff8c42]' : 'border-gray-100',
+                  expandedId === venta.id ? 'shadow-md' : 'hover:shadow-sm',
+                ]"
+              >
+                <button
+                  @click="toggleExpand(venta.id)"
+                  :aria-expanded="expandedId === venta.id"
+                  :aria-controls="`detalle-${venta.id}`"
+                  class="w-full flex items-center justify-between gap-4 px-5 py-4 hover:bg-orange-50/40 transition-colors text-left focus-visible:outline-none focus-visible:bg-orange-50/60"
+                >
+                  <div class="flex items-center gap-4 min-w-0">
+                    <div
                       :class="[
-                        'text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0',
-                        venta.cliente ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400',
+                        'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold',
+                        venta.cliente ? 'bg-orange-50 text-[#ff8c42]' : 'bg-gray-100 text-gray-300',
                       ]"
+                      aria-hidden="true"
                     >
-                      <i class="fa-solid fa-user text-[9px] mr-1"></i>{{ venta.cliente || 'Sin cliente registrado' }}
-                    </span>
-                    <span v-if="venta.cancelada" class="text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 bg-red-50 text-red-500">
-                      <i class="fa-solid fa-ban text-[9px] mr-1"></i>Cancelada
+                      <template v-if="venta.cliente">{{ iniciales(venta.cliente) }}</template>
+                      <i v-else class="fa-solid fa-user text-sm"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p :class="['text-sm font-bold text-gray-900 truncate max-w-full', venta.cancelada ? 'line-through text-gray-500' : '']">{{ tituloVenta(venta) }}</p>
+                        <span class="font-mono text-[11px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded flex-shrink-0">{{ venta.numero }}</span>
+                        <span v-if="venta.cancelada" class="text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 bg-red-50 text-red-500">
+                          <i class="fa-solid fa-ban text-[9px] mr-1"></i>Cancelada
+                        </span>
+                        <span v-else-if="venta.prendasDevueltas > 0" class="text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 bg-amber-50 text-amber-600">
+                          <i class="fa-solid fa-rotate-left text-[9px] mr-1"></i>{{ venta.prendasDevueltas }} devuelta{{ venta.prendasDevueltas === 1 ? '' : 's' }}
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-500 mt-1 truncate">
+                        <span class="font-medium text-gray-700">{{ venta.cliente || 'Sin cliente registrado' }}</span>
+                        <span class="text-gray-300 mx-1.5">&bull;</span>{{ venta.totalPrendas }} prenda{{ venta.totalPrendas === 1 ? '' : 's' }}
+                        <span v-if="venta.registradoPor" class="hidden sm:inline"><span class="text-gray-300 mx-1.5">&bull;</span>Por {{ venta.registradoPor }}</span>
+                        <span v-if="venta.cancelada && venta.canceladaPor" class="hidden sm:inline"><span class="text-gray-300 mx-1.5">&bull;</span>Cancelada por {{ venta.canceladaPor }}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-4 flex-shrink-0">
+                    <div class="text-right">
+                      <p :class="['text-lg font-black tabular-nums', venta.cancelada ? 'line-through text-gray-400' : 'text-gray-900']">S/ {{ venta.totalNeto.toFixed(2) }}</p>
+                      <p v-if="!venta.cancelada && venta.totalNeto !== venta.total" class="text-[11px] text-gray-400 line-through tabular-nums">S/ {{ venta.total.toFixed(2) }}</p>
+                    </div>
+                    <span :class="['w-8 h-8 rounded-full flex items-center justify-center transition-colors', expandedId === venta.id ? 'bg-orange-50 text-[#ff8c42]' : 'bg-gray-50 text-gray-400']">
+                      <i :class="['fa-solid fa-chevron-down text-xs transition-transform duration-200', expandedId === venta.id ? 'rotate-180' : '']"></i>
                     </span>
                   </div>
-                  <p class="text-xs text-gray-400 mt-0.5">
-                    {{ venta.fecha }} · {{ venta.totalPrendas }} prenda{{ venta.totalPrendas === 1 ? '' : 's' }}
-                    <span v-if="venta.prendasDevueltas > 0"> · {{ venta.prendasDevueltas }} devuelta{{ venta.prendasDevueltas === 1 ? '' : 's' }}</span>
-                    <span v-if="venta.registradoPor"> · Registrado por {{ venta.registradoPor }}</span>
-                    <span v-if="venta.cancelada && venta.canceladaPor"> · Cancelada por {{ venta.canceladaPor }}</span>
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center gap-4 flex-shrink-0">
-                <div class="text-right">
-                  <span :class="['text-lg font-bold text-gray-900', venta.cancelada ? 'line-through' : '']">S/ {{ venta.totalNeto.toFixed(2) }}</span>
-                  <p v-if="!venta.cancelada && venta.totalNeto !== venta.total" class="text-[11px] text-gray-400 line-through">S/ {{ venta.total.toFixed(2) }}</p>
-                </div>
-                <i :class="['fa-solid', expandedId === venta.id ? 'fa-chevron-up' : 'fa-chevron-down', 'text-gray-400 text-xs']"></i>
-              </div>
-            </button>
+                </button>
 
-            <div v-if="expandedId === venta.id" class="border-t border-gray-100 bg-gray-50 px-5 py-4">
-              <div class="flex items-center justify-between mb-3">
-                <p v-if="venta.notas" class="text-xs text-gray-500 italic">"{{ venta.notas }}"</p>
-                <span v-else></span>
-                <div class="flex items-center gap-2">
-                  <button
-                    v-if="!venta.cancelada && esAdmin"
-                    @click="cancelarVenta(venta)"
-                    class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-white border border-red-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors"
-                  >
-                    <i class="fa-solid fa-ban text-[11px]"></i> Cancelar Venta
-                  </button>
-                  <a
-                    :href="route('admin.sales.boleta', venta.id)"
-                    target="_blank"
-                    class="text-xs font-semibold text-gray-600 hover:text-[#ff8c42] bg-white border border-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 flex-shrink-0"
-                  >
-                    <i class="fa-solid fa-print text-[11px]"></i> Imprimir Boleta
-                  </a>
-                </div>
-              </div>
-
-              <table class="w-full text-xs">
-                <thead>
-                  <tr class="text-gray-400">
-                    <th class="text-left py-1.5 pr-4 font-semibold">Producto</th>
-                    <th class="text-left py-1.5 pr-4 font-semibold">Marca</th>
-                    <th class="text-left py-1.5 pr-4 font-semibold">Talla</th>
-                    <th class="text-left py-1.5 pr-4 font-semibold">Color</th>
-                    <th class="text-center py-1.5 pr-4 font-semibold">Cant.</th>
-                    <th class="text-right py-1.5 pr-4 font-semibold">P. Unit.</th>
-                    <th class="text-right py-1.5 pr-4 font-semibold">Subtotal</th>
-                    <th v-if="!venta.cancelada && esAdmin" class="text-center py-1.5 font-semibold">Devolución</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, idx) in venta.items" :key="idx" class="border-t border-gray-100">
-                    <td class="py-2 pr-4 text-gray-900 font-medium">{{ item.producto }}</td>
-                    <td class="py-2 pr-4 text-gray-600">{{ item.marca }}</td>
-                    <td class="py-2 pr-4 text-gray-600">{{ item.talla }}</td>
-                    <td class="py-2 pr-4">
-                      <div class="flex items-center gap-1.5">
-                        <ColorSwatch :hex="item.colorHex" class="w-3.5 h-3.5 rounded-full border border-gray-200" />
-                        <span class="text-gray-600">{{ item.color }}</span>
-                      </div>
-                    </td>
-                    <td class="py-2 pr-4 text-center text-gray-900">
-                      {{ item.cantidad }}
-                      <span v-if="item.cantidadDevuelta > 0" class="block text-[10px] text-red-400 font-semibold">-{{ item.cantidadDevuelta }} dev.</span>
-                    </td>
-                    <td class="py-2 pr-4 text-right text-gray-900">S/ {{ item.precioUnitario.toFixed(2) }}</td>
-                    <td class="py-2 pr-4 text-right text-gray-900 font-semibold">
-                      S/ {{ item.subtotalNeto.toFixed(2) }}
-                      <span v-if="item.subtotalNeto !== item.subtotal" class="block text-[10px] text-gray-400 font-normal line-through">S/ {{ item.subtotal.toFixed(2) }}</span>
-                    </td>
-                    <td v-if="!venta.cancelada && esAdmin" class="py-2 text-center">
+                <!-- Detalle -->
+                <div v-if="expandedId === venta.id" :id="`detalle-${venta.id}`" class="border-t border-gray-100 bg-gray-50/70 px-5 py-5">
+                  <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <p v-if="venta.notas" class="text-xs text-gray-500 italic flex items-center gap-1.5">
+                      <i class="fa-regular fa-note-sticky text-gray-300"></i>{{ venta.notas }}
+                    </p>
+                    <span v-else></span>
+                    <div class="flex items-center gap-2">
                       <button
-                        v-if="item.pendienteDevolucion > 0"
-                        @click="devolverItem(item)"
-                        class="text-[11px] font-semibold text-gray-500 hover:text-white hover:bg-red-500 bg-white border border-gray-200 px-2.5 py-1 rounded-lg transition-colors"
+                        v-if="!venta.cancelada && esAdmin"
+                        @click="cancelarVenta(venta)"
+                        class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-white border border-red-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
                       >
-                        <i class="fa-solid fa-rotate-left text-[10px] mr-1"></i>Devolver
+                        <i class="fa-solid fa-ban text-[11px]"></i> Cancelar venta
                       </button>
-                      <span v-else class="text-[11px] text-gray-300">Devuelto</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      <button
+                        type="button"
+                        @click="boletaAbierta = venta.id"
+                        class="text-xs font-semibold text-white bg-gray-900 hover:bg-[#ff8c42] px-3.5 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50"
+                      >
+                        <i class="fa-solid fa-print text-[11px]"></i> Imprimir boleta
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+                    <table class="w-full text-xs min-w-[640px]">
+                      <thead>
+                        <tr class="text-gray-400 bg-gray-50/80 uppercase tracking-wide text-[10px]">
+                          <th class="text-left py-2.5 pl-4 pr-4 font-semibold">Producto</th>
+                          <th class="text-left py-2.5 pr-4 font-semibold">Talla</th>
+                          <th class="text-left py-2.5 pr-4 font-semibold">Color</th>
+                          <th class="text-center py-2.5 pr-4 font-semibold">Cant.</th>
+                          <th class="text-right py-2.5 pr-4 font-semibold">P. Unit.</th>
+                          <th class="text-right py-2.5 pr-4 font-semibold">Subtotal</th>
+                          <th v-if="!venta.cancelada && esAdmin" class="text-center py-2.5 pr-4 font-semibold">Devolución</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, idx) in venta.items" :key="idx" class="border-t border-gray-100">
+                          <td class="py-3 pl-4 pr-4">
+                            <p class="text-gray-900 font-semibold text-[13px]">{{ item.producto }}</p>
+                            <p class="text-gray-400 mt-0.5">{{ item.marca }}</p>
+                          </td>
+                          <td class="py-3 pr-4">
+                            <span class="font-semibold text-gray-700 bg-gray-100 rounded-md px-2 py-0.5">{{ item.talla }}</span>
+                          </td>
+                          <td class="py-3 pr-4">
+                            <div class="flex items-center gap-1.5">
+                              <ColorSwatch :hex="item.colorHex" class="w-3.5 h-3.5 rounded-full border border-gray-200" />
+                              <span class="text-gray-600">{{ item.color }}</span>
+                            </div>
+                          </td>
+                          <td class="py-3 pr-4 text-center text-gray-900 font-semibold tabular-nums">
+                            {{ item.cantidad }}
+                            <span v-if="item.cantidadDevuelta > 0" class="block text-[10px] text-red-400 font-semibold">-{{ item.cantidadDevuelta }} dev.</span>
+                          </td>
+                          <td class="py-3 pr-4 text-right text-gray-600 tabular-nums">S/ {{ item.precioUnitario.toFixed(2) }}</td>
+                          <td class="py-3 pr-4 text-right text-gray-900 font-bold tabular-nums">
+                            S/ {{ item.subtotalNeto.toFixed(2) }}
+                            <span v-if="item.subtotalNeto !== item.subtotal" class="block text-[10px] text-gray-400 font-normal line-through">S/ {{ item.subtotal.toFixed(2) }}</span>
+                          </td>
+                          <td v-if="!venta.cancelada && esAdmin" class="py-3 pr-4 text-center">
+                            <button
+                              v-if="item.pendienteDevolucion > 0"
+                              @click="devolverItem(item)"
+                              class="text-[11px] font-semibold text-gray-500 hover:text-white hover:bg-red-500 bg-white border border-gray-200 px-2.5 py-1 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
+                            >
+                              <i class="fa-solid fa-rotate-left text-[10px] mr-1"></i>Devolver
+                            </button>
+                            <span v-else class="text-[11px] text-gray-300">Devuelto</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Resumen -->
+                  <div class="flex justify-end mt-4">
+                    <dl class="w-full sm:w-64 space-y-1.5 text-xs">
+                      <div v-if="venta.totalNeto !== venta.total" class="flex justify-between text-gray-400">
+                        <dt>Total facturado</dt>
+                        <dd class="tabular-nums">S/ {{ venta.total.toFixed(2) }}</dd>
+                      </div>
+                      <div v-if="venta.totalNeto !== venta.total" class="flex justify-between text-red-400">
+                        <dt>Devoluciones</dt>
+                        <dd class="tabular-nums">- S/ {{ (venta.total - venta.totalNeto).toFixed(2) }}</dd>
+                      </div>
+                      <div class="flex justify-between items-baseline pt-2 border-t border-gray-200">
+                        <dt class="font-semibold text-gray-600">Total neto</dt>
+                        <dd :class="['text-base font-black tabular-nums', venta.cancelada ? 'text-gray-400 line-through' : 'text-gray-900']">S/ {{ venta.totalNeto.toFixed(2) }}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              </article>
             </div>
-          </div>
+          </section>
 
           <Pagination v-model="paginaActual" :total-items="ventasFiltradas.length" :per-page="perPage" />
         </div>
@@ -201,9 +264,9 @@
           v-else
           icon="fa-solid fa-filter-circle-xmark"
           title="Ninguna venta coincide"
-          text="Prueba con otra búsqueda."
+          text="Prueba con otra búsqueda o cambia el filtro."
         >
-          <button @click="filtroTexto = ''" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar búsqueda</button>
+          <button @click="limpiarFiltros" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-4 py-2 rounded-xl transition">Limpiar filtros</button>
         </EmptyState>
       </ListCard>
     </div>
@@ -220,6 +283,8 @@
       @close="ventaPendienteCancelar = null"
     />
 
+    <BoletaModal v-if="boletaAbierta" :venta-id="boletaAbierta" @close="boletaAbierta = null" />
+
     <DevolucionModal v-if="itemDevolver" :item="itemDevolver" @close="itemDevolver = null" />
   </AdminLayout>
 </template>
@@ -233,6 +298,7 @@ import SearchInput from '@/Components/Admin/SearchInput.vue';
 import Pagination from '@/Components/Admin/Pagination.vue';
 import ConfirmModal from '@/Components/Admin/ConfirmModal.vue';
 import DevolucionModal from './DevolucionModal.vue';
+import BoletaModal from './BoletaModal.vue';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
 import { Head, usePage, Link, router } from '@inertiajs/vue3';
 import { ref, computed, watch, onMounted, nextTick } from 'vue';
@@ -271,6 +337,7 @@ const toggleExpand = (id) => {
   expandedId.value = expandedId.value === id ? null : id;
 };
 
+const boletaAbierta = ref(null);
 const itemDevolver = ref(null);
 
 const devolverItem = (item) => {
@@ -283,21 +350,78 @@ const tituloVenta = (venta) => {
   return `${nombresUnicos[0]} + ${nombresUnicos.length - 1} más`;
 };
 
+const filtroEstado = ref('todas');
+
+const esVigente = (v) => !v.cancelada;
+const tieneDevolucion = (v) => !v.cancelada && v.prendasDevueltas > 0;
+
+const filtrosEstado = computed(() => [
+  { value: 'todas', label: 'Todas', cantidad: props.ventas.length },
+  { value: 'vigentes', label: 'Vigentes', cantidad: props.ventas.filter(esVigente).length },
+  { value: 'devoluciones', label: 'Con devoluciones', cantidad: props.ventas.filter(tieneDevolucion).length },
+  { value: 'canceladas', label: 'Canceladas', cantidad: props.ventas.filter((v) => v.cancelada).length },
+]);
+
 const ventasFiltradas = computed(() => {
   const texto = filtroTexto.value.trim().toLowerCase();
-  if (!texto) return props.ventas;
 
-  return props.ventas.filter((v) =>
-    (v.cliente || '').toLowerCase().includes(texto) ||
-    v.numero.toLowerCase().includes(texto) ||
-    v.items.some(i => i.producto.toLowerCase().includes(texto))
-  );
+  return props.ventas.filter((v) => {
+    if (filtroEstado.value === 'vigentes' && !esVigente(v)) return false;
+    if (filtroEstado.value === 'devoluciones' && !tieneDevolucion(v)) return false;
+    if (filtroEstado.value === 'canceladas' && !v.cancelada) return false;
+    if (!texto) return true;
+
+    return (v.cliente || '').toLowerCase().includes(texto) ||
+      v.numero.toLowerCase().includes(texto) ||
+      v.items.some(i => i.producto.toLowerCase().includes(texto));
+  });
 });
+
+const limpiarFiltros = () => {
+  filtroTexto.value = '';
+  filtroEstado.value = 'todas';
+};
+
+const tarjetas = computed(() => [
+  { label: 'Total de Ventas', valor: props.stats.totalVentas, icono: 'fa-receipt', color: 'text-blue-500', fondo: 'bg-blue-50' },
+  { label: 'Ingresos Totales', valor: `S/ ${props.stats.totalIngresos.toFixed(2)}`, icono: 'fa-sack-dollar', color: 'text-[#ff8c42]', fondo: 'bg-orange-50', destacado: true },
+  { label: 'Prendas Vendidas', valor: props.stats.prendasVendidas, icono: 'fa-shirt', color: 'text-emerald-500', fondo: 'bg-emerald-50' },
+  { label: 'Promedio por Venta', valor: `S/ ${props.stats.promedioVenta.toFixed(2)}`, icono: 'fa-chart-simple', color: 'text-violet-500', fondo: 'bg-violet-50' },
+]);
+
+const iniciales = (nombre) =>
+  nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+
+// Franja de color a la izquierda de cada venta según su estado.
+const acentoEstado = (v) => {
+  if (v.cancelada) return 'border-l-red-300 opacity-70';
+  if (v.prendasDevueltas > 0) return 'border-l-amber-300';
+  return 'border-l-emerald-300';
+};
+
+// "d/m/Y" -> Date local
+const parseFecha = (texto) => {
+  const [d, m, y] = texto.split('/').map(Number);
+  return new Date(y, m - 1, d);
+};
+
+const etiquetaDia = (texto) => {
+  const fecha = parseFecha(texto);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const dias = Math.round((hoy - fecha) / 86400000);
+  const larga = fecha.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
+  const capitalizada = larga.charAt(0).toUpperCase() + larga.slice(1);
+
+  if (dias === 0) return `Hoy · ${capitalizada}`;
+  if (dias === 1) return `Ayer · ${capitalizada}`;
+  return capitalizada;
+};
 
 const perPage = 15;
 const paginaActual = ref(1);
 
-watch(filtroTexto, () => {
+watch([filtroTexto, filtroEstado], () => {
   paginaActual.value = 1;
 });
 
@@ -309,6 +433,28 @@ watch(() => ventasFiltradas.value.length, (total) => {
 const ventasPaginadas = computed(() => {
   const inicio = (paginaActual.value - 1) * perPage;
   return ventasFiltradas.value.slice(inicio, inicio + perPage);
+});
+
+// Agrupa la página actual por día; el total del día se calcula sobre todas las ventas
+// filtradas de esa fecha (aunque el día continúe en otra página) y excluye canceladas.
+const gruposPaginados = computed(() => {
+  const grupos = [];
+  for (const venta of ventasPaginadas.value) {
+    let grupo = grupos[grupos.length - 1];
+    if (!grupo || grupo.fecha !== venta.fecha) {
+      const delDia = ventasFiltradas.value.filter((v) => v.fecha === venta.fecha);
+      grupo = {
+        fecha: venta.fecha,
+        etiqueta: etiquetaDia(venta.fecha),
+        cantidadVentas: delDia.filter(esVigente).length,
+        total: delDia.filter(esVigente).reduce((acc, v) => acc + v.totalNeto, 0),
+        ventas: [],
+      };
+      grupos.push(grupo);
+    }
+    grupo.ventas.push(venta);
+  }
+  return grupos;
 });
 
 // Llega desde "Ver en Historial" (?venta=123) al registrar una venta: la busca, se
