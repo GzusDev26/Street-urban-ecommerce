@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use App\Support\PublicFile;
 
 class PurchaseController extends Controller
 {
@@ -111,7 +112,7 @@ class PurchaseController extends Controller
                         'id' => $c->id,
                         'nombre' => $c->name,
                         'hex' => $c->hex,
-                        'imagenUrl' => $c->image_url ? \Illuminate\Support\Facades\Storage::url($c->image_url) : null,
+                        'imagenUrl' => PublicFile::url($c->image_url),
                         'variantes' => $c->variants->map(fn ($v) => [
                             'id' => $v->id,
                             'talla' => $v->size,

@@ -9,7 +9,7 @@
       </div>
       <!-- Barra lateral derecha -->
       <div class="lg:col-span-1">
-        <div class="sticky top-28 bg-[#0a0a0a] p-8 border border-gray-800 rounded-2xl">
+        <div class="sticky top-28 bg-sunken p-8 border border-gray-800 rounded-2xl">
           <slot name="right-sidebar" />
         </div>
       </div>

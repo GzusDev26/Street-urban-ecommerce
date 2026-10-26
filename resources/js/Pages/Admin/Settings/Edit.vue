@@ -4,211 +4,254 @@
     <template #breadcrumb>Configuración</template>
     <template #header>Datos del Negocio</template>
 
-    <div class="space-y-6">
-      <div v-if="page.props.flash?.success" class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2">
-        <i class="fa-solid fa-circle-check"></i> {{ page.props.flash.success }}
-      </div>
+    <div class="max-w-6xl grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-6 items-start" :class="{ 'pb-24': hayCambios }">
+      <!-- Formulario -->
+      <form id="form-negocio" class="space-y-6 min-w-0" novalidate @submit.prevent="guardar">
+        <Transition
+          enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+          enter-from-class="opacity-0 -translate-y-1"
+          leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
+          leave-to-class="opacity-0"
+        >
+          <div v-if="aviso" role="status" class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            <span class="flex-1">{{ aviso }}</span>
+            <button type="button" class="w-8 h-8 -mr-1 rounded-lg flex items-center justify-center hover:bg-green-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500" aria-label="Cerrar aviso" @click="aviso = null">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
+        </Transition>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <!-- IZQUIERDA: formulario -->
-        <div class="lg:col-span-2 space-y-6">
-          <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-            <div class="flex items-center gap-2 mb-1">
-              <i class="fa-solid fa-store text-gray-400 text-sm"></i>
-              <h3 class="text-lg font-bold text-gray-900">Identidad y Contacto</h3>
+        <!-- Identidad -->
+        <section class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm" aria-labelledby="identidad-titulo">
+          <header class="flex items-start gap-3 mb-5">
+            <span class="w-10 h-10 rounded-xl bg-orange-50 text-[#ff8c42] flex items-center justify-center flex-shrink-0" aria-hidden="true">
+              <i class="fa-solid fa-store"></i>
+            </span>
+            <div>
+              <h3 id="identidad-titulo" class="text-lg font-bold text-gray-900 leading-tight">Identidad</h3>
+              <p class="text-sm text-gray-500 mt-0.5">Encabeza las boletas y aparece en toda la tienda.</p>
             </div>
-            <p class="text-xs text-gray-400 mb-6">
-              Aparece en la página de Contacto de la tienda y en las boletas que imprimes desde Ventas.
-            </p>
+          </header>
 
-            <form @submit.prevent="handleSubmit" class="space-y-5">
-              <div>
-                <label for="edit-1" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                  <i class="fa-solid fa-tag text-gray-300 text-xs"></i> Nombre del negocio
-                </label>
-                <input id="edit-1"
-                  v-model="formData.name"
+          <div class="space-y-5">
+            <FormField label="Nombre del negocio">
+              <FormInput v-model="form.name" type="text" icon="fa-solid fa-tag" maxlength="255" required :aria-invalid="!!errores.name" />
+              <p v-if="errores.name" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.name }}</p>
+            </FormField>
+
+            <div class="grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-5">
+              <FormField label="RUC" optional>
+                <FormInput
+                  v-model="form.ruc"
                   type="text"
-                  class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
-                  required
+                  icon="fa-solid fa-file-invoice"
+                  inputmode="numeric"
+                  maxlength="11"
+                  placeholder="20123456789"
+                  :aria-invalid="!!errores.ruc"
                 />
-                <p v-if="validationErrors.name" class="text-red-500 text-xs mt-1">{{ validationErrors.name[0] }}</p>
-              </div>
+                <p v-if="errores.ruc" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.ruc }}</p>
+                <p v-else-if="form.ruc && form.ruc.length !== 11" class="text-amber-600 text-xs mt-1.5">El RUC tiene 11 dígitos ({{ form.ruc.length }}/11).</p>
+              </FormField>
 
-              <div>
-                <label for="edit-2" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                  <i class="fa-solid fa-envelope text-gray-300 text-xs"></i> Email de contacto (opcional)
-                </label>
-                <input id="edit-2"
-                  v-model="formData.email"
-                  type="email"
-                  class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
+              <FormField label="Dirección" optional>
+                <FormInput v-model="form.address" type="text" icon="fa-solid fa-location-dot" maxlength="500" placeholder="Jr. Progreso 123, San Ramón" autocomplete="street-address" :aria-invalid="!!errores.address" />
+                <p v-if="errores.address" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.address }}</p>
+              </FormField>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contacto -->
+        <section class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm" aria-labelledby="contacto-titulo">
+          <header class="flex items-start gap-3 mb-5">
+            <span class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+              <i class="fa-solid fa-address-book"></i>
+            </span>
+            <div>
+              <h3 id="contacto-titulo" class="text-lg font-bold text-gray-900 leading-tight">Contacto</h3>
+              <p class="text-sm text-gray-500 mt-0.5">Lo que ven los clientes en la página de Contacto de la tienda.</p>
+            </div>
+          </header>
+
+          <div class="space-y-5">
+            <FormField label="Correo de contacto" optional>
+              <FormInput v-model="form.email" type="email" icon="fa-regular fa-envelope" maxlength="255" placeholder="contacto@tunegocio.com" autocomplete="email" :aria-invalid="!!errores.email" />
+              <p v-if="errores.email" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.email }}</p>
+            </FormField>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <FormField label="Teléfono" optional hint="Sale en la boleta y en Contacto.">
+                <FormInput v-model="form.phone" type="tel" icon="fa-solid fa-phone" maxlength="20" placeholder="+51 987 654 321" autocomplete="tel" :aria-invalid="!!errores.phone" />
+                <p v-if="errores.phone" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.phone }}</p>
+              </FormField>
+
+              <FormField label="WhatsApp" optional>
+                <FormInput
+                  v-model="form.whatsapp"
+                  type="tel"
+                  icon="fa-brands fa-whatsapp"
+                  inputmode="numeric"
+                  maxlength="20"
+                  placeholder="51987654321"
+                  :aria-invalid="!!errores.whatsapp"
+                  aria-describedby="whatsapp-ayuda"
                 />
-                <p v-if="validationErrors.email" class="text-red-500 text-xs mt-1">{{ validationErrors.email[0] }}</p>
-              </div>
+                <p v-if="errores.whatsapp" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.whatsapp }}</p>
+                <p v-else id="whatsapp-ayuda" class="text-xs text-gray-400 mt-1.5">
+                  Con código de país, solo números.
+                  <a v-if="form.whatsapp" :href="`https://wa.me/${form.whatsapp}`" target="_blank" rel="noopener" class="font-semibold text-[#e67e2d] hover:underline whitespace-nowrap">
+                    Probar enlace <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i><span class="sr-only">(se abre en otra pestaña)</span>
+                  </a>
+                </p>
+              </FormField>
+            </div>
+          </div>
+        </section>
 
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="edit-3" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-solid fa-phone text-gray-300 text-xs"></i> Teléfono (opcional)
-                  </label>
-                  <input id="edit-3"
-                    v-model="formData.phone"
-                    type="text"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
-                  />
-                  <p v-if="validationErrors.phone" class="text-red-500 text-xs mt-1">{{ validationErrors.phone[0] }}</p>
-                </div>
-                <div>
-                  <label for="edit-4" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-brands fa-whatsapp text-gray-300 text-xs"></i> WhatsApp (opcional)
-                  </label>
-                  <input id="edit-4"
-                    v-model="formData.whatsapp"
-                    type="text"
-                    placeholder="51987654321"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
-                  />
-                  <p v-if="validationErrors.whatsapp" class="text-red-500 text-xs mt-1">{{ validationErrors.whatsapp[0] }}</p>
-                </div>
-              </div>
-              <p class="text-[11px] text-gray-400 -mt-3">Código de país sin "+" ni espacios (ej. 51987654321) — va directo al link de WhatsApp.</p>
+        <!-- Inventario -->
+        <section class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm" aria-labelledby="inventario-titulo">
+          <header class="flex items-start gap-3 mb-5">
+            <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+              <i class="fa-solid fa-boxes-stacked"></i>
+            </span>
+            <div>
+              <h3 id="inventario-titulo" class="text-lg font-bold text-gray-900 leading-tight">Inventario</h3>
+              <p class="text-sm text-gray-500 mt-0.5">Cuándo avisarte que una prenda se está acabando.</p>
+            </div>
+          </header>
 
-              <div class="border-t border-gray-100 pt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label for="edit-5" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-solid fa-location-dot text-gray-300 text-xs"></i> Dirección (opcional)
-                  </label>
-                  <input id="edit-5"
-                    v-model="formData.address"
-                    type="text"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
-                  />
-                  <p v-if="validationErrors.address" class="text-red-500 text-xs mt-1">{{ validationErrors.address[0] }}</p>
-                </div>
-
-                <div>
-                  <label for="edit-6" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-solid fa-file-invoice text-gray-300 text-xs"></i> RUC (opcional)
-                  </label>
-                  <input id="edit-6"
-                    v-model="formData.ruc"
-                    type="text"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
-                  />
-                  <p v-if="validationErrors.ruc" class="text-red-500 text-xs mt-1">{{ validationErrors.ruc[0] }}</p>
-                </div>
-              </div>
-
-              <div class="border-t border-gray-100 pt-5">
-                <label for="edit-7" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
-                  <i class="fa-solid fa-triangle-exclamation text-gray-300 text-xs"></i> Umbral de stock bajo
-                </label>
-                <input id="edit-7"
-                  v-model.number="formData.low_stock_threshold"
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div>
+              <label for="umbral" class="block text-sm font-semibold text-gray-700 mb-1.5">Umbral de stock bajo</label>
+              <div class="inline-flex items-center rounded-xl border border-gray-200 bg-surface overflow-hidden focus-within:border-[#ff8c42] focus-within:ring-4 focus-within:ring-orange-100 transition">
+                <button type="button" class="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:bg-gray-100" aria-label="Restar uno" :disabled="form.low_stock_threshold <= 1" @click="ajustarUmbral(-1)">
+                  <i class="fa-solid fa-minus text-xs" aria-hidden="true"></i>
+                </button>
+                <input
+                  id="umbral"
+                  v-model.number="form.low_stock_threshold"
                   type="number"
                   min="1"
-                  class="w-full sm:w-40 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
-                  required
+                  max="1000"
+                  inputmode="numeric"
+                  class="w-16 h-11 border-0 border-x border-gray-200 bg-transparent text-center text-base font-bold text-gray-900 focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  :aria-invalid="!!errores.low_stock_threshold"
+                  aria-describedby="umbral-ayuda"
                 />
-                <p class="text-[11px] text-gray-400 mt-1.5">
-                  Cuando una prenda tenga menos unidades que este número, se marcará en amarillo en el inventario de Compras.
-                </p>
-                <p v-if="validationErrors.low_stock_threshold" class="text-red-500 text-xs mt-1">{{ validationErrors.low_stock_threshold[0] }}</p>
-              </div>
-
-              <div class="pt-2">
-                <button
-                  type="submit"
-                  :disabled="loading"
-                  class="flex items-center gap-2 bg-gradient-to-r from-[#ff8c42] to-[#e67e2d] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 text-white font-bold text-sm py-2.5 px-6 rounded-xl transition-all duration-200 shadow-sm"
-                >
-                  <i class="fa-solid fa-save"></i> {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+                <button type="button" class="w-11 h-11 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:bg-gray-100" aria-label="Sumar uno" :disabled="form.low_stock_threshold >= 1000" @click="ajustarUmbral(1)">
+                  <i class="fa-solid fa-plus text-xs" aria-hidden="true"></i>
                 </button>
               </div>
-            </form>
+              <p v-if="errores.low_stock_threshold" class="text-red-500 text-xs mt-1.5" role="alert">{{ errores.low_stock_threshold }}</p>
+            </div>
+
+            <p id="umbral-ayuda" class="flex-1 flex items-start gap-2.5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700 sm:mt-6">
+              <i class="fa-solid fa-triangle-exclamation mt-0.5" aria-hidden="true"></i>
+              <span>Una prenda con <b>menos de {{ umbralTexto }}</b> se marca en amarillo en el inventario de Compras.</span>
+            </p>
+          </div>
+        </section>
+      </form>
+
+      <!-- Vista previa -->
+      <aside class="lg:sticky lg:top-0 bg-surface rounded-2xl border border-gray-100 shadow-sm overflow-hidden" aria-label="Vista previa">
+        <div class="px-5 pt-4 pb-3 flex items-center gap-2">
+          <h3 class="text-sm font-bold text-gray-900">Vista previa</h3>
+          <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-600">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 motion-safe:animate-pulse" aria-hidden="true"></span> Se actualiza mientras escribes
+          </span>
+        </div>
+
+        <div class="px-5">
+          <div class="grid grid-cols-2 p-1 bg-gray-100 rounded-xl" role="tablist" aria-label="Qué previsualizar">
+            <button
+              v-for="t in PESTANAS"
+              :id="`tab-${t.id}`"
+              :key="t.id"
+              type="button"
+              role="tab"
+              :aria-selected="pestana === t.id"
+              :aria-controls="`panel-${t.id}`"
+              :tabindex="pestana === t.id ? 0 : -1"
+              :class="[
+                'h-9 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]',
+                pestana === t.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800',
+              ]"
+              @click="pestana = t.id"
+              @keydown.right.prevent="moverPestana(1)"
+              @keydown.left.prevent="moverPestana(-1)"
+            >
+              <i :class="t.icon" aria-hidden="true"></i> {{ t.label }}
+            </button>
           </div>
         </div>
 
-        <!-- DERECHA: vista previa en vivo -->
-        <div class="lg:sticky lg:top-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-            <i class="fa-solid fa-eye text-gray-400 text-sm"></i>
-            <h3 class="text-sm font-bold text-gray-900">Vista Previa</h3>
-            <span class="ml-auto flex items-center gap-1 text-[10px] font-semibold text-green-500">
-              <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> en vivo
-            </span>
-          </div>
+        <!-- Boleta real, con una venta de ejemplo -->
+        <div v-show="pestana === 'boleta'" id="panel-boleta" role="tabpanel" aria-labelledby="tab-boleta" class="mt-4 bg-gray-100 px-4 py-6 flex justify-center max-h-[640px] overflow-y-auto">
+          <BoletaTicket :venta="VENTA_EJEMPLO" :business="negocioPreview" :zoom="1.05" />
+        </div>
 
-          <!-- Mini boleta, con un item de ejemplo para que se vea como una boleta real -->
-          <div class="p-5">
-            <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">En la Boleta</p>
+        <!-- Página de Contacto de la tienda (siempre oscura, como la tienda por defecto) -->
+        <div v-show="pestana === 'contacto'" id="panel-contacto" role="tabpanel" aria-labelledby="tab-contacto" class="p-5">
+          <div class="theme-shop-dark bg-canvas text-fg rounded-xl p-5">
+            <p class="text-[10px] uppercase tracking-[0.25em] text-[#ff8c42] font-semibold">Ponte en contacto</p>
+            <p class="mt-2 text-lg font-black uppercase italic leading-tight">Tu opinión <span class="text-[#ff8c42]">nos importa</span></p>
+            <p class="mt-2 text-xs text-gray-400 leading-relaxed">En {{ negocioPreview.name }}, cada mensaje cuenta.</p>
 
-            <div class="border border-gray-100 rounded-xl p-5 bg-gray-50/60">
-              <div class="text-center">
-                <div class="w-10 h-10 bg-[#ff8c42] rounded-lg flex items-center justify-center font-black text-white mx-auto mb-2 text-sm">
-                  {{ (formData.name || 'S').charAt(0).toUpperCase() }}
-                </div>
-                <h1 class="text-base font-black tracking-tight text-gray-900">{{ formData.name || 'Nombre del negocio' }}</h1>
-                <p v-if="formData.ruc" class="text-[10px] text-gray-400">RUC {{ formData.ruc }}</p>
-                <p v-if="formData.address" class="text-[10px] text-gray-400 truncate">{{ formData.address }}</p>
-              </div>
-
-              <div class="border-t border-dashed border-gray-300 my-3"></div>
-
-              <div class="flex items-center justify-between text-[11px] text-gray-500 mb-1">
-                <span>Zapatillas Urban x1</span>
-                <span class="text-gray-900 font-medium">S/ 99.00</span>
-              </div>
-
-              <div class="border-t border-dashed border-gray-300 my-3"></div>
-
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Total</span>
-                <span class="text-lg font-black text-gray-900">S/ 99.00</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="border-t border-gray-100"></div>
-
-          <!-- Mini vista de la página de Contacto -->
-          <div class="p-5">
-            <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">En Contacto</p>
-
-            <div class="bg-[#111111] rounded-xl p-5 space-y-4">
-              <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-lg bg-[#ff8c42]/15 flex items-center justify-center flex-shrink-0">
-                  <i class="fa-solid fa-envelope text-[#ff8c42] text-xs"></i>
+            <ul class="mt-5 space-y-3">
+              <li v-for="c in canalesContacto" :key="c.label" class="flex items-center gap-3 rounded-xl border border-gray-800 bg-surface px-3 py-2.5">
+                <span class="w-9 h-9 rounded-lg bg-[#ff8c42]/15 text-[#ff8c42] flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                  <i :class="c.icon" class="text-sm"></i>
                 </span>
-                <span class="text-sm text-gray-300 truncate">{{ formData.email || 'Sin email configurado' }}</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-lg bg-[#ff8c42]/15 flex items-center justify-center flex-shrink-0">
-                  <i class="fa-solid fa-phone text-[#ff8c42] text-xs"></i>
+                <span class="min-w-0">
+                  <span class="block text-[10px] uppercase tracking-wider text-gray-500">{{ c.label }}</span>
+                  <span :class="['block text-sm truncate', c.valor ? 'text-fg font-semibold' : 'text-gray-500 italic']">{{ c.valor || 'No se mostrará' }}</span>
                 </span>
-                <span class="text-sm text-gray-300">{{ formData.phone || 'Sin teléfono configurado' }}</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-lg bg-[#ff8c42]/15 flex items-center justify-center flex-shrink-0">
-                  <i class="fa-brands fa-whatsapp text-[#ff8c42] text-xs"></i>
-                </span>
-                <div class="min-w-0">
-                  <p class="text-sm text-gray-300">{{ formData.whatsapp || 'Sin WhatsApp configurado' }}</p>
-                  <p v-if="formData.whatsapp" class="text-[10px] text-gray-500 truncate">wa.me/{{ formData.whatsapp }}</p>
-                </div>
-              </div>
-            </div>
+              </li>
+            </ul>
           </div>
+          <p class="mt-3 text-xs text-gray-400">Los campos vacíos no aparecen en la tienda.</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Barra de cambios sin guardar -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+      enter-from-class="opacity-0 translate-y-4"
+      leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
+      leave-to-class="opacity-0 translate-y-4"
+    >
+      <div v-if="hayCambios" class="fixed bottom-4 inset-x-4 lg:left-auto lg:right-8 z-40 lg:w-[min(560px,calc(100vw-22rem))]" role="region" aria-label="Cambios sin guardar">
+        <div class="flex items-center gap-3 rounded-2xl bg-fg text-canvas pl-5 pr-2 py-2 shadow-2xl shadow-black/30">
+          <i class="fa-solid fa-circle-exclamation text-[#ff8c42]" aria-hidden="true"></i>
+          <p class="flex-1 text-sm font-medium truncate"><span class="sm:hidden">Sin guardar</span><span class="hidden sm:inline">Tienes cambios sin guardar</span></p>
+          <button type="button" class="h-10 px-4 rounded-xl text-sm font-semibold hover:bg-canvas/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]" @click="descartar">
+            Descartar
+          </button>
+          <button
+            type="submit"
+            form="form-negocio"
+            :disabled="guardando"
+            class="h-10 px-5 rounded-xl bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.98] text-white text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-60 disabled:cursor-wait focus:outline-none focus-visible:ring-2 focus-visible:ring-canvas"
+          >
+            <i :class="guardando ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'" class="text-xs" aria-hidden="true"></i>
+            {{ guardando ? 'Guardando…' : 'Guardar' }}
+          </button>
         </div>
       </div>
-    </div>
+    </Transition>
   </AdminLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import BoletaTicket from '@/Components/Admin/BoletaTicket.vue';
+import FormField from '@/Components/Admin/FormField.vue';
+import FormInput from '@/Components/Admin/FormInput.vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -216,30 +259,100 @@ const props = defineProps({
 });
 
 const page = usePage();
-const loading = ref(false);
-const validationErrors = ref({});
 
-const formData = ref({
-  name: props.settings.name,
-  email: props.settings.email,
-  phone: props.settings.phone,
-  whatsapp: props.settings.whatsapp,
-  address: props.settings.address,
-  ruc: props.settings.ruc,
-  low_stock_threshold: props.settings.low_stock_threshold,
+const CAMPOS = ['name', 'email', 'phone', 'whatsapp', 'address', 'ruc', 'low_stock_threshold'];
+const desdeServidor = () => Object.fromEntries(CAMPOS.map((k) => [k, props.settings[k] ?? (k === 'low_stock_threshold' ? 5 : '')]));
+
+// Lo último guardado; tras guardar, Inertia trae `settings` actualizado y se toma como nueva base.
+const base = ref(desdeServidor());
+const form = reactive(desdeServidor());
+watch(() => props.settings, () => {
+  base.value = desdeServidor();
+  Object.assign(form, desdeServidor());
 });
 
-const handleSubmit = () => {
-  loading.value = true;
-  validationErrors.value = {};
+const hayCambios = computed(() => CAMPOS.some((k) => String(form[k] ?? '') !== String(base.value[k] ?? '')));
 
-  router.patch(route('admin.settings.update'), formData.value, {
-    onError: (errors) => {
-      validationErrors.value = errors;
+const errores = ref({});
+const guardando = ref(false);
+const aviso = ref(page.props.flash?.success ?? null);
+watch(() => page.props.flash?.success, (v) => { if (v) aviso.value = v; });
+
+// RUC y WhatsApp solo llevan números: se limpian al vuelo (espacios, "+", guiones al pegar).
+const soloDigitos = (v) => String(v ?? '').replace(/\D/g, '');
+watch(() => [form.ruc, form.whatsapp], () => {
+  for (const k of ['ruc', 'whatsapp']) {
+    const limpio = soloDigitos(form[k]);
+    if (limpio !== form[k]) form[k] = limpio;
+  }
+});
+
+const ajustarUmbral = (delta) => {
+  const actual = Number(form.low_stock_threshold) || 1;
+  form.low_stock_threshold = Math.min(1000, Math.max(1, actual + delta));
+};
+const umbralTexto = computed(() => {
+  const n = Number(form.low_stock_threshold) || 1;
+  return `${n} ${n === 1 ? 'unidad' : 'unidades'}`;
+});
+
+const descartar = () => {
+  Object.assign(form, base.value);
+  errores.value = {};
+};
+
+const guardar = () => {
+  if (!hayCambios.value || guardando.value) return;
+  guardando.value = true;
+  errores.value = {};
+
+  router.patch(route('admin.settings.update'), { ...form }, {
+    preserveScroll: true,
+    onError: (e) => {
+      errores.value = e;
     },
     onFinish: () => {
-      loading.value = false;
+      guardando.value = false;
     },
   });
+};
+
+// --- Vista previa ----------------------------------------------------------------------------
+const PESTANAS = [
+  { id: 'boleta', label: 'Boleta', icon: 'fa-solid fa-receipt' },
+  { id: 'contacto', label: 'Contacto', icon: 'fa-solid fa-address-card' },
+];
+const pestana = ref('boleta');
+const moverPestana = (paso) => {
+  const i = PESTANAS.findIndex((t) => t.id === pestana.value);
+  pestana.value = PESTANAS[(i + paso + PESTANAS.length) % PESTANAS.length].id;
+  document.getElementById(`tab-${pestana.value}`)?.focus();
+};
+
+const negocioPreview = computed(() => ({ ...form, name: form.name.trim() || 'Nombre del negocio' }));
+
+const canalesContacto = computed(() => [
+  { label: 'Email', icon: 'fa-solid fa-envelope', valor: form.email },
+  { label: 'Teléfono', icon: 'fa-solid fa-phone', valor: form.phone },
+  { label: 'WhatsApp', icon: 'fa-brands fa-whatsapp', valor: form.whatsapp ? `wa.me/${form.whatsapp}` : '' },
+]);
+
+const hoy = new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date());
+const VENTA_EJEMPLO = {
+  numero: 'V-00000',
+  fecha: hoy,
+  registradoPor: page.props.auth.user.name,
+  cliente: 'Cliente de ejemplo',
+  clienteDocumento: null,
+  cancelada: false,
+  notas: null,
+  items: [
+    { producto: 'Polo Oversize', marca: 'Street', talla: 'M', color: 'Negro', cantidad: 1, cantidadDevuelta: 0, precioUnitario: 59, subtotal: 59 },
+    { producto: 'Jogger Cargo', marca: 'Urban', talla: 'L', color: 'Beige', cantidad: 1, cantidadDevuelta: 0, precioUnitario: 89, subtotal: 89 },
+  ],
+  totalPrendas: 2,
+  prendasDevueltas: 0,
+  total: 148,
+  totalNeto: 148,
 };
 </script>

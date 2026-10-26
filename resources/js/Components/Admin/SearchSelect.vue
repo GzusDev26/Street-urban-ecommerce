@@ -107,7 +107,7 @@ const alTeclear = (e) => {
         @blur="cerrarConRetraso"
         @keydown="alTeclear"
         :class="[
-          'w-full h-11 pl-4 pr-10 rounded-xl border bg-white text-sm text-gray-900 placeholder:text-gray-400 transition',
+          'w-full h-11 pl-4 pr-10 rounded-xl border bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition',
           'focus:outline-none focus:ring-4 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed',
           abierto ? 'border-[#ff8c42]' : 'border-gray-200 hover:border-gray-300 focus:border-[#ff8c42]',
         ]"
@@ -118,7 +118,7 @@ const alTeclear = (e) => {
     <div
       v-if="abierto && !disabled"
       role="listbox"
-      class="absolute z-30 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-60 overflow-y-auto"
+      class="absolute z-30 mt-1.5 w-full bg-surface border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-60 overflow-y-auto"
     >
       <button
         v-for="(op, i) in filtradas"

@@ -232,7 +232,7 @@ const confirmarEliminacion = () => {
       </div>
 
       <div v-if="colores.length === 0 && !showForm" class="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/60 py-8 px-6 text-center">
-        <div class="w-12 h-12 rounded-2xl bg-white shadow-sm text-gray-300 flex items-center justify-center mx-auto mb-3">
+        <div class="w-12 h-12 rounded-2xl bg-surface shadow-sm text-gray-300 flex items-center justify-center mx-auto mb-3">
           <i class="fa-solid fa-palette text-xl"></i>
         </div>
         <p class="text-sm font-semibold text-gray-700">Este modelo aún no tiene colores</p>
@@ -281,7 +281,7 @@ const confirmarEliminacion = () => {
           @click="modoVarios = op.v; error = ''"
           :class="[
             'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all',
-            modoVarios === op.v ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
+            modoVarios === op.v ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
           ]"
         >
           <i :class="op.i" class="text-xs"></i> {{ op.t }}
@@ -312,7 +312,7 @@ const confirmarEliminacion = () => {
                 ? 'border-gray-100 bg-gray-100/60 text-gray-400 cursor-not-allowed'
                 : seleccion.includes(p.hex)
                   ? 'border-[#ff8c42] bg-orange-50 text-gray-900 ring-2 ring-orange-100'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300',
+                  : 'border-gray-200 bg-surface text-gray-700 hover:border-gray-300',
             ]"
           >
             <span class="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0 flex items-center justify-center" :style="{ backgroundColor: p.hex }">
@@ -393,13 +393,13 @@ const confirmarEliminacion = () => {
 
         <FormField label="Foto del color" optional group>
           <div class="flex items-center gap-3">
-            <div class="w-16 h-16 rounded-xl overflow-hidden bg-white border border-gray-200 flex-shrink-0">
+            <div class="w-16 h-16 rounded-xl overflow-hidden bg-surface border border-gray-200 flex-shrink-0">
               <img v-if="previewUrl" :src="previewUrl" alt="Vista previa" class="w-full h-full object-cover">
               <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
                 <i class="fa-solid fa-image text-lg"></i>
               </div>
             </div>
-            <label class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border border-dashed border-gray-300 bg-white text-sm font-semibold text-gray-600 hover:border-[#ff8c42] hover:text-[#ff8c42] hover:bg-orange-50/40 cursor-pointer transition-colors">
+            <label class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border border-dashed border-gray-300 bg-surface text-sm font-semibold text-gray-600 hover:border-[#ff8c42] hover:text-[#ff8c42] hover:bg-orange-50/40 cursor-pointer transition-colors">
               <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
               {{ formImagen ? 'Cambiar foto' : (previewUrl ? 'Reemplazar foto' : 'Subir foto') }}
               <input ref="fileInput" type="file" accept="image/*" @change="onImagenSeleccionada" class="sr-only">

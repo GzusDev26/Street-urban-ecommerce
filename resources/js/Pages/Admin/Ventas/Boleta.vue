@@ -1,7 +1,7 @@
 <template>
   <Head :title="`Boleta ${venta.numero}`" />
 
-  <div class="min-h-screen bg-[#e7e8eb] py-8 px-4 print:bg-white print:p-0">
+  <div class="min-h-screen bg-gray-200 py-8 px-4 print:bg-surface print:p-0">
     <div class="max-w-md mx-auto print:max-w-none">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-6 print:hidden">
         <Link :href="route('admin.sales.index')" class="text-sm font-semibold text-gray-500 hover:text-gray-800 flex items-center gap-1.5 transition-colors">
@@ -9,14 +9,14 @@
         </Link>
 
         <div class="flex items-center gap-3">
-          <div class="inline-flex p-0.5 bg-white border border-gray-200 rounded-xl" role="group" aria-label="Ancho del papel">
+          <div class="inline-flex p-0.5 bg-surface border border-gray-200 rounded-xl" role="group" aria-label="Ancho del papel">
             <button
               v-for="mm in [58, 80]"
               :key="mm"
               type="button"
               @click="elegirAncho(mm)"
               :aria-pressed="ancho === mm"
-              :class="['px-3 h-9 text-xs font-bold rounded-lg transition-colors', ancho === mm ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-800']"
+              :class="['px-3 h-9 text-xs font-bold rounded-lg transition-colors', ancho === mm ? 'bg-fg text-canvas' : 'text-gray-500 hover:text-gray-800']"
             >{{ mm }} mm</button>
           </div>
           <button

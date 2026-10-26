@@ -10,7 +10,7 @@
         <div
           v-for="metric in metrics"
           :key="metric.label"
-          class="relative bg-white rounded-2xl border border-gray-100 p-6 pl-7 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+          class="relative bg-surface rounded-2xl border border-gray-100 p-6 pl-7 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow overflow-hidden"
         >
           <span :class="['absolute left-0 top-0 bottom-0 w-1.5', metric.accent]"></span>
           <div>
@@ -37,7 +37,7 @@
       <!-- Chart + Sidebar widgets -->
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
         <!-- Weekly sales chart -->
-        <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="xl:col-span-2 bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
           <div class="flex items-start justify-between mb-6">
             <div>
               <h3 class="text-lg font-bold text-gray-900">Ventas Semanales</h3>
@@ -91,7 +91,7 @@
 
         <!-- Quick actions + Top products -->
         <div class="space-y-5">
-          <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
             <h3 class="text-sm font-bold text-gray-900 mb-4">Acciones Rápidas</h3>
             <div class="space-y-2.5">
               <Link
@@ -132,7 +132,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
             <h3 class="text-sm font-bold text-gray-900 mb-4">Productos Top</h3>
             <div v-if="topProductos.length > 0" class="space-y-4">
               <div v-for="product in topProductos" :key="product.name">
@@ -151,7 +151,7 @@
       </div>
 
       <!-- Recent sales -->
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-bold text-gray-900">Ventas Recientes</h3>
           <Link :href="route('admin.sales.index')" class="text-xs font-semibold text-[#ff8c42] hover:text-[#ff7a24]">

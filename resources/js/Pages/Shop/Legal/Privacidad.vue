@@ -13,17 +13,17 @@ import ArticleLayout from '@/Layouts/Shop/ArticleLayout.vue';
     <!-- Título de la página -->
     <section class="relative py-16 px-4 md:px-8 lg:px-16 overflow-hidden">
       <!-- Background Gradient -->
-      <div class="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent"></div>
-      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-fg/5 via-transparent to-transparent"></div>
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
 
       <div class="relative max-w-full mx-auto">
         <div>
           <!-- Título Principal -->
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight italic leading-tight mb-4 max-w-4xl">
-            Política <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">de privacidad</span>
+            Política <span class="text-transparent bg-clip-text bg-gradient-to-r from-fg to-gray-500">de privacidad</span>
           </h1>
-          <div class="h-1.5 w-24 bg-gradient-to-r from-white via-white to-gray-600 rounded-full"></div>
+          <div class="h-1.5 w-24 bg-gradient-to-r from-fg via-fg to-gray-600 rounded-full"></div>
         </div>
       </div>
     </section>
@@ -55,7 +55,7 @@ import ArticleLayout from '@/Layouts/Shop/ArticleLayout.vue';
 
       <h2>1. Responsable del tratamiento</h2>
 
-      <p>El responsable del tratamiento de los datos personales es la tienda <strong>STREET URBAN,</strong> de la ciudad de Lima. Nuestra dirección de contacto general es <code>contacto@gmail.com</code>; para consultas relacionadas con datos personales, el correo es <code>datos@gmail.com</code></p>
+      <p>El responsable del tratamiento de los datos personales es la tienda <strong>STREET URBAN,</strong> de San Ramón, Chanchamayo (Junín, Perú). Nuestra dirección de contacto general es <code>contacto@gmail.com</code>; para consultas relacionadas con datos personales, el correo es <code>datos@gmail.com</code></p>
       
       <h2>2. ¿Qué datos personales tratamos?</h2>
 

@@ -691,7 +691,7 @@ const guardarCompra = () => {
 
 <template>
   <div
-    class="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4"
+    class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4"
     @mousedown="pulsoEnElFondo = $event.target === $event.currentTarget"
     @click.self="cerrarPorFondo"
   >
@@ -702,7 +702,7 @@ const guardarCompra = () => {
       class="modal-compra bg-gray-50 w-full max-w-6xl rounded-t-3xl sm:rounded-3xl shadow-2xl ring-1 ring-black/5 flex flex-col h-[94vh] sm:h-auto sm:max-h-[94vh] overflow-hidden"
     >
       <!-- Encabezado -->
-      <header class="flex items-center gap-4 px-6 py-4 bg-white border-b border-gray-100 flex-shrink-0">
+      <header class="flex items-center gap-4 px-6 py-4 bg-surface border-b border-gray-100 flex-shrink-0">
         <div class="w-11 h-11 rounded-2xl bg-orange-50 text-[#ff8c42] flex items-center justify-center flex-shrink-0">
           <i class="fa-solid fa-cart-flatbed"></i>
         </div>
@@ -725,7 +725,7 @@ const guardarCompra = () => {
         <div class="lg:overflow-y-auto p-5 sm:p-6 space-y-5">
 
           <!-- Paso 1: prenda -->
-          <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <section class="bg-surface rounded-2xl border border-gray-100 shadow-sm p-5">
             <header class="flex items-center gap-3 mb-4">
               <span :class="['w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors', paso1Listo ? 'bg-green-500 text-white' : 'bg-[#ff8c42] text-white']">
                 <i v-if="paso1Listo" class="fa-solid fa-check text-[11px]"></i><template v-else>1</template>
@@ -764,7 +764,7 @@ const guardarCompra = () => {
                       <i class="fa-solid fa-circle-check"></i> Modelo existente, se sumará el stock
                     </p>
                   </div>
-                  <button type="button" @click="limpiarSeleccion" aria-label="Quitar el modelo elegido" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-white flex items-center justify-center flex-shrink-0">
+                  <button type="button" @click="limpiarSeleccion" aria-label="Quitar el modelo elegido" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-surface flex items-center justify-center flex-shrink-0">
                     <i class="fa-solid fa-xmark"></i>
                   </button>
                 </div>
@@ -778,11 +778,11 @@ const guardarCompra = () => {
                     type="text"
                     autocomplete="off"
                     placeholder="Busca el modelo (Ej: Stan Smith, Dri-Fit, All Star)"
-                    class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
+                    class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
                   >
                   <div
                     v-if="showSuggestions && (searchQuery.trim().length >= 2 || prendaForm.categoria || prendaForm.marca)"
-                    class="absolute z-20 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-60 overflow-y-auto"
+                    class="absolute z-20 mt-1.5 w-full bg-surface border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-60 overflow-y-auto"
                   >
                     <div v-if="isSearching" class="px-3 py-2.5 text-sm text-gray-400">Buscando...</div>
                     <template v-else>
@@ -818,15 +818,15 @@ const guardarCompra = () => {
             </div>
 
             <!-- Crear categoría a propósito (solo administradores) -->
-            <div v-if="creandoCategoria" class="mt-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-4">
+            <div v-if="creandoCategoria" class="mt-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-surface p-4">
               <div class="flex items-center justify-between mb-3">
                 <h4 class="text-sm font-bold text-gray-900">Nueva categoría</h4>
-                <button type="button" @click="creandoCategoria = false" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-white" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" @click="creandoCategoria = false" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-surface" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                 <div class="md:col-span-1 md:self-start">
                   <label for="categoria-nueva-nombre" class="block text-xs font-semibold text-gray-600 mb-1.5">Nombre</label>
-                  <input id="categoria-nueva-nombre" v-model="categoriaNueva.name" @keydown.enter.prevent="crearCategoria" type="text" placeholder="Ej: Polos" class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                  <input id="categoria-nueva-nombre" v-model="categoriaNueva.name" @keydown.enter.prevent="crearCategoria" type="text" placeholder="Ej: Polos" class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
                 </div>
                 <div class="md:col-span-2">
                   <span class="block text-xs font-semibold text-gray-600 mb-1.5">¿Qué tallas usa? <span class="font-normal text-gray-400">(elige según lo que vende)</span></span>
@@ -837,7 +837,7 @@ const guardarCompra = () => {
                       type="button"
                       @click="categoriaNueva.sizeType = g.id"
                       :aria-pressed="categoriaNueva.sizeType === g.id"
-                      :class="['flex flex-col items-center gap-0.5 rounded-xl border-2 px-2 py-2.5 text-center transition-all', categoriaNueva.sizeType === g.id ? 'border-[#ff8c42] bg-white shadow-sm' : 'border-gray-200 bg-white/60 hover:border-gray-300']"
+                      :class="['flex flex-col items-center gap-0.5 rounded-xl border-2 px-2 py-2.5 text-center transition-all', categoriaNueva.sizeType === g.id ? 'border-[#ff8c42] bg-surface shadow-sm' : 'border-gray-200 bg-surface/60 hover:border-gray-300']"
                     >
                       <i :class="[g.icono, categoriaNueva.sizeType === g.id ? 'text-[#ff8c42]' : 'text-gray-400']" class="text-sm"></i>
                       <span class="text-sm font-bold text-gray-900">{{ g.nombre }}</span>
@@ -856,10 +856,10 @@ const guardarCompra = () => {
             </div>
 
             <!-- Agregar marca a la categoría (solo administradores) -->
-            <div v-if="creandoMarca" class="mt-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-4">
+            <div v-if="creandoMarca" class="mt-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-surface p-4">
               <div class="flex items-center justify-between mb-1">
                 <h4 class="text-sm font-bold text-gray-900">Nueva marca en {{ prendaForm.categoria }}</h4>
-                <button type="button" @click="creandoMarca = false" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-white" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" @click="creandoMarca = false" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-surface" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
               </div>
               <p class="text-xs text-gray-500 mb-3">Elige una marca que ya usas en otra categoría o escribe una nueva. Por ejemplo: Nike, Adidas, Gap.</p>
               <div class="flex flex-wrap items-start gap-3">
@@ -874,10 +874,10 @@ const guardarCompra = () => {
             </div>
 
             <!-- Crear modelo en la categoría y marca elegidas (solo administradores) -->
-            <div v-if="creandoModelo" class="mt-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-4">
+            <div v-if="creandoModelo" class="mt-5 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-surface p-4">
               <div class="flex items-center justify-between mb-1">
                 <h4 class="text-sm font-bold text-gray-900">Nuevo modelo de {{ prendaForm.marca }}</h4>
-                <button type="button" @click="creandoModelo = false" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-white" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" @click="creandoModelo = false" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-surface" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
               </div>
               <p class="text-xs text-gray-500 mb-3">Dentro de {{ prendaForm.categoria }} › {{ prendaForm.marca }}. Después eliges su color y sus tallas.</p>
               <div class="flex flex-wrap items-start gap-3">
@@ -888,7 +888,7 @@ const guardarCompra = () => {
                   maxlength="255"
                   aria-label="Nombre del modelo nuevo"
                   placeholder="Ej: Stan Smith, Dri-Fit, All Star"
-                  class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 flex-1 min-w-[14rem]"
+                  class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 flex-1 min-w-[14rem]"
                 >
                 <button type="button" @click="crearModelo()" :disabled="guardandoModelo" class="bg-[#ff8c42] hover:bg-[#f27d30] disabled:opacity-60 text-white text-sm font-bold h-11 px-5 rounded-xl transition-colors">
                   {{ guardandoModelo ? 'Creando...' : 'Crear modelo' }}
@@ -899,7 +899,7 @@ const guardarCompra = () => {
           </section>
 
           <!-- Paso 2: color -->
-          <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <section class="bg-surface rounded-2xl border border-gray-100 shadow-sm p-5">
             <header class="flex items-center gap-3 mb-4">
               <span :class="['w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors', paso2Listo ? 'bg-green-500 text-white' : 'bg-[#ff8c42] text-white']">
                 <i v-if="paso2Listo" class="fa-solid fa-check text-[11px]"></i><template v-else>2</template>
@@ -940,7 +940,7 @@ const guardarCompra = () => {
                 v-model="prendaForm.colorNombre"
                 type="text"
                 placeholder="Nombre del color, ej: Negro con blanco"
-                class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 mb-3"
+                class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 mb-3"
               >
               <p class="text-xs font-semibold text-gray-500 mb-2">O elige un color de referencia <span class="font-normal text-gray-400">(completa el nombre)</span></p>
               <div class="flex gap-1.5 flex-wrap">
@@ -951,7 +951,7 @@ const guardarCompra = () => {
                   :aria-pressed="prendaForm.color === color.hex"
                   :class="['w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center',
                            prendaForm.color === color.hex ? 'border-gray-900 ring-2 ring-offset-2 ring-[#ff8c42] scale-105' : 'border-gray-200 hover:scale-110',
-                           color.hex === null ? 'bg-white' : '']"
+                           color.hex === null ? 'bg-surface' : '']"
                   :style="color.hex ? { backgroundColor: color.hex } : {}"
                   :title="color.nombre">
                   <i v-if="color.hex === null" class="fa-solid fa-ban text-gray-300 text-xs"></i>
@@ -961,7 +961,7 @@ const guardarCompra = () => {
           </section>
 
           <!-- Paso 3: tallas y cantidades -->
-          <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <section class="bg-surface rounded-2xl border border-gray-100 shadow-sm p-5">
             <header class="flex flex-wrap items-center gap-3 mb-4">
               <span :class="['w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors', paso3Listo ? 'bg-green-500 text-white' : 'bg-[#ff8c42] text-white']">
                 <i v-if="paso3Listo" class="fa-solid fa-check text-[11px]"></i><template v-else>3</template>
@@ -974,7 +974,7 @@ const guardarCompra = () => {
                   type="button"
                   @click="elegirGrupoTalla(g.id)"
                   :aria-pressed="grupoTalla === g.id"
-                  :class="['px-3 py-1.5 text-xs font-bold rounded-md transition-all', grupoTalla === g.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+                  :class="['px-3 py-1.5 text-xs font-bold rounded-md transition-all', grupoTalla === g.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
                 >{{ g.nombre }}</button>
               </div>
               <span class="ml-auto text-xs text-gray-500">
@@ -989,7 +989,7 @@ const guardarCompra = () => {
                 :key="t"
                 :class="[
                   'rounded-xl border-2 px-2 pt-2 pb-2 transition-colors focus-within:ring-4 focus-within:ring-orange-100',
-                  grilla[t] ? 'border-[#ff8c42] bg-orange-50' : 'border-gray-200 bg-white hover:border-gray-300 focus-within:border-[#ff8c42]',
+                  grilla[t] ? 'border-[#ff8c42] bg-orange-50' : 'border-gray-200 bg-surface hover:border-gray-300 focus-within:border-[#ff8c42]',
                 ]"
               >
                 <p :class="['text-center text-xs font-bold mb-1', grilla[t] ? 'text-[#e67e2d]' : 'text-gray-500']">{{ t }}</p>
@@ -1000,7 +1000,7 @@ const guardarCompra = () => {
                     @click="cambiarCantidad(t, -1)"
                     :disabled="!grilla[t]"
                     :aria-label="`Restar 1 a la talla ${t}`"
-                    class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 bg-white border border-gray-200 hover:border-[#ff8c42] hover:text-[#ff8c42] active:scale-95 disabled:opacity-30 disabled:hover:border-gray-200 disabled:hover:text-gray-500 disabled:cursor-not-allowed transition-all"
+                    class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 bg-surface border border-gray-200 hover:border-[#ff8c42] hover:text-[#ff8c42] active:scale-95 disabled:opacity-30 disabled:hover:border-gray-200 disabled:hover:text-gray-500 disabled:cursor-not-allowed transition-all"
                   >
                     <i class="fa-solid fa-minus text-xs"></i>
                   </button>
@@ -1036,14 +1036,14 @@ const guardarCompra = () => {
                 maxlength="20"
                 placeholder="Otra talla (ej. 42)"
                 aria-label="Agregar otra talla"
-                class="w-40 h-9 px-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 bg-white"
+                class="w-40 h-9 px-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 bg-surface"
               >
               <button type="button" @click="agregarTallaNueva" class="text-sm font-semibold text-[#ff8c42] hover:underline">+ Agregar talla</button>
             </div>
           </section>
 
           <!-- Paso 4: precios y agregar -->
-          <section class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <section class="bg-surface rounded-2xl border border-gray-100 shadow-sm p-5">
             <header class="flex items-center gap-3 mb-4">
               <span :class="['w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors', paso4Listo ? 'bg-green-500 text-white' : 'bg-[#ff8c42] text-white']">
                 <i v-if="paso4Listo" class="fa-solid fa-check text-[11px]"></i><template v-else>4</template>
@@ -1057,14 +1057,14 @@ const guardarCompra = () => {
                 <label for="registrar-compra-modal-6" class="block text-sm font-semibold text-gray-700 mb-1.5">Precio Compra</label>
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">S/</span>
-                  <input id="registrar-compra-modal-6" v-model.number="prendaForm.precioCompra" type="number" step="0.01" min="0" placeholder="0.00" class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-10">
+                  <input id="registrar-compra-modal-6" v-model.number="prendaForm.precioCompra" type="number" step="0.01" min="0" placeholder="0.00" class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-10">
                 </div>
               </div>
               <div>
                 <label for="registrar-compra-modal-7" class="block text-sm font-semibold text-gray-700 mb-1.5">Precio Venta</label>
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">S/</span>
-                  <input id="registrar-compra-modal-7" v-model.number="prendaForm.precioVenta" type="number" step="0.01" min="0" placeholder="0.00" class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-10">
+                  <input id="registrar-compra-modal-7" v-model.number="prendaForm.precioVenta" type="number" step="0.01" min="0" placeholder="0.00" class="w-full h-11 px-4 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-10">
                 </div>
               </div>
               <div>
@@ -1112,7 +1112,7 @@ const guardarCompra = () => {
         </div>
 
         <!-- ======================= DERECHA: resumen ======================= -->
-        <aside class="bg-white border-t lg:border-t-0 lg:border-l border-gray-100 flex flex-col lg:min-h-0" aria-label="Resumen de la compra">
+        <aside class="bg-surface border-t lg:border-t-0 lg:border-l border-gray-100 flex flex-col lg:min-h-0" aria-label="Resumen de la compra">
           <div class="flex-1 lg:overflow-y-auto p-5 space-y-5">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-gray-900">Resumen de la compra</h3>
@@ -1123,19 +1123,19 @@ const guardarCompra = () => {
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label for="registrar-compra-modal-1" class="block text-xs font-semibold text-gray-600 mb-1">Fecha</label>
-                <input id="registrar-compra-modal-1" v-model="compraForm.fecha" type="date" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                <input id="registrar-compra-modal-1" v-model="compraForm.fecha" type="date" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
               <div>
                 <label for="registrar-compra-modal-3" class="block text-xs font-semibold text-gray-600 mb-1">Factura # (opcional)</label>
-                <input id="registrar-compra-modal-3" v-model="compraForm.factura" type="text" placeholder="F-001234" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                <input id="registrar-compra-modal-3" v-model="compraForm.factura" type="text" placeholder="F-001234" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
               <div class="col-span-2">
                 <label for="registrar-compra-modal-2" class="block text-xs font-semibold text-gray-600 mb-1">Tienda/Proveedor</label>
-                <input id="registrar-compra-modal-2" v-model="tiendaCapitalizada" type="text" placeholder="Ej: Centro Comercial Jockey" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                <input id="registrar-compra-modal-2" v-model="tiendaCapitalizada" type="text" placeholder="Ej: Centro Comercial Jockey" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
               <div class="col-span-2">
                 <label for="registrar-compra-modal-4" class="block text-xs font-semibold text-gray-600 mb-1">Notas (opcional)</label>
-                <input id="registrar-compra-modal-4" v-model="compraForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                <input id="registrar-compra-modal-4" v-model="compraForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
             </div>
 
@@ -1144,7 +1144,7 @@ const guardarCompra = () => {
               <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2.5">Prendas agregadas</p>
 
               <div v-if="grupos.length === 0" class="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/60 px-4 py-8 text-center">
-                <div class="w-11 h-11 mx-auto mb-3 rounded-2xl bg-white shadow-sm text-gray-300 flex items-center justify-center"><i class="fa-solid fa-shirt"></i></div>
+                <div class="w-11 h-11 mx-auto mb-3 rounded-2xl bg-surface shadow-sm text-gray-300 flex items-center justify-center"><i class="fa-solid fa-shirt"></i></div>
                 <p class="text-sm font-semibold text-gray-600">Aún no agregaste prendas</p>
                 <p class="text-xs text-gray-400 mt-1">Completa los 4 pasos y pulsa «Agregar».</p>
               </div>
@@ -1156,7 +1156,7 @@ const guardarCompra = () => {
                       <p class="font-semibold text-gray-900 truncate leading-tight">{{ g.nombre }}</p>
                       <p class="text-xs text-gray-400 truncate">{{ g.marca }} · {{ g.categoria }}</p>
                     </div>
-                    <span class="flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-full pl-1.5 pr-2.5 py-0.5 flex-shrink-0">
+                    <span class="flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-surface border border-gray-200 rounded-full pl-1.5 pr-2.5 py-0.5 flex-shrink-0">
                       <ColorSwatch :hex="g.color" class="w-3.5 h-3.5 rounded-full border border-gray-200" /> {{ g.colorNombre }}
                     </span>
                   </div>
@@ -1165,7 +1165,7 @@ const guardarCompra = () => {
                     <span
                       v-for="l in g.lineas"
                       :key="l.id"
-                      class="inline-flex items-center gap-1 text-xs font-semibold bg-white border border-gray-200 rounded-md pl-2 pr-1 py-0.5 text-gray-700"
+                      class="inline-flex items-center gap-1 text-xs font-semibold bg-surface border border-gray-200 rounded-md pl-2 pr-1 py-0.5 text-gray-700"
                     >
                       {{ l.talla }} <span class="text-[#e67e2d]">×{{ l.cantidad }}</span>
                       <button type="button" @click="eliminarPrenda(l.id)" class="w-4 h-4 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center" :aria-label="`Quitar talla ${l.talla}`">
@@ -1197,7 +1197,7 @@ const guardarCompra = () => {
           </div>
 
           <!-- Totales y guardar: siempre visibles -->
-          <footer class="border-t border-gray-100 bg-white p-5 space-y-4 flex-shrink-0">
+          <footer class="border-t border-gray-100 bg-surface p-5 space-y-4 flex-shrink-0">
             <dl class="space-y-1.5 text-sm">
               <div class="flex justify-between"><dt class="text-gray-500">Total prendas</dt><dd class="font-semibold text-gray-900 tabular-nums">{{ totalPrendas() }}</dd></div>
               <div class="flex justify-between"><dt class="text-gray-500">Utilidad aprox.</dt><dd class="font-semibold text-green-600 tabular-nums">S/ {{ utilidadTotal().toFixed(2) }}</dd></div>

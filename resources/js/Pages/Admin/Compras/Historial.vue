@@ -36,15 +36,15 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Total de Compras Registradas</p>
           <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalCompras }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Total Invertido</p>
           <p class="text-3xl font-black text-[#ff8c42] mt-1">S/ {{ stats.totalGastado.toFixed(2) }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Promedio por Compra</p>
           <p class="text-3xl font-black text-gray-900 mt-1">S/ {{ stats.promedioCompra.toFixed(2) }}</p>
         </div>
@@ -102,7 +102,7 @@
                 <button
                   v-if="!compra.cancelada && esAdmin"
                   @click="cancelarCompra(compra)"
-                  class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-white border border-red-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors"
+                  class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-surface border border-red-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors"
                 >
                   <i class="fa-solid fa-ban text-[11px]"></i> Cancelar Compra
                 </button>

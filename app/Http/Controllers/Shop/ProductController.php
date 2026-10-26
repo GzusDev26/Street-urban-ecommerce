@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\SaleItem;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Support\PublicFile;
 
 class ProductController extends Controller
 {
@@ -17,7 +18,7 @@ class ProductController extends Controller
                 'id' => $c->id,
                 'nombre' => $c->name,
                 'hex' => $c->hex,
-                'imagen' => $c->image_url ? Storage::disk('public')->url($c->image_url) : null,
+                'imagen' => PublicFile::url($c->image_url),
                 'tallas' => $c->variants
                     ->map(fn ($v) => [
                         'variant_id' => $v->id,
@@ -33,7 +34,7 @@ class ProductController extends Controller
 
         $colorConFoto = $p->colors->first(fn ($c) => $c->image_url);
         $precioBase = $colores->isNotEmpty() ? $colores->min('precio') : (float) $p->price;
-        $imageFallback = $p->image_url ? Storage::disk('public')->url($p->image_url) : null;
+        $imageFallback = PublicFile::url($p->image_url);
 
         return [
             'id' => $p->id,
@@ -43,10 +44,11 @@ class ProductController extends Controller
             'category' => $p->category->name ?? 'Sin categoría',
             'brand' => $p->brand->name ?? 'Sin marca',
             'stock' => $p->stock > 0,
-            'rating' => 4.5,
             'sold' => $vendidosPorProducto[$p->id] ?? 0,
+            // "Nuevo" según la fecha real de alta (antes era una lista fija de ids).
+            'isNew' => $p->created_at?->gt(now()->subDays(30)) ?? false,
             'image' => $colorConFoto
-                ? Storage::disk('public')->url($colorConFoto->image_url)
+                ? PublicFile::url($colorConFoto->image_url)
                 : $imageFallback,
             'colores' => $colores,
         ];
@@ -78,22 +80,30 @@ class ProductController extends Controller
             ->map(fn ($p) => $this->mapProduct($p, $vendidos->toArray()));
     }
 
-    // Deriva las categorías a mostrar en el Home directo de los productos activos,
-    // usando la foto de uno de sus productos como imagen. Así, al agregar una
-    // categoría nueva (ej. "Medias") aparece sola, sin tocar código.
+    // Vitrina de categorías del Home: solo las destacadas (featured), para que la portada
+    // mantenga una composición curada aunque se creen más categorías desde el admin.
+    // Las que aún no tienen productos salen como "Próximamente" (sin enlace).
+    // Imagen: la propia de la categoría, si no la foto de uno de sus productos.
     private function getCategories($products)
     {
-        return $products
-            ->groupBy('category')
-            ->map(function ($group, $name) {
-                $conFoto = $group->firstWhere('image', '!=', null) ?? $group->first();
+        $porCategoria = $products->groupBy('category');
+
+        return Category::where('active', true)
+            ->where('featured', true)
+            ->orderBy('id')
+            ->get()
+            ->map(function (Category $categoria) use ($porCategoria) {
+                $productos = $porCategoria->get($categoria->name, collect());
+                $conFoto = $productos->firstWhere('image', '!=', null);
 
                 return [
-                    'name' => $name,
-                    'image' => $conFoto['image'] ?? null,
-                    'count' => $group->count(),
+                    'name' => $categoria->name,
+                    'image' => $categoria->image ?? $conFoto['image'] ?? null,
+                    'count' => $productos->count(),
                 ];
             })
+            // Primero las que ya tienen productos; el resto mantiene su orden.
+            ->sortBy(fn ($c) => $c['count'] > 0 ? 0 : 1, SORT_REGULAR, false)
             ->values();
     }
 
@@ -104,6 +114,8 @@ class ProductController extends Controller
         return Inertia::render('Shop/Home', [
             'products' => $products,
             'categories' => $this->getCategories($products),
+            // Categorías activas fuera de la vitrina: si hay alguna, el Home ofrece "Ver todas".
+            'moreCategories' => Category::where('active', true)->where('featured', false)->count(),
         ]);
     }
 

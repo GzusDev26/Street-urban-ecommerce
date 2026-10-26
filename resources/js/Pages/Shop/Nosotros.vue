@@ -11,8 +11,8 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
     <section class="relative min-h-screen pt-20 pb-20 px-4 md:px-8 lg:px-16 overflow-hidden flex items-center">
       <!-- Animated background -->
       <div class="absolute inset-0">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-fg/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-fg/5 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
       </div>
 
       <div class="relative max-w-6xl mx-auto w-full">
@@ -26,13 +26,13 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
               <h1 class="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic leading-tight">
                 Street
                 <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] to-white">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] to-fg">
                   Urban
                 </span>
               </h1>
             </div>
 
-            <div class="h-1 w-32 bg-gradient-to-r from-[#ff8c42] to-white rounded-full"></div>
+            <div class="h-1 w-32 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full"></div>
 
             <p class="text-xl text-gray-300 leading-relaxed max-w-lg">
               Más que una tienda. Una propuesta pensada para quienes encuentran en su estilo una forma de expresarse.
@@ -40,7 +40,7 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
 
             <Link
               :href="route('shop.tienda')"
-              class="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold uppercase tracking-wider hover:bg-gray-200 transition-all rounded-lg group"
+              class="inline-flex items-center gap-3 px-8 py-4 bg-fg text-canvas font-bold uppercase tracking-wider hover:bg-gray-200 transition-all rounded-lg group"
             >
               Explora Ahora
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 group-hover:translate-x-1 transition-transform">
@@ -63,7 +63,7 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
     </section>
 
     <!-- Values Section -->
-    <section class="px-4 md:px-8 lg:px-16 py-24 border-y border-gray-800 bg-black/50">
+    <section class="px-4 md:px-8 lg:px-16 py-24 border-y border-gray-800 bg-sunken/60">
       <div class="max-w-6xl mx-auto">
         <div class="mb-16">
           <p class="text-sm uppercase tracking-[0.3em] text-[#ff8c42] font-semibold mb-4">
@@ -82,7 +82,7 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128A2.25 2.25 0 002.75 21h19.5a2.25 2.25 0 002.247-2.128 3 3 0 00-5.78-1.128m0 0a6.001 6.001 0 00-7.08 0m0 0a6 6 0 00-8.914 2.88M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black uppercase italic mb-3 text-white">
+            <h3 class="text-2xl font-black uppercase italic mb-3 text-fg">
               Estilo
             </h3>
             <p class="text-gray-400 leading-relaxed">
@@ -97,7 +97,7 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black uppercase italic mb-3 text-white">
+            <h3 class="text-2xl font-black uppercase italic mb-3 text-fg">
               Identidad
             </h3>
             <p class="text-gray-400 leading-relaxed">
@@ -112,7 +112,7 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 class="text-2xl font-black uppercase italic mb-3 text-white">
+            <h3 class="text-2xl font-black uppercase italic mb-3 text-fg">
               Actitud
             </h3>
             <p class="text-gray-400 leading-relaxed">
@@ -136,7 +136,7 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
               Democratizar el <span class="text-gray-500">estilo urbano</span>
             </h2>
 
-            <div class="h-1 w-32 bg-gradient-to-r from-[#ff8c42] to-white rounded-full mb-8"></div>
+            <div class="h-1 w-32 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full mb-8"></div>
 
             <div class="space-y-6 text-gray-400 leading-relaxed text-lg">
               <p>
@@ -155,19 +155,19 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
           <div class="space-y-8">
             <div class="border-l-4 border-[#ff8c42] pl-6 py-4">
               <p class="text-sm text-gray-400 mb-2">Desde</p>
-              <p class="text-4xl font-black text-white">2024</p>
+              <p class="text-4xl font-black text-fg">2024</p>
               <p class="text-gray-500 mt-2">Llevando estilo a las calles</p>
             </div>
 
             <div class="border-l-4 border-[#ff8c42] pl-6 py-4">
               <p class="text-sm text-gray-400 mb-2">Comunidad</p>
-              <p class="text-4xl font-black text-white">+2K</p>
+              <p class="text-4xl font-black text-fg">+2K</p>
               <p class="text-gray-500 mt-2">Personas viviendo su estilo</p>
             </div>
 
             <div class="border-l-4 border-[#ff8c42] pl-6 py-4">
               <p class="text-sm text-gray-400 mb-2">Colección</p>
-              <p class="text-4xl font-black text-white">150+</p>
+              <p class="text-4xl font-black text-fg">150+</p>
               <p class="text-gray-500 mt-2">Prendas cuidadosamente seleccionadas</p>
             </div>
           </div>
@@ -181,12 +181,12 @@ import ShopLayout from '@/Layouts/Shop/ShopLayout.vue';
         <p class="text-4xl md:text-6xl lg:text-7xl font-black uppercase italic leading-tight max-w-4xl">
           Define tu estilo.
           <br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] to-white">
-            Domina las calles.
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] to-fg">
+            Hazlo a tu manera.
           </span>
         </p>
 
-        <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-white rounded-full mt-8"></div>
+        <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full mt-8"></div>
       </div>
     </section>
 

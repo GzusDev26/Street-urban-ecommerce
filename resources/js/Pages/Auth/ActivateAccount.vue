@@ -88,14 +88,14 @@ const handleActivate = async () => {
   <Transition name="fade">
     <div
       v-if="showSplash"
-      class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center px-4"
+      class="fixed inset-0 z-50 bg-canvas flex flex-col items-center justify-center px-4"
     >
       <div class="w-16 h-16 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-green-500">
           <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <h2 class="text-3xl font-black text-white text-center mb-2">¡BIENVENIDO!</h2>
+      <h2 class="text-3xl font-black text-fg text-center mb-2">¡BIENVENIDO!</h2>
       <p class="text-gray-400 text-sm text-center">Iniciando sesión, un momento...</p>
     </div>
   </Transition>
@@ -120,7 +120,7 @@ const handleActivate = async () => {
           <span class="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Correo electrónico
           </span>
-          <div class="bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white text-sm">
+          <div class="bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-fg text-sm">
             {{ email }}
           </div>
         </div>
@@ -134,7 +134,7 @@ const handleActivate = async () => {
             v-model="name"
             type="text"
             placeholder="Ej: Juan Pérez"
-            class="w-full bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition duration-300"
+            class="w-full bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl text-fg placeholder-gray-500 focus:outline-none focus:border-fg focus:ring-1 focus:ring-fg transition duration-300"
           />
         </div>
 
@@ -148,7 +148,7 @@ const handleActivate = async () => {
             v-model="phone"
             type="tel"
             placeholder="+51 999 123 456"
-            class="w-full bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition duration-300"
+            class="w-full bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl text-fg placeholder-gray-400 focus:outline-none focus:border-fg focus:ring-1 focus:ring-fg transition duration-300"
           />
         </div>
 
@@ -162,7 +162,7 @@ const handleActivate = async () => {
               v-model="password"
               :type="showPassword ? 'text' : 'password'"
               placeholder="Mínimo 8 caracteres"
-              class="w-full bg-gray-700 border border-gray-600 px-4 py-3 pr-12 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition duration-300"
+              class="w-full bg-gray-700 border border-gray-600 px-4 py-3 pr-12 rounded-xl text-fg placeholder-gray-400 focus:outline-none focus:border-fg focus:ring-1 focus:ring-fg transition duration-300"
             />
             <button
               @click="showPassword = !showPassword"
@@ -189,7 +189,7 @@ const handleActivate = async () => {
             v-model="passwordConfirm"
             type="password"
             placeholder="Repite tu contraseña"
-            class="w-full bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition duration-300"
+            class="w-full bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl text-fg placeholder-gray-400 focus:outline-none focus:border-fg focus:ring-1 focus:ring-fg transition duration-300"
           />
         </div>
 
@@ -207,7 +207,7 @@ const handleActivate = async () => {
         <button
           @click="handleActivate"
           :disabled="isLoading"
-          class="w-full bg-white text-black py-4 font-bold tracking-widest uppercase hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 rounded-xl text-sm"
+          class="w-full bg-fg text-canvas py-4 font-bold tracking-widest uppercase hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 rounded-xl text-sm"
         >
           {{ isLoading ? 'ACTIVANDO...' : 'Activar Cuenta' }}
         </button>

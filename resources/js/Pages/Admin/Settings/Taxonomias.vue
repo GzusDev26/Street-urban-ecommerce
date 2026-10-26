@@ -12,6 +12,8 @@
         <i class="fa-solid fa-circle-exclamation"></i> {{ page.props.errors.error }}
       </div>
 
+      <CategoryShowcase :categorias="categorias" />
+
       <p class="text-xs text-gray-400">
         Las categorías se crean aquí a propósito (no escribiéndolas al comprar) para evitar duplicados como «Polo» y «Polos»; cada una define las tallas que se ofrecen al comprar. Solo puedes eliminar las que no tengan productos asociados.
       </p>
@@ -50,6 +52,7 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import TaxonomyCard from '@/Components/Admin/TaxonomyCard.vue';
+import CategoryShowcase from '@/Components/Admin/CategoryShowcase.vue';
 
 defineProps({
   categorias: Array,

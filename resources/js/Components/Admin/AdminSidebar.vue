@@ -9,7 +9,7 @@
       <img
         src="/image/logo/street-urban-icono-dark.png"
         :alt="`Logo de ${brand.name}`"
-        class="w-14 h-12 flex-shrink-0 object-fill"
+        class="w-12 h-12 flex-shrink-0 object-contain"
       />
       <div v-if="!rail" class="min-w-0 flex-1 leading-tight">
         <p class="text-[15px] font-bold tracking-tight text-white truncate">{{ brand.name }}</p>

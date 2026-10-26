@@ -6,7 +6,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+  <div class="bg-surface rounded-2xl border border-gray-100 shadow-sm">
     <div class="flex flex-wrap items-center justify-between gap-4 p-6 pb-5">
       <div>
         <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>

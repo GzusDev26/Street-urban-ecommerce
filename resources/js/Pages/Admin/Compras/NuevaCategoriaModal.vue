@@ -74,7 +74,7 @@ const guardar = () => {
           :aria-pressed="form.size_type === g.id"
           :class="[
             'flex flex-col items-center gap-1 rounded-xl border-2 px-2 py-3.5 text-center transition-all',
-            form.size_type === g.id ? 'border-[#ff8c42] bg-orange-50' : 'border-gray-200 bg-white hover:border-gray-300',
+            form.size_type === g.id ? 'border-[#ff8c42] bg-orange-50' : 'border-gray-200 bg-surface hover:border-gray-300',
           ]"
         >
           <i :class="[g.icono, form.size_type === g.id ? 'text-[#ff8c42]' : 'text-gray-400']"></i>

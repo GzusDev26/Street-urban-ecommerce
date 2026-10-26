@@ -103,6 +103,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/categorias/{category}/marcas', [CategoryBrandController::class, 'attachBrand'])->name('admin.categories.brands.attach');
         Route::delete('/categorias/{category}/marcas/{brand}', [CategoryBrandController::class, 'detachBrand'])->name('admin.categories.brands.detach');
         Route::patch('/categorias/{category}', [CategoryBrandController::class, 'updateCategory'])->name('admin.categories.update');
+        Route::patch('/categorias/{category}/vitrina', [CategoryBrandController::class, 'updateCategoryFeatured'])->name('admin.categories.featured');
+        Route::post('/categorias/{category}/foto', [CategoryBrandController::class, 'updateCategoryImage'])->name('admin.categories.image');
         Route::delete('/categorias/{category}', [CategoryBrandController::class, 'destroyCategory'])->name('admin.categories.destroy');
         Route::post('/marcas', [CategoryBrandController::class, 'storeBrand'])->name('admin.brands.store');
         Route::patch('/marcas/{brand}', [CategoryBrandController::class, 'updateBrand'])->name('admin.brands.update');

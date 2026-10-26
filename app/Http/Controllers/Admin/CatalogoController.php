@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use App\Support\PublicFile;
 
 class CatalogoController extends Controller
 {
@@ -178,7 +179,7 @@ class CatalogoController extends Controller
                 'id' => $c->id,
                 'nombre' => $c->name,
                 'hex' => $c->hex,
-                'imagenUrl' => $c->image_url ? Storage::disk('public')->url($c->image_url) : null,
+                'imagenUrl' => PublicFile::url($c->image_url),
             ]);
 
         return response()->json($colores);
@@ -201,7 +202,7 @@ class CatalogoController extends Controller
         }
 
         $imagePath = $request->hasFile('imagen')
-            ? $request->file('imagen')->store('product-colors', 'public')
+            ? PublicFile::storeNamed($request->file('imagen'), 'product-colors', $producto->name, $validated['nombre'])
             : null;
 
         $producto->colors()->create([
@@ -278,7 +279,7 @@ class CatalogoController extends Controller
             if ($imagePath) {
                 Storage::disk('public')->delete($imagePath);
             }
-            $imagePath = $request->file('imagen')->store('product-colors', 'public');
+            $imagePath = PublicFile::storeNamed($request->file('imagen'), 'product-colors', $color->product->name, $validated['nombre']);
         }
 
         $color->update([
@@ -304,7 +305,7 @@ class CatalogoController extends Controller
         ]);
 
         $anterior = $color->image_url;
-        $color->update(['image_url' => $request->file('imagen')->store('product-colors', 'public')]);
+        $color->update(['image_url' => PublicFile::storeNamed($request->file('imagen'), 'product-colors', $color->product->name, $color->name)]);
 
         if ($anterior) {
             Storage::disk('public')->delete($anterior);

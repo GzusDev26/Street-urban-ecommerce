@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div
-      class="boleta-modal-raiz fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-[2px] flex justify-end"
+      class="boleta-modal-raiz fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex justify-end"
       @mousedown="pulsoEnElFondo = $event.target === $event.currentTarget"
       @click.self="pulsoEnElFondo && emit('close')"
     >
@@ -9,7 +9,7 @@
         role="dialog"
         aria-modal="true"
         :aria-label="resumen ? 'Venta registrada' : 'Boleta de venta'"
-        class="modal-boleta bg-white w-full sm:w-[36rem] max-w-full h-full shadow-2xl flex flex-col"
+        class="modal-boleta bg-surface w-full sm:w-[36rem] max-w-full h-full shadow-2xl flex flex-col"
       >
         <!-- Cabecera -->
         <header class="flex items-start gap-3 px-6 pt-6 pb-4 print:hidden">
@@ -37,7 +37,7 @@
         </header>
 
         <!-- Vista previa de la boleta -->
-        <div class="flex-1 min-h-0 overflow-auto bg-[#e7e8eb] px-4 py-6 flex justify-center items-start print:bg-white print:p-0 print:overflow-visible">
+        <div class="flex-1 min-h-0 overflow-auto bg-gray-200 px-4 py-6 flex justify-center items-start print:bg-surface print:p-0 print:overflow-visible">
           <div v-if="cargando" class="self-center text-sm text-gray-500 flex items-center gap-2 py-16">
             <i class="fa-solid fa-spinner fa-spin"></i> Cargando boleta...
           </div>
@@ -58,7 +58,7 @@
                 type="button"
                 @click="elegirAncho(mm)"
                 :aria-pressed="ancho === mm"
-                :class="['px-4 h-8 text-xs font-bold rounded-lg transition-colors', ancho === mm ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-800']"
+                :class="['px-4 h-8 text-xs font-bold rounded-lg transition-colors', ancho === mm ? 'bg-fg text-canvas' : 'text-gray-500 hover:text-gray-800']"
               >{{ mm }} mm</button>
             </div>
           </div>
@@ -75,7 +75,7 @@
           <div v-if="resumen" class="grid grid-cols-2 gap-2">
             <Link
               :href="`${route('admin.sales.index')}?venta=${ventaId}`"
-              class="h-11 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+              class="h-11 rounded-xl bg-surface border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-colors flex items-center justify-center gap-2"
             >
               <i class="fa-solid fa-receipt"></i> Ver en historial
             </Link>

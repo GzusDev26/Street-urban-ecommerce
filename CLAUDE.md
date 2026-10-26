@@ -248,6 +248,50 @@ php artisan db:seed        # Run seeders
 - **Layouts**: `resources/js/Layouts/` - Page layout wrappers
 - **Styling**: Use Tailwind CSS classes directly; no separate CSS files needed
 
+### Modo claro / oscuro
+
+- El admin está diseñado en claro y la tienda en oscuro. Los grises y colores de estado (`gray-*`, `red-*`, `green-*`…) son variables CSS que se invierten solas en el modo contrario (ver el comentario al inicio de `tailwind.config.js`). No uses `dark:` para colores; escribe las clases como en el resto del archivo.
+- Para fondos y texto principal usa los tokens: `bg-canvas` (fondo de página), `bg-surface` (tarjetas, inputs, modales), `bg-sunken` (footer/zonas hundidas), `text-fg` / `bg-fg` (texto principal o botón invertido). Evita `bg-white` y, en la tienda, `text-white` salvo sobre fotos o colores sólidos.
+- `theme-fixed`: zona que nunca cambia (la boleta térmica). `theme-shop-dark`: pieza de la tienda que siempre va en oscuro (navbar sobre el hero).
+- El botón sol/luna es `Components/ThemeToggle.vue`; la lógica está en `resources/js/theme.js`. Qué páginas son "tienda" lo decide `surfaceFor()` en `theme.js` y la misma regla en `resources/views/app.blade.php`.
+
+### Imágenes
+
+- **Del sitio** (logos, fotos de categorías base, hero, nosotros): en `public/image/`, **sí van en Git**.
+- **Subidas desde el admin** (fotos de colores, portadas de categoría, avatares): en `storage/app/public/` (`product-colors/`, `categorias/`, `avatars/`), **no van en Git**; son datos, como la BD. Viajan con la base de datos, no con el repositorio.
+- Para la URL usa `App\Support\PublicFile::url($path)` (devuelve `/storage/...` relativo). **No uses `Storage::url()`**: arma la dirección con `APP_URL` y si no coincide con el dominio real (ej. `localhost` vs `.test`) la foto no carga.
+- Para guardar usa `PublicFile::storeNamed($file, 'carpeta', $modelo, $color)` → nombres legibles como `airforce-one-blanco-k3f9a2.jpg`, no el hash de Laravel.
+- Al reemplazar o borrar, elimina el archivo subido anterior; nunca borres nada de `public/image/`.
+
+### Tienda: datos honestos
+
+- Nada de descuentos, precios "antes", ratings ni insignias inventadas (ya se quitaron de `ProductCard`): es publicidad engañosa ante INDECOPI. "Nuevo" se calcula con la fecha real de alta (`isNew`, últimos 30 días).
+- No prometer envíos, cambios ni plazos que no estén en una política escrita en la web.
+- El negocio está en **San Ramón, Chanchamayo (Junín, Perú)**, no en Lima. Nombre, RUC, teléfono, WhatsApp y dirección reales están en `BusinessSetting` (admin → Datos del negocio) y se comparten como `page.props.business`; úsalos en vez de textos fijos. Las páginas legales aún tienen datos de relleno (correos `@gmail.com`, `RUC_DEL_RESPONSABLE`).
+
+### Vitrina del Home (categorías)
+
+- El Home muestra solo las categorías `featured` (admin → Categorías y marcas → "Vitrina del Home", con interruptor y foto de portada). Las categorías nuevas entran **ocultas** para no romper la composición; si hay más activas que destacadas aparece "Ver todas las categorías".
+- Las categorías sin productos salen como "Próximamente" y sin enlace. Las 5 categorías base (con imágenes en `public/image/shop/`) las crea `CategorySeeder`, que se puede correr varias veces sin duplicar ni pisar cambios del admin.
+
+### Animación
+
+- Usa los tokens de `resources/css/app.css`: `--ease-out` (entradas/salidas), `--ease-in-out` (revelados, movimiento en pantalla), `--ease-drawer`. No `ease-in` ni `transition: all`.
+- Solo `transform`, `opacity` y `clip-path`. Respeta `prefers-reduced-motion` y limita los hover a `@media (hover: hover) and (pointer: fine)`.
+- Movimiento solo con propósito (ver skills de Emil Kowalski en `.claude/skills`, ej. `emil-design-eng`, `animate`). Nada de cintas/marquesinas decorativas: se descartaron por genéricas.
+
+### Configurar una máquina nueva
+
+```bash
+composer install && npm install
+php artisan migrate
+php artisan db:seed --class=CategorySeeder   # categorías base + vitrina
+php artisan storage:link                     # sin esto no se ven las fotos subidas
+npm run build
+```
+
+Los skills de `.claude/skills/` son copias reales (no accesos directos) para que funcionen al clonar; si se actualizan con `npx skills update` hay que volver a reemplazar los accesos por copias antes de subir.
+
 ### Working with Inertia.js
 
 When passing data from controller to Vue component:

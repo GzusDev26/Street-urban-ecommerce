@@ -36,7 +36,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    class="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
+    class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
     @mousedown="pulsoEnElFondo = $event.target === $event.currentTarget"
     @click.self="pulsoEnElFondo && emit('close')"
   >
@@ -45,7 +45,7 @@ onBeforeUnmount(() => {
       aria-modal="true"
       :aria-label="title"
       :class="[size === 'lg' ? 'sm:max-w-lg' : 'sm:max-w-md']"
-      class="modal-panel bg-white w-full rounded-t-3xl sm:rounded-3xl shadow-2xl ring-1 ring-black/5 flex flex-col max-h-[92vh]"
+      class="modal-panel bg-surface w-full rounded-t-3xl sm:rounded-3xl shadow-2xl ring-1 ring-black/5 flex flex-col max-h-[92vh]"
       @submit.prevent="emit('submit')"
     >
       <header class="flex items-start gap-4 px-6 pt-6 pb-5">

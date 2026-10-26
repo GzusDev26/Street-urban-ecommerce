@@ -13,7 +13,7 @@ const emit = defineEmits(['confirm', 'close']);
 
 <template>
   <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="emit('close')">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <div class="bg-surface rounded-2xl shadow-2xl w-full max-w-sm p-6">
       <div
         :class="[
           'w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4',

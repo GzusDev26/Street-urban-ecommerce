@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Support\NameMatcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -93,10 +94,50 @@ class CategoryBrandController extends Controller
         return back()->with('success', 'Categoría actualizada correctamente.');
     }
 
+    // Vitrina del Home: decide si la categoría aparece en la portada de la tienda.
+    public function updateCategoryFeatured(Request $request, Category $category)
+    {
+        $validated = $request->validate(['featured' => 'required|boolean']);
+
+        $category->update(['featured' => $validated['featured']]);
+
+        return back()->with('success', $validated['featured']
+            ? "«{$category->name}» ahora se muestra en el Home."
+            : "«{$category->name}» ya no se muestra en el Home.");
+    }
+
+    // Foto de portada de la categoría en el Home. Se guarda como ruta relativa (/storage/...)
+    // para que funcione en cualquier dominio; al reemplazarla se borra la subida anterior,
+    // pero nunca las imágenes base de /image/shop.
+    public function updateCategoryImage(Request $request, Category $category)
+    {
+        $request->validate([
+            'imagen' => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ], [
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'Usa una imagen JPG, PNG o WEBP.',
+            'imagen.max' => 'La imagen no puede pesar más de 4 MB.',
+        ]);
+
+        $anterior = $category->image;
+        $ruta = $request->file('imagen')->store('categorias', 'public');
+        $category->update(['image' => '/storage/' . $ruta]);
+
+        if ($anterior && str_starts_with($anterior, '/storage/categorias/')) {
+            Storage::disk('public')->delete(substr($anterior, strlen('/storage/')));
+        }
+
+        return back()->with('success', "Foto de «{$category->name}» actualizada.");
+    }
+
     public function destroyCategory(Category $category)
     {
         if ($category->products()->exists()) {
             return back()->withErrors(['error' => "No puedes eliminar \"{$category->name}\": tiene productos asociados."]);
+        }
+
+        if ($category->image && str_starts_with($category->image, '/storage/categorias/')) {
+            Storage::disk('public')->delete(substr($category->image, strlen('/storage/')));
         }
 
         $category->delete();
@@ -214,6 +255,9 @@ class CategoryBrandController extends Controller
             'description' => $item->description,
             'productos' => $item->products_count,
             'size_type' => $item->size_type ?? null,
+            // Solo categorías: datos de la vitrina del Home.
+            'image' => $item->image ?? null,
+            'featured' => (bool) ($item->featured ?? false),
         ];
     }
 

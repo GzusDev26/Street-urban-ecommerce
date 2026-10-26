@@ -37,7 +37,7 @@ const submitForm = () => {
       <div class="absolute inset-0">
         <div class="absolute top-1/4 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#ff8c42]/25 to-transparent rounded-full blur-3xl animate-pulse"></div>
         <div class="absolute bottom-1/4 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-[#ff8c42]/15 to-transparent rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/[0.03] rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-fg/[0.03] rounded-full blur-3xl"></div>
       </div>
 
       <div class="relative max-w-7xl mx-auto w-full">
@@ -51,9 +51,9 @@ const submitForm = () => {
           <!-- Main Heading -->
           <div class="space-y-6">
             <h1 class="text-6xl md:text-8xl lg:text-9xl font-black uppercase italic leading-[0.95] tracking-tight">
-              <span class="text-white">Tu opinión</span>
+              <span class="text-fg">Tu opinión</span>
               <br>
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] via-[#ffb380] to-white">
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] via-[#ffb380] to-fg">
                 nos importa
               </span>
             </h1>
@@ -89,7 +89,7 @@ const submitForm = () => {
     </section>
 
     <!-- Contact Methods - Premium Grid -->
-    <section class="px-4 md:px-8 lg:px-16 py-32 border-t border-gray-800 bg-black/30">
+    <section class="px-4 md:px-8 lg:px-16 py-32 border-t border-gray-800 bg-sunken/60">
       <div class="max-w-7xl mx-auto">
         <div class="mb-20">
           <p class="text-sm uppercase tracking-[0.3em] text-[#ff8c42] font-semibold mb-6">
@@ -98,12 +98,12 @@ const submitForm = () => {
           <h2 class="text-5xl md:text-6xl lg:text-7xl font-black uppercase italic mb-6">
             Elige Tu <span class="text-gray-500">Forma</span>
           </h2>
-          <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-white rounded-full"></div>
+          <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full"></div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Email Card -->
-          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-black/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
+          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-sunken/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
             <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div class="relative z-10">
               <div class="w-16 h-16 rounded-2xl bg-[#ff8c42]/15 group-hover:bg-[#ff8c42]/25 flex items-center justify-center mb-8 transition-all duration-300">
@@ -111,7 +111,7 @@ const submitForm = () => {
                   <path stroke-linecap="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5A2.25 2.25 0 002.25 6.75m19.5 0h-15m0 0L9 12m0 0l4.5 4.5M9 12l-4.5-4.5" />
                 </svg>
               </div>
-              <h3 class="text-3xl font-black uppercase italic mb-4 text-white">Email</h3>
+              <h3 class="text-3xl font-black uppercase italic mb-4 text-fg">Email</h3>
               <p class="text-gray-400 leading-relaxed mb-8 text-lg">
                 Envíanos tu mensaje y nos pondremos en contacto en las próximas 24 horas.
               </p>
@@ -125,7 +125,7 @@ const submitForm = () => {
           </div>
 
           <!-- Phone Card -->
-          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-black/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
+          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-sunken/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
             <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div class="relative z-10">
               <div class="w-16 h-16 rounded-2xl bg-[#ff8c42]/15 group-hover:bg-[#ff8c42]/25 flex items-center justify-center mb-8 transition-all duration-300">
@@ -133,7 +133,7 @@ const submitForm = () => {
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 11.308 8.217 20.25 18.375 20.25A8.625 8.625 0 0020.25 21v-4.875c0-.621.504-1.125 1.125-1.125h4.875c.621 0 1.125.504 1.125 1.125V21a8.625 8.625 0 01-8.375 8.25M9 12c0 1.657 1.343 3 3 3s3-1.343 3-3-1.343-3-3-3-3 1.343-3 3z" />
                 </svg>
               </div>
-              <h3 class="text-3xl font-black uppercase italic mb-4 text-white">Teléfono</h3>
+              <h3 class="text-3xl font-black uppercase italic mb-4 text-fg">Teléfono</h3>
               <p class="text-gray-400 leading-relaxed mb-8 text-lg">
                 Habla directamente con nuestro equipo para una respuesta inmediata.
               </p>
@@ -147,7 +147,7 @@ const submitForm = () => {
           </div>
 
           <!-- Hours Card -->
-          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-black/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
+          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-sunken/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
             <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div class="relative z-10">
               <div class="w-16 h-16 rounded-2xl bg-[#ff8c42]/15 group-hover:bg-[#ff8c42]/25 flex items-center justify-center mb-8 transition-all duration-300">
@@ -155,7 +155,7 @@ const submitForm = () => {
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5-15a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 class="text-3xl font-black uppercase italic mb-4 text-white">Horarios</h3>
+              <h3 class="text-3xl font-black uppercase italic mb-4 text-fg">Horarios</h3>
               <p class="text-gray-400 leading-relaxed mb-8 text-lg">
                 Estamos disponibles en estos horarios para atenderte.
               </p>
@@ -168,7 +168,7 @@ const submitForm = () => {
           </div>
 
           <!-- Redes Card -->
-          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-black/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
+          <div class="group relative overflow-hidden rounded-3xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/40 to-sunken/60 p-10 hover:shadow-2xl hover:shadow-[#ff8c42]/10">
             <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div class="relative z-10">
               <div class="w-16 h-16 rounded-2xl bg-[#ff8c42]/15 group-hover:bg-[#ff8c42]/25 flex items-center justify-center mb-8 transition-all duration-300">
@@ -176,7 +176,7 @@ const submitForm = () => {
                   <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.769-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0c.174.324.277.696.277 1.093s-.103.769-.277 1.093" />
                 </svg>
               </div>
-              <h3 class="text-3xl font-black uppercase italic mb-4 text-white">Redes Sociales</h3>
+              <h3 class="text-3xl font-black uppercase italic mb-4 text-fg">Redes Sociales</h3>
               <p class="text-gray-400 leading-relaxed mb-8 text-lg">
                 Síguenos en redes para actualizaciones y contenido exclusivo.
               </p>
@@ -200,10 +200,10 @@ const submitForm = () => {
           <h2 class="text-5xl md:text-6xl lg:text-7xl font-black uppercase italic mb-6">
             Comparte Tu <span class="text-gray-500">Mensaje</span>
           </h2>
-          <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-white rounded-full"></div>
+          <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full"></div>
         </div>
 
-        <div class="border border-gray-800 rounded-3xl p-8 md:p-12 bg-gradient-to-br from-gray-900/40 to-black/60 backdrop-blur-sm hover:border-[#ff8c42]/30 transition-all duration-500">
+        <div class="border border-gray-800 rounded-3xl p-8 md:p-12 bg-gradient-to-br from-gray-900/40 to-sunken/60 backdrop-blur-sm hover:border-[#ff8c42]/30 transition-all duration-500">
           <form @submit.prevent="submitForm" class="space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <!-- Name -->
@@ -217,7 +217,7 @@ const submitForm = () => {
                   type="text"
                   required
                   placeholder="Tu nombre"
-                  class="w-full bg-white/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-white placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-white/10"
+                  class="w-full bg-fg/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-fg placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-fg/10"
                 />
               </div>
 
@@ -232,7 +232,7 @@ const submitForm = () => {
                   type="email"
                   required
                   placeholder="tu@email.com"
-                  class="w-full bg-white/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-white placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-white/10"
+                  class="w-full bg-fg/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-fg placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-fg/10"
                 />
               </div>
             </div>
@@ -247,7 +247,7 @@ const submitForm = () => {
                 v-model="form.subject"
                 type="text"
                 placeholder="Cuéntanos el tema de tu mensaje..."
-                class="w-full bg-white/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-white placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-white/10"
+                class="w-full bg-fg/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-fg placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-fg/10"
               />
             </div>
 
@@ -262,7 +262,7 @@ const submitForm = () => {
                 rows="8"
                 required
                 placeholder="Escribe tu mensaje con libertad. Queremos conocer tu perspectiva..."
-                class="w-full bg-white/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-white placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-white/10 resize-none"
+                class="w-full bg-fg/[0.05] border border-gray-700/50 rounded-xl px-6 py-4 text-fg placeholder-gray-600 focus:border-[#ff8c42]/60 focus:outline-none transition-all focus:bg-fg/10 resize-none"
               ></textarea>
             </div>
 
@@ -312,12 +312,12 @@ const submitForm = () => {
         <p class="text-xl md:text-2xl lg:text-3xl font-black uppercase italic leading-tight max-w-4xl mb-8">
           Tu mensaje nos ayuda a crecer.
           <br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] to-white">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff8c42] to-fg">
             Tu voz es importante.
           </span>
         </p>
 
-        <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-white rounded-full"></div>
+        <div class="h-1 w-40 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full"></div>
       </div>
     </section>
 
@@ -340,12 +340,12 @@ const submitForm = () => {
               Mantente en el loop con nuestros últimos drops, contenido exclusivo, behind-the-scenes y eventos especiales de {{ business.name }}.
             </p>
 
-            <div class="h-1 w-32 bg-gradient-to-r from-[#ff8c42] to-white rounded-full"></div>
+            <div class="h-1 w-32 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full"></div>
           </div>
 
           <!-- Right: Social Buttons -->
           <div class="grid grid-cols-2 gap-6">
-            <a href="#" class="group relative overflow-hidden rounded-2xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/60 to-black/40 p-8 hover:shadow-lg hover:shadow-[#ff8c42]/20">
+            <a href="#" class="group relative overflow-hidden rounded-2xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/60 to-sunken/40 p-8 hover:shadow-lg hover:shadow-[#ff8c42]/20">
               <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div class="relative z-10 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-[#ff8c42] mx-auto mb-4 group-hover:scale-110 transition-transform">
@@ -355,7 +355,7 @@ const submitForm = () => {
               </div>
             </a>
 
-            <a :href="whatsappLink" target="_blank" class="group relative overflow-hidden rounded-2xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/60 to-black/40 p-8 hover:shadow-lg hover:shadow-[#ff8c42]/20">
+            <a :href="whatsappLink" target="_blank" class="group relative overflow-hidden rounded-2xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/60 to-sunken/40 p-8 hover:shadow-lg hover:shadow-[#ff8c42]/20">
               <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div class="relative z-10 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-[#ff8c42] mx-auto mb-4 group-hover:scale-110 transition-transform">
@@ -365,7 +365,7 @@ const submitForm = () => {
               </div>
             </a>
 
-            <a href="#" class="group relative overflow-hidden rounded-2xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/60 to-black/40 p-8 hover:shadow-lg hover:shadow-[#ff8c42]/20 col-span-2">
+            <a href="#" class="group relative overflow-hidden rounded-2xl border border-gray-800 hover:border-[#ff8c42]/50 transition-all duration-500 bg-gradient-to-br from-gray-900/60 to-sunken/40 p-8 hover:shadow-lg hover:shadow-[#ff8c42]/20 col-span-2">
               <div class="absolute inset-0 bg-gradient-to-br from-[#ff8c42]/0 to-[#ff8c42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div class="relative z-10 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-[#ff8c42] mx-auto mb-4 group-hover:scale-110 transition-transform">

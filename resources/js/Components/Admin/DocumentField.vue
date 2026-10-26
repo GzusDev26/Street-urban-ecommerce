@@ -74,7 +74,7 @@ watch(type, () => {
           :aria-pressed="type === op"
           :class="[
             'px-3 py-1 text-xs font-bold rounded-md transition-all',
-            type === op ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
+            type === op ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
           ]"
         >
           {{ op }}
@@ -91,7 +91,7 @@ watch(type, () => {
         autocomplete="off"
         :placeholder="type === 'DNI' ? '8 dígitos' : '11 dígitos'"
         :class="[
-          'w-full h-11 pl-4 pr-12 rounded-xl border bg-white text-sm text-gray-900 tracking-wider placeholder:tracking-normal placeholder:text-gray-400 transition',
+          'w-full h-11 pl-4 pr-12 rounded-xl border bg-surface text-sm text-gray-900 tracking-wider placeholder:tracking-normal placeholder:text-gray-400 transition',
           'focus:outline-none focus:ring-4',
           error ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 hover:border-gray-300 focus:border-[#ff8c42] focus:ring-orange-100',
         ]"

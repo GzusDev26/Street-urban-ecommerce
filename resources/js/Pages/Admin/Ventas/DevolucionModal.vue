@@ -45,7 +45,7 @@ const guardar = () => {
 
 <template>
   <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="emit('close')">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="bg-surface rounded-2xl shadow-2xl w-full max-w-md">
       <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <div>
           <h2 class="text-xl font-bold text-gray-900">Registrar Devolución</h2>
@@ -75,7 +75,7 @@ const guardar = () => {
             type="number"
             min="1"
             :max="item.pendienteDevolucion"
-            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
           >
         </div>
 
@@ -85,7 +85,7 @@ const guardar = () => {
             v-model="motivo"
             type="text"
             placeholder="Ej. talla equivocada, prenda defectuosa..."
-            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white placeholder:text-gray-300"
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface placeholder:text-gray-300"
           >
         </div>
 

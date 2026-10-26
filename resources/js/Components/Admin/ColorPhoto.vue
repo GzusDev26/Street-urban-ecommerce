@@ -116,7 +116,7 @@ const onSoltar = (e) => {
     </span>
 
     <!-- Subiendo -->
-    <span v-if="subiendo" class="absolute inset-0 flex items-center justify-center bg-white/70" aria-hidden="true">
+    <span v-if="subiendo" class="absolute inset-0 flex items-center justify-center bg-surface/70" aria-hidden="true">
       <i class="fa-solid fa-spinner fa-spin text-[#ff8c42]"></i>
     </span>
 

@@ -37,7 +37,7 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <div v-for="stat in tarjetas" :key="stat.label" class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex items-center gap-4">
+        <div v-for="stat in tarjetas" :key="stat.label" class="bg-surface rounded-2xl border border-gray-100 p-5 shadow-sm flex items-center gap-4">
           <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', stat.fondo]">
             <i :class="['fa-solid text-lg', stat.icono, stat.color]"></i>
           </div>
@@ -66,7 +66,7 @@
                 'text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50',
                 filtroEstado === f.value
                   ? 'bg-[#ff8c42] border-[#ff8c42] text-white shadow-sm'
-                  : 'bg-white border-gray-200 text-gray-500 hover:border-[#ff8c42]/50 hover:text-[#ff8c42]',
+                  : 'bg-surface border-gray-200 text-gray-500 hover:border-[#ff8c42]/50 hover:text-[#ff8c42]',
               ]"
             >
               {{ f.label }}
@@ -94,7 +94,7 @@
                 :key="venta.id"
                 :id="`venta-${venta.id}`"
                 :class="[
-                  'rounded-2xl border bg-white overflow-hidden transition-all duration-200 border-l-4',
+                  'rounded-2xl border bg-surface overflow-hidden transition-all duration-200 border-l-4',
                   acentoEstado(venta),
                   venta.id === ventaDestacada ? 'ring-2 ring-[#ff8c42]/30 border-[#ff8c42]' : 'border-gray-100',
                   expandedId === venta.id ? 'shadow-md' : 'hover:shadow-sm',
@@ -160,21 +160,21 @@
                       <button
                         v-if="!venta.cancelada && esAdmin"
                         @click="cancelarVenta(venta)"
-                        class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-white border border-red-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
+                        class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-surface border border-red-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
                       >
                         <i class="fa-solid fa-ban text-[11px]"></i> Cancelar venta
                       </button>
                       <button
                         type="button"
                         @click="boletaAbierta = venta.id"
-                        class="text-xs font-semibold text-white bg-gray-900 hover:bg-[#ff8c42] px-3.5 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50"
+                        class="text-xs font-semibold text-canvas bg-fg hover:bg-[#ff8c42] px-3.5 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50"
                       >
                         <i class="fa-solid fa-print text-[11px]"></i> Imprimir boleta
                       </button>
                     </div>
                   </div>
 
-                  <div class="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+                  <div class="bg-surface rounded-xl border border-gray-100 overflow-x-auto">
                     <table class="w-full text-xs min-w-[640px]">
                       <thead>
                         <tr class="text-gray-400 bg-gray-50/80 uppercase tracking-wide text-[10px]">
@@ -215,7 +215,7 @@
                             <button
                               v-if="item.pendienteDevolucion > 0"
                               @click="devolverItem(item)"
-                              class="text-[11px] font-semibold text-gray-500 hover:text-white hover:bg-red-500 bg-white border border-gray-200 px-2.5 py-1 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
+                              class="text-[11px] font-semibold text-gray-500 hover:text-white hover:bg-red-500 bg-surface border border-gray-200 px-2.5 py-1 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
                             >
                               <i class="fa-solid fa-rotate-left text-[10px] mr-1"></i>Devolver
                             </button>

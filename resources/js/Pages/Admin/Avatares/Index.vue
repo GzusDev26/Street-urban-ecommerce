@@ -12,7 +12,7 @@
         <i class="fa-solid fa-circle-exclamation"></i> {{ page.props.errors.imagen }}
       </div>
 
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+      <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
         <div class="flex items-center gap-2 mb-1">
           <i class="fa-solid fa-images text-gray-400 text-sm"></i>
           <h3 class="text-lg font-bold text-gray-900">Galería de Avatares</h3>

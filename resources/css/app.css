@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /* Curvas de animación compartidas (las de CSS por defecto se quedan cortas). */
+    :root {
+        --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* entradas y salidas */
+        --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* movimiento en pantalla, revelados */
+        --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);    /* paneles deslizantes */
+    }
+
+    /* @tailwindcss/forms pinta los campos de blanco fijo; aquí siguen al tema. */
+    [type='text'], [type='email'], [type='url'], [type='password'], [type='number'], [type='date'],
+    [type='datetime-local'], [type='month'], [type='search'], [type='tel'], [type='time'], [type='week'],
+    [multiple], textarea, select, [type='checkbox'], [type='radio'] {
+        background-color: rgb(var(--surface));
+    }
+
+    select option {
+        background-color: rgb(var(--surface));
+    }
+}

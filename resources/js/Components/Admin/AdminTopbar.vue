@@ -2,7 +2,7 @@
   <!-- 72px de alto, igual que la marca del aside: así sus bordes inferiores forman una sola línea.
        relative z-30: backdrop-blur crea su propio contexto de apilamiento, y sin esto el menú de usuario
        queda detrás de las tarjetas del contenido. -->
-  <header class="relative z-30 h-[72px] flex-shrink-0 bg-white/90 backdrop-blur border-b border-gray-200/80">
+  <header class="relative z-30 h-[72px] flex-shrink-0 bg-surface/90 backdrop-blur border-b border-gray-200/80">
     <div class="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
       <!-- Izquierda: control del aside + ubicación -->
       <div class="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -66,13 +66,15 @@
             <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
           </svg>
           <span class="flex-1 text-left">Buscar…</span>
-          <kbd class="inline-flex items-center h-5 px-1.5 rounded border border-gray-200 bg-white font-sans text-[10px] font-semibold text-gray-500">Ctrl K</kbd>
+          <kbd class="inline-flex items-center h-5 px-1.5 rounded border border-gray-200 bg-surface font-sans text-[10px] font-semibold text-gray-500">Ctrl K</kbd>
         </button>
         <button type="button" class="icon-btn flex md:hidden" aria-label="Buscar en el panel" @click="emit('open-search')">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
           </svg>
         </button>
+
+        <ThemeToggle class="icon-btn flex" />
 
         <a
           :href="route('shop.home')"
@@ -101,7 +103,7 @@
             :aria-label="`Menú de ${user.name}`"
             @click="menuOpen = !menuOpen"
           >
-            <span class="w-9 h-9 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-white shadow-sm">
+            <span class="w-9 h-9 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-surface shadow-sm">
               <img v-if="user.avatarUrl" :src="user.avatarUrl" :alt="user.name" class="w-full h-full object-cover" />
               <template v-else>{{ user.initial }}</template>
             </span>
@@ -128,7 +130,7 @@
               v-if="menuOpen"
               id="topbar-user-menu"
               role="menu"
-              class="absolute right-0 top-full mt-2 z-30 w-64 origin-top-right rounded-xl bg-white border border-gray-200 p-1.5 shadow-xl shadow-gray-900/10"
+              class="absolute right-0 top-full mt-2 z-30 w-64 origin-top-right rounded-xl bg-surface border border-gray-200 p-1.5 shadow-xl shadow-black/10"
             >
               <div class="flex items-center gap-3 px-3 py-2.5 mb-1 border-b border-gray-100">
                 <span class="w-10 h-10 rounded-full bg-[#ff8c42] flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
@@ -161,6 +163,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 
 defineProps({
   user: { type: Object, required: true },
@@ -198,11 +201,11 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   border-radius: 0.625rem;
-  color: rgb(75 85 99);
+  color: rgb(var(--gray-600));
   transition: color 150ms ease, background-color 150ms ease;
 }
 
-.icon-btn:hover { color: rgb(17 24 39); background-color: rgb(243 244 246); }
+.icon-btn:hover { color: rgb(var(--gray-900)); background-color: rgb(var(--gray-100)); }
 .icon-btn:focus { outline: none; }
 .icon-btn:focus-visible { box-shadow: 0 0 0 2px #ff8c42; }
 
@@ -215,11 +218,11 @@ onBeforeUnmount(() => {
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgb(55 65 81);
+  color: rgb(var(--gray-700));
   transition: color 150ms ease, background-color 150ms ease;
 }
 
-.menu-item:hover { color: rgb(17 24 39); background-color: rgb(249 250 251); }
+.menu-item:hover { color: rgb(var(--gray-900)); background-color: rgb(var(--gray-50)); }
 .menu-item:focus { outline: none; }
 .menu-item:focus-visible { box-shadow: 0 0 0 2px #ff8c42; }
 </style>

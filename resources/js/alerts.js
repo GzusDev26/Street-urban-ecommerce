@@ -5,12 +5,12 @@ import Swal from 'sweetalert2';
 // El mensaje va como `text` (no `html`) porque a veces viene del servidor.
 
 const CLASES = {
-  popup: '!rounded-3xl !p-8',
+  popup: '!rounded-3xl !p-8 !bg-surface',
   title: '!text-xl !font-bold !text-gray-900',
   htmlContainer: '!text-sm !text-gray-500 !leading-relaxed',
   actions: '!w-full !flex !gap-2 !mt-6',
   confirmButton: '!flex-1 !h-11 !rounded-xl !bg-[#ff8c42] hover:!bg-[#f27d30] !text-white !font-bold !text-sm !shadow-md !shadow-orange-200 !m-0',
-  cancelButton: '!flex-1 !h-11 !rounded-xl !bg-white !border !border-gray-200 hover:!bg-gray-50 !text-gray-700 !font-semibold !text-sm !m-0',
+  cancelButton: '!flex-1 !h-11 !rounded-xl !bg-surface !border !border-gray-200 hover:!bg-gray-50 !text-gray-700 !font-semibold !text-sm !m-0',
 };
 
 const BOTON_PELIGRO = '!flex-1 !h-11 !rounded-xl !bg-red-500 hover:!bg-red-600 !text-white !font-bold !text-sm !shadow-md !shadow-red-200 !m-0';

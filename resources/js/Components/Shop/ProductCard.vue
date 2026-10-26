@@ -56,24 +56,9 @@ const handleImageError = () => {
   imageError.value = true;
 };
 
-// Generamos badges y descuentos ficticios para potenciar el diseño visual streetwear
-const hasSale = computed(() => props.product.id % 3 === 0);
-const isNew = computed(() => props.product.id === 2 || props.product.id === 5 || props.product.id === 11);
-const isLimited = computed(() => props.product.price > 100 && !hasSale.value);
-
-const originalPrice = computed(() => {
-  if (hasSale.value) {
-    return Math.round(props.product.price * 1.33);
-  }
-  return null;
-});
-
-const discountPercentage = computed(() => {
-  if (hasSale.value && originalPrice.value) {
-    return Math.round(((originalPrice.value - props.product.price) / originalPrice.value) * 100);
-  }
-  return null;
-});
+// "Nuevo" viene del servidor según la fecha real de alta. No hay descuentos: mostrar un
+// precio "antes" inventado sería publicidad engañosa.
+const isNew = computed(() => !!props.product.isNew);
 
 const hoveredColor = ref(null);
 
@@ -98,94 +83,70 @@ const irADetalle = () => {
 </script>
 
 <template>
-  <div
+  <article
+    class="group relative flex flex-col cursor-pointer"
     @click="irADetalle"
-    class="group relative flex flex-col overflow-hidden bg-[#1a1a1a] border border-gray-800 rounded-lg transition-all duration-300 hover:shadow-lg hover:border-gray-700 cursor-pointer"
   >
+    <!-- Foto -->
+    <div class="relative aspect-[4/5] overflow-hidden rounded-xl bg-surface">
+      <div v-if="productImage && !imageLoaded && !imageError" class="absolute inset-0 bg-gray-800 animate-pulse" aria-hidden="true"></div>
 
-    <!-- Contenedor de la Imagen (Área Interactiva Superior) -->
-    <div class="relative aspect-square overflow-hidden bg-[#0f0f0f] w-full">
-
-      <!-- Skeleton Loader mientras carga -->
-      <div v-if="productImage && !imageLoaded && !imageError" class="absolute inset-0 bg-gray-700 animate-pulse"></div>
-
-      <!-- Placeholder cuando hay error o el producto aún no tiene foto registrada -->
-      <div v-if="imageError || !productImage" class="absolute inset-0 bg-gray-800 flex flex-col items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-12 h-12 text-gray-400 mb-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75l5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-15-4.35l5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0z" />
-        </svg>
-        <p class="text-xs text-gray-500 text-center px-2">Imagen no disponible</p>
+      <!-- Sin foto todavía: portada neutra de marca -->
+      <div v-if="imageError || !productImage" class="theme-shop-dark absolute inset-0 bg-gradient-to-br from-[#1c1c1e] to-[#0b0b0c] overflow-hidden" aria-hidden="true">
+        <img src="/image/logo/street-urban-icono-dark.png" alt="" class="absolute -right-8 -bottom-10 h-[95%] w-auto max-w-none aspect-square opacity-[0.12] -rotate-12 transition-transform duration-700 group-hover:-rotate-6" />
+        <p class="absolute left-4 bottom-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">Foto próximamente</p>
       </div>
 
-      <!-- Imagen con zoom suave y transición de opacidad -->
       <img
         v-if="productImage"
         :src="productImage"
         :alt="product.name"
+        loading="lazy"
+        class="h-full w-full object-cover object-center transition-[transform,opacity] duration-500 group-hover:scale-105"
+        :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
         @load="handleImageLoad"
         @error="handleImageError"
-        class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
-        :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
-        loading="lazy"
       />
 
-      <!-- BADGES (Esquina Superior Izquierda) -->
-      <div class="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
-        <span v-if="hasSale" class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-          -{{ discountPercentage }}%
-        </span>
-        <span v-if="isNew" class="bg-black text-white text-xs font-bold px-3 py-1 rounded-full">
-          Nuevo
-        </span>
+      <div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+        <span v-if="!product.stock" class="bg-white text-black text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">Agotado</span>
+        <span v-else-if="isNew" class="bg-[#ff8c42] text-black text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">Nuevo</span>
       </div>
 
-      <!-- BOTÓN WISHLIST (Esquina Superior Derecha) -->
       <button
+        type="button"
+        class="absolute top-2 right-2 z-20 w-11 h-11 rounded-full flex items-center justify-center bg-white/90 text-black shadow-sm hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]"
+        :aria-label="isFavorite ? `Quitar ${product.name} de favoritos` : `Añadir ${product.name} a favoritos`"
+        :aria-pressed="isFavorite"
         @click.stop.prevent="toggleFavorite"
-        class="absolute top-4 right-4 z-20 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all"
-        aria-label="Añadir a Favoritos"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          :fill="isFavorite ? 'currentColor' : 'none'"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-          class="w-5 h-5 transition-colors"
-          :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" :fill="isFavorite ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" :class="['w-5 h-5', isFavorite ? 'text-red-500' : '']" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
         </svg>
       </button>
+
+      <!-- Acción al pasar el mouse (en táctil toda la tarjeta lleva al detalle) -->
+      <span class="pointer-events-none absolute inset-x-3 bottom-3 hidden md:flex h-11 items-center justify-center rounded-lg bg-white text-black text-xs font-bold uppercase tracking-widest opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 motion-reduce:transition-none" aria-hidden="true">
+        {{ product.stock ? 'Elegir talla' : 'Ver detalle' }}
+      </span>
     </div>
 
-    <!-- Detalles del Producto (Sección Inferior) -->
-    <div class="flex flex-1 flex-col p-4 justify-between">
-      <!-- Marca y Categoría -->
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">{{ product.brand }}</span>
-        <span v-if="!product.stock" class="text-xs font-bold text-red-500 uppercase tracking-wider">
-          Agotado
-        </span>
-        <span v-else class="text-xs font-bold text-green-500 uppercase tracking-wider">
-          En stock
-        </span>
-      </div>
-
-      <!-- Nombre y Enlace al Producto -->
-      <div>
-        <h3 class="text-sm font-semibold text-white group-hover:text-gray-300 transition-colors">
-          {{ product.name }}
+    <!-- Datos -->
+    <div class="pt-4 flex flex-col gap-1">
+      <div class="flex items-start justify-between gap-3">
+        <h3 class="text-sm font-semibold text-fg leading-snug">
+          <a :href="route('shop.producto', product.id)" class="after:absolute after:inset-0 focus:outline-none focus-visible:underline" @click.prevent>{{ product.name }}</a>
         </h3>
-        <p class="text-xs text-gray-400 mt-1 line-clamp-2">
-          {{ product.description }}
-        </p>
+        <span class="text-sm font-bold text-fg whitespace-nowrap">S/ {{ displayPrice.toFixed(2) }}</span>
       </div>
+      <p class="text-xs text-gray-500">
+        {{ product.brand }}<template v-if="Number(product.sold) > 0"> · {{ product.sold }} vendido{{ Number(product.sold) === 1 ? '' : 's' }}</template>
+      </p>
 
-      <!-- Colores disponibles: puntitos con tallas/stock al pasar el mouse -->
-      <div v-if="product.colores?.length" class="mt-3 flex items-center gap-1.5 flex-wrap">
+      <!-- Colores: al pasar el mouse se ve su precio, tallas y foto -->
+      <div v-if="product.colores?.length" class="relative z-10 mt-2 flex items-center gap-1.5 flex-wrap">
         <div
-          v-for="color in product.colores"
+          v-for="color in product.colores.slice(0, 6)"
           :key="color.nombre"
           class="relative"
           @mouseenter="hoveredColor = color"
@@ -193,64 +154,24 @@ const irADetalle = () => {
         >
           <button
             type="button"
-            @click.stop="irADetalle"
-            class="w-5 h-5 rounded-full border-2 border-gray-600 hover:border-white transition-colors"
+            class="w-5 h-5 rounded-full ring-1 ring-gray-700 ring-offset-2 ring-offset-canvas hover:ring-fg transition"
             :style="{ backgroundColor: color.hex || '#6b7280' }"
-            :aria-label="color.nombre"
+            :aria-label="`${color.nombre}, S/ ${color.precio.toFixed(2)}`"
+            @click.stop="irADetalle"
+            @focus="hoveredColor = color"
+            @blur="hoveredColor = null"
           ></button>
 
           <div
             v-if="hoveredColor === color"
-            class="absolute bottom-full left-0 mb-2 w-max max-w-[160px] bg-black border border-gray-700 rounded-lg px-3 py-2 shadow-xl z-30 pointer-events-none"
+            class="absolute bottom-full left-0 mb-2 w-max max-w-[180px] bg-surface border border-gray-700 rounded-lg px-3 py-2 shadow-xl z-30 pointer-events-none"
           >
-            <p class="text-xs font-bold text-white mb-1">{{ color.nombre }} · S/ {{ color.precio.toFixed(2) }}</p>
-            <p class="text-[11px] text-gray-300">
-              Tallas: {{ color.tallas.map(t => t.talla).join(', ') }}
-            </p>
-            <p class="text-[11px] text-gray-400">
-              Stock: {{ color.tallas.reduce((sum, t) => sum + t.stock, 0) }} unidades
-            </p>
+            <p class="text-xs font-bold text-fg mb-0.5">{{ color.nombre }} · S/ {{ color.precio.toFixed(2) }}</p>
+            <p class="text-[11px] text-gray-400">Tallas: {{ color.tallas.map(t => t.talla).join(', ') }}</p>
           </div>
         </div>
-      </div>
-
-      <!-- Rating y Vendidos -->
-      <div class="mt-3 pt-3 border-t border-gray-700 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <!-- Estrellas -->
-          <div class="flex gap-0.5">
-            <span v-for="i in 5" :key="i" class="text-xs">
-              <span v-if="i <= Math.floor(product.rating)" class="text-yellow-400">★</span>
-              <span v-else class="text-gray-600">★</span>
-            </span>
-          </div>
-          <span class="text-xs text-gray-400">{{ product.rating }}</span>
-        </div>
-        <span class="text-xs text-gray-500">{{ product.sold }} vendidos</span>
-      </div>
-
-      <!-- Precio y Carrito -->
-      <div class="mt-3 pt-3 border-t border-gray-700 flex items-end justify-between">
-        <div class="flex flex-col">
-          <div class="flex items-baseline gap-2">
-            <span class="text-lg font-bold text-white">
-              S/ {{ displayPrice.toFixed(2) }}
-            </span>
-            <span v-if="hasSale" class="text-xs text-gray-500 line-through">
-              S/ {{ originalPrice }}
-            </span>
-          </div>
-        </div>
-        <span
-          :class="['p-2 bg-white text-black rounded-lg pointer-events-none transition-colors', !product.stock ? 'opacity-50' : 'group-hover:bg-gray-200']"
-          title="Elegir color y talla"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-        </span>
+        <span v-if="product.colores.length > 6" class="text-xs text-gray-500">+{{ product.colores.length - 6 }}</span>
       </div>
     </div>
-
-  </div>
+  </article>
 </template>

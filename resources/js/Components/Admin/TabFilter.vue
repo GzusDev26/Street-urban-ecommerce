@@ -17,7 +17,7 @@ const model = defineModel({ type: String, default: '' });
       @click="model = tab.value"
       :class="[
         'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all',
-        model === tab.value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
+        model === tab.value ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
       ]"
     >
       {{ tab.label }}

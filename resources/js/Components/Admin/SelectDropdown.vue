@@ -44,7 +44,7 @@ const cerrarConRetraso = () => {
       :aria-expanded="isOpen"
       :class="[
         size === 'sm' ? 'h-10' : 'h-11',
-        'w-full flex items-center justify-between gap-2 bg-white border rounded-xl text-sm px-4 text-left transition',
+        'w-full flex items-center justify-between gap-2 bg-surface border rounded-xl text-sm px-4 text-left transition',
         'focus:outline-none focus:ring-4 focus:ring-orange-100',
         isOpen ? 'border-[#ff8c42]' : 'border-gray-200 hover:border-gray-300 focus:border-[#ff8c42]',
         model ? 'text-gray-900' : 'text-gray-400',
@@ -57,7 +57,7 @@ const cerrarConRetraso = () => {
     <div
       v-if="isOpen"
       role="listbox"
-      class="absolute z-20 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-56 overflow-y-auto"
+      class="absolute z-20 mt-1.5 w-full bg-surface border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-56 overflow-y-auto"
     >
       <button
         v-for="op in options"

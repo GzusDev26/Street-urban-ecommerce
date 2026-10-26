@@ -49,18 +49,18 @@ onMounted(() => {
 
     <!-- Título de la página -->
     <section class="relative py-16 px-4 md:px-8 lg:px-16 overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent"></div>
-      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-fg/5 via-transparent to-transparent"></div>
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
 
       <div class="relative max-w-full mx-auto">
         <div>
           <!-- Título Principal -->
           <h1
             class="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight italic leading-tight mb-4 max-w-4xl">
-            Registro <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">de Datos</span>
+            Registro <span class="text-transparent bg-clip-text bg-gradient-to-r from-fg to-gray-500">de Datos</span>
           </h1>
-          <div class="h-1.5 w-24 bg-gradient-to-r from-white via-white to-gray-600 rounded-full"></div>
+          <div class="h-1.5 w-24 bg-gradient-to-r from-fg via-fg to-gray-600 rounded-full"></div>
         </div>
       </div>
     </section>
@@ -73,30 +73,30 @@ onMounted(() => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="registro-datos-1" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tipo de Documento</label>
-                <select id="registro-datos-1" v-model="form.docType" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 uppercase font-bold focus:border-white outline-none">
+                <select id="registro-datos-1" v-model="form.docType" class="w-full bg-sunken border border-gray-800 p-4 uppercase font-bold focus:border-fg outline-none">
                   <option value="DNI">DNI</option>
                   <option value="RUC">RUC</option>
                 </select>
               </div>
               <div>
                 <label for="registro-datos-2" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Número</label>
-                <input id="registro-datos-2" v-model="form.docNumber" type="text" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+                <input id="registro-datos-2" v-model="form.docNumber" type="text" class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" required>
               </div>
             </div>
 
             <div>
               <label for="registro-datos-3" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Nombre / Razón Social</label>
-              <input id="registro-datos-3" v-model="form.name" type="text" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+              <input id="registro-datos-3" v-model="form.name" type="text" class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" required>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="registro-datos-4" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Correo</label>
-                <input id="registro-datos-4" v-model="form.email" type="email" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+                <input id="registro-datos-4" v-model="form.email" type="email" class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" required>
               </div>
               <div>
                 <label for="registro-datos-5" class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Teléfono</label>
-                <input id="registro-datos-5" v-model="form.phone" type="tel" class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" required>
+                <input id="registro-datos-5" v-model="form.phone" type="tel" class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" required>
               </div>
             </div>
           </form>

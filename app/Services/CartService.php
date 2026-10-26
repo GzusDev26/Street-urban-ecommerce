@@ -8,7 +8,7 @@ use App\Models\Customer;
 use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Support\PublicFile;
 
 class CartService
 {
@@ -79,9 +79,7 @@ class CartService
                 'color' => $variant->productColor?->name,
                 'color_hex' => $variant->productColor?->hex,
                 'size' => $variant->size,
-                'image' => $variant->productColor?->image_url
-                    ? Storage::disk('public')->url($variant->productColor->image_url)
-                    : null,
+                'image' => PublicFile::url($variant->productColor?->image_url),
                 'quantity' => $line['quantity'],
                 'available_stock' => $availableStock,
                 'unit_price' => round($price, 2),

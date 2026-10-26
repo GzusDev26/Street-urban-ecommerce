@@ -98,17 +98,17 @@ const goToPage = (page) => {
     <!-- Tienda Header Premium -->
     <section class="relative py-16 px-4 md:px-8 lg:px-16 overflow-hidden">
       <!-- Background Gradient -->
-      <div class="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent"></div>
-      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-fg/5 via-transparent to-transparent"></div>
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
 
       <div class="relative max-w-full mx-auto">
         <div>
           <!-- Título Principal -->
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight italic leading-tight mb-4 max-w-4xl">
-            Todos <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Nuestros Productos</span>
+            Todos <span class="text-transparent bg-clip-text bg-gradient-to-r from-fg to-gray-500">Nuestros Productos</span>
           </h1>
-          <div class="h-1.5 w-24 bg-gradient-to-r from-[#ff8c42] to-white rounded-full"></div>
+          <div class="h-1.5 w-24 bg-gradient-to-r from-[#ff8c42] to-fg rounded-full"></div>
         </div>
       </div>
     </section>
@@ -135,7 +135,7 @@ const goToPage = (page) => {
                     'w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all',
                     selectedCategory === category.name
                       ? 'bg-[#ff8c42] text-black'
-                      : 'bg-transparent border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-white'
+                      : 'bg-transparent border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-fg'
                   ]"
                 >
                   <div class="flex justify-between items-center">
@@ -159,7 +159,7 @@ const goToPage = (page) => {
                     'w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all',
                     !selectedBrand
                       ? 'bg-[#ff8c42] text-black'
-                      : 'bg-transparent border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-white'
+                      : 'bg-transparent border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-fg'
                   ]"
                 >
                   <span>Ver todas</span>
@@ -173,7 +173,7 @@ const goToPage = (page) => {
                     'w-full text-left px-4 py-3 rounded-lg font-semibold text-sm transition-all',
                     selectedBrand === brand.name
                       ? 'bg-[#ff8c42] text-black'
-                      : 'bg-transparent border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-white'
+                      : 'bg-transparent border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-fg'
                   ]"
                 >
                   <div class="flex justify-between items-center">
@@ -190,7 +190,7 @@ const goToPage = (page) => {
         <div class="md:col-span-3 lg:col-span-4">
           <div class="mb-6">
             <p class="text-sm text-gray-400">
-              Mostrando <span class="text-white font-semibold">{{ filteredProducts.length }}</span>
+              Mostrando <span class="text-fg font-semibold">{{ filteredProducts.length }}</span>
               producto<span v-if="filteredProducts.length !== 1">s</span>
               <span v-if="selectedCategory !== 'Todos'" class="text-gray-500">
                 en {{ selectedCategory }}<span v-if="selectedBrand"> - {{ selectedBrand }}</span>
@@ -213,7 +213,7 @@ const goToPage = (page) => {
           <!-- Paginación -->
           <div v-if="totalPages > 1" class="mt-12 flex flex-col items-center gap-6">
             <div class="text-sm text-gray-400">
-              Página <span class="text-white font-semibold">{{ currentPage }}</span> de <span class="text-white font-semibold">{{ totalPages }}</span>
+              Página <span class="text-fg font-semibold">{{ currentPage }}</span> de <span class="text-fg font-semibold">{{ totalPages }}</span>
             </div>
 
             <div class="flex gap-2 items-center">
@@ -221,7 +221,7 @@ const goToPage = (page) => {
               <button
                 @click="goToPage(currentPage - 1)"
                 :disabled="currentPage === 1"
-                class="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:border-gray-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:border-gray-500 hover:text-fg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 ← Anterior
               </button>
@@ -236,7 +236,7 @@ const goToPage = (page) => {
                     'px-3 py-2 rounded-lg font-semibold text-sm transition-colors',
                     currentPage === page
                       ? 'bg-[#ff8c42] text-black'
-                      : 'border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-white'
+                      : 'border border-gray-700 text-gray-300 hover:border-[#ff8c42]/50 hover:text-fg'
                   ]"
                 >
                   {{ page }}
@@ -247,7 +247,7 @@ const goToPage = (page) => {
               <button
                 @click="goToPage(currentPage + 1)"
                 :disabled="currentPage === totalPages"
-                class="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:border-gray-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:border-gray-500 hover:text-fg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Siguiente →
               </button>

@@ -88,7 +88,7 @@ const guardar = () => {
             'rounded-xl border-2 py-2 text-sm font-bold transition-all',
             yaRegistradas.has(t) ? 'border-gray-100 bg-gray-100 text-gray-400 cursor-not-allowed'
               : elegidas.includes(t) ? 'border-[#ff8c42] bg-orange-50 text-[#e67e2d]'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 disabled:opacity-50',
+              : 'border-gray-200 bg-surface text-gray-600 hover:border-gray-300 disabled:opacity-50',
           ]"
         >{{ t }}</button>
       </div>
@@ -102,7 +102,7 @@ const guardar = () => {
           placeholder="Otra talla"
           aria-label="Agregar otra talla"
           :disabled="sinColores"
-          class="w-36 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white disabled:opacity-50"
+          class="w-36 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface disabled:opacity-50"
         >
         <button type="button" @click="agregarOtra" :disabled="sinColores" class="text-sm font-semibold text-[#ff8c42] hover:underline disabled:opacity-50">+ Agregar</button>
       </div>

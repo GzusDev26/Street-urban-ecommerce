@@ -5,7 +5,7 @@ import ShopFooter from '@/Components/Shop/ShopFooter.vue';
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#111111] text-white font-sans relative">
+  <div class="min-h-screen bg-canvas text-fg font-sans relative">
 
     <Navbar />
 

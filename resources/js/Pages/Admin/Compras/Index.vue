@@ -34,19 +34,19 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Total Productos</p>
           <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalProductos }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Variantes Registradas</p>
           <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalVariantes }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Sin Stock</p>
           <p class="text-3xl font-black text-red-500 mt-1">{{ stats.sinStock }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <p class="text-sm text-gray-400 font-medium">Valor de Inventario</p>
           <p class="text-3xl font-black text-[#ff8c42] mt-1">S/ {{ stats.valorInventario.toFixed(2) }}</p>
         </div>
@@ -63,7 +63,7 @@
               role="tab"
               :aria-selected="vista === op.id"
               @click="cambiarVista(op.id)"
-              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
             >
               <i :class="op.icono" class="text-xs"></i> {{ op.nombre }}
             </button>
@@ -89,7 +89,7 @@
               role="tab"
               :aria-selected="vista === op.id"
               @click="cambiarVista(op.id)"
-              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
             >
               <i :class="op.icono" class="text-xs"></i> {{ op.nombre }}
             </button>

@@ -30,7 +30,7 @@ const removeItem = async (id) => {
       <div v-if="items.length === 0" class="py-20 text-center border border-dashed border-gray-800 rounded-2xl">
         <i class="fa-regular fa-heart text-3xl text-gray-600 mb-4 block"></i>
         <p class="text-gray-400">Aún no has agregado productos a tu lista de deseos.</p>
-        <Link :href="route('shop.tienda')" class="mt-4 inline-block text-white border-b border-white hover:opacity-70">
+        <Link :href="route('shop.tienda')" class="mt-4 inline-block text-fg border-b border-fg hover:opacity-70">
           Ver productos
         </Link>
       </div>
@@ -40,27 +40,27 @@ const removeItem = async (id) => {
         <div
           v-for="item in items"
           :key="item.id"
-          class="relative bg-[#1a1a1a] border border-gray-800 rounded-xl overflow-hidden flex flex-col"
+          class="relative bg-surface border border-gray-800 rounded-xl overflow-hidden flex flex-col"
         >
           <button
             @click="removeItem(item.id)"
-            class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-[#111111]/80 border border-gray-700 rounded-full hover:bg-[#242424] transition-colors"
+            class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-canvas/80 border border-gray-700 rounded-full hover:bg-surface-2 transition-colors"
             aria-label="Quitar de la lista de deseos"
           >
             <i class="fa-solid fa-xmark text-gray-300 text-sm"></i>
           </button>
 
-          <Link :href="route('shop.producto', item.productId)" class="aspect-square bg-[#0f0f0f] flex items-center justify-center overflow-hidden">
+          <Link :href="route('shop.producto', item.productId)" class="aspect-square bg-sunken flex items-center justify-center overflow-hidden">
             <img v-if="item.image" :src="item.image" :alt="item.name" class="w-full h-full object-cover">
             <i v-else class="fa-regular fa-image text-3xl text-gray-700"></i>
           </Link>
 
           <div class="p-4 flex flex-col flex-1">
-            <Link :href="route('shop.producto', item.productId)" class="text-sm font-semibold text-white hover:text-gray-300 transition-colors line-clamp-2 mb-1">
+            <Link :href="route('shop.producto', item.productId)" class="text-sm font-semibold text-fg hover:text-gray-300 transition-colors line-clamp-2 mb-1">
               {{ item.name }}
             </Link>
             <p v-if="item.colorNombre" class="text-xs text-gray-500 mb-2">{{ item.colorNombre }}</p>
-            <p class="text-base font-bold text-white mb-4 mt-auto">S/ {{ item.price.toFixed(2) }}</p>
+            <p class="text-base font-bold text-fg mb-4 mt-auto">S/ {{ item.price.toFixed(2) }}</p>
 
             <Link
               :href="route('shop.producto', item.productId)"

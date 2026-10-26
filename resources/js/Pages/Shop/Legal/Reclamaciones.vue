@@ -50,19 +50,19 @@ const submitForm = () => {
     <!-- Título de la página -->
     <section class="relative py-16 px-4 md:px-8 lg:px-16 overflow-hidden">
       <!-- Background Gradient -->
-      <div class="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent"></div>
-      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-fg/5 via-transparent to-transparent"></div>
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
 
       <div class="relative max-w-full mx-auto">
         <div>
           <!-- Título Principal -->
           <h1
             class="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight italic leading-tight mb-4 max-w-4xl">
-            Libro <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">de
+            Libro <span class="text-transparent bg-clip-text bg-gradient-to-r from-fg to-gray-500">de
               reclamaciones</span>
           </h1>
-          <div class="h-1.5 w-24 bg-gradient-to-r from-white via-white to-gray-600 rounded-full"></div>
+          <div class="h-1.5 w-24 bg-gradient-to-r from-fg via-fg to-gray-600 rounded-full"></div>
         </div>
       </div>
     </section>
@@ -78,7 +78,7 @@ const submitForm = () => {
 
       <p>
         Nombre del responsable: <strong>STREET URBAN</strong><br />
-        RUC: <strong>RUC_DEL_RESPONSABLE;</strong> dirección: <strong>Lima</strong><br />
+        RUC: <strong>RUC_DEL_RESPONSABLE;</strong> dirección: <strong>San Ramón, Chanchamayo (Junín)</strong><br />
         Fecha de la solicitud: <strong>{{ curDate }}</strong>
       </p>
 
@@ -95,7 +95,7 @@ const submitForm = () => {
             </label>
 
             <input id="claimant_name" v-model="form.claimant_name" type="text" required
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p v-if="form.errors.claimant_name" class="mt-2 text-sm text-red-400">{{ form.errors.claimant_name }}</p>
           </div>
 
@@ -105,7 +105,7 @@ const submitForm = () => {
             </label>
 
             <input id="claimant_address" v-model="form.claimant_address" type="text" required
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p v-if="form.errors.claimant_address" class="mt-2 text-sm text-red-400">{{ form.errors.claimant_address }}</p>
           </div>
 
@@ -116,7 +116,7 @@ const submitForm = () => {
 
             <input id="claimant_national_id" v-model="form.claimant_national_id" type="text" required
               @input="form.claimant_national_id = form.claimant_national_id.replace(/\s/g, '')"
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p v-if="form.errors.claimant_national_id" class="mt-2 text-sm text-red-400">{{ form.errors.claimant_national_id }}</p>
           </div>
 
@@ -126,7 +126,7 @@ const submitForm = () => {
             </label>
 
             <input id="claimant_email" v-model="form.claimant_email" type="email" required
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p v-if="form.errors.claimant_email" class="mt-2 text-sm text-red-400">{{ form.errors.claimant_email }}</p>
           </div>
 
@@ -136,7 +136,7 @@ const submitForm = () => {
             </label>
 
             <input id="claimant_phone" v-model="form.claimant_phone" type="tel"
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p v-if="form.errors.claimant_phone" class="mt-2 text-sm text-red-400">{{ form.errors.claimant_phone }}</p>
           </div>
         </section>
@@ -152,7 +152,7 @@ const submitForm = () => {
 
             <input id="purchased_item" v-model="form.purchased_item" type="text" required
               placeholder="Ej.: Pantalón hombre marca Diskovish talla 32"
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p v-if="form.errors.purchased_item" class="mt-2 text-sm text-red-400">{{ form.errors.purchased_item }}</p>
           </div>
 
@@ -163,7 +163,7 @@ const submitForm = () => {
 
             <input id="claimed_amount" v-model="form.claimed_amount" type="number" min="0" step="0.01"
               placeholder="0.00"
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none" />
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none" />
             <p class="mt-2 text-xs text-gray-500">Puedes indicar 0.00 si no corresponde un monto económico.</p>
             <p v-if="form.errors.claimed_amount" class="mt-2 text-sm text-red-400">{{ form.errors.claimed_amount }}</p>
           </div>
@@ -208,7 +208,7 @@ const submitForm = () => {
             </label>
 
             <textarea id="claim_details" v-model="form.claim_details" rows="5" required
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none resize-none"></textarea>
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none resize-none"></textarea>
             <p v-if="form.errors.claim_details" class="mt-2 text-sm text-red-400">{{ form.errors.claim_details }}</p>
           </div>
 
@@ -218,7 +218,7 @@ const submitForm = () => {
             </label>
 
             <textarea id="claim_request" v-model="form.claim_request" rows="5" required
-              class="w-full bg-[#0a0a0a] border border-gray-800 p-4 focus:border-white outline-none resize-none"></textarea>
+              class="w-full bg-sunken border border-gray-800 p-4 focus:border-fg outline-none resize-none"></textarea>
             <p v-if="form.errors.claim_request" class="mt-2 text-sm text-red-400">{{ form.errors.claim_request }}</p>
           </div>
         </section>
@@ -229,8 +229,8 @@ const submitForm = () => {
 
           <label for="privacy" class="leading-relaxed text-gray-400">
             Autorizo que
-            <strong class="text-white">STREET URBAN</strong>
-            trate mis datos personales conforme a su <a href="/politica-de-privacidad" target="_blank" class="underline text-white hover:text-gray-300">
+            <strong class="text-fg">STREET URBAN</strong>
+            trate mis datos personales conforme a su <a href="/politica-de-privacidad" target="_blank" class="underline text-fg hover:text-gray-300">
             Política de privacidad</a>, con la finalidad de atender la reclamación correspondiente.
           </label>
         </div>
@@ -238,17 +238,17 @@ const submitForm = () => {
         <p v-if="form.errors.accept_privacy" class="text-sm text-red-400">{{ form.errors.accept_privacy }}</p>
 
         <button type="submit" :disabled="form.processing"
-          class="w-full py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-gray-200 transition-all">
+          class="w-full py-4 bg-fg text-canvas font-black uppercase tracking-widest hover:bg-gray-200 transition-all">
           {{ form.processing ? 'Enviando...' : 'Enviar reclamación' }}
         </button>
       </form>
 
       <div
         v-if="success_message"
-        class="mt-6 p-4 border border-gray-800 bg-[#0a0a0a] text-gray-300 text-sm"
+        class="mt-6 p-4 border border-gray-800 bg-sunken text-gray-300 text-sm"
       >
         <p>{{ success_message }}</p>
-        <p v-if="complaint_number" class="mt-2 font-bold text-white">
+        <p v-if="complaint_number" class="mt-2 font-bold text-fg">
           Número de registro: {{ complaint_number }}
         </p>
       </div>

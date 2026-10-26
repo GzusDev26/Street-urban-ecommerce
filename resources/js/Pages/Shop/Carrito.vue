@@ -98,17 +98,17 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
 
     <!-- Título de la página -->
     <section class="relative py-16 px-4 md:px-8 lg:px-16 overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent"></div>
-      <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-fg/5 via-transparent to-transparent"></div>
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-fg/5 rounded-full blur-3xl"></div>
 
       <div class="relative max-w-full mx-auto">
         <div>
           <!-- Título Principal -->
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight italic leading-tight mb-4 max-w-4xl">
-            Tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Carrito</span>
+            Tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-fg to-gray-500">Carrito</span>
           </h1>
-          <div class="h-1.5 w-24 bg-gradient-to-r from-white via-white to-gray-600 rounded-full"></div>
+          <div class="h-1.5 w-24 bg-gradient-to-r from-fg via-fg to-gray-600 rounded-full"></div>
         </div>
       </div>
     </section>
@@ -131,13 +131,13 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
           <div v-if="cartItems.length === 0" class="py-20 text-center border border-dashed border-gray-800 rounded-2xl">
             <p>Tu carrito está vacío.</p>
             <Link :href="route('shop.tienda')"
-              class="mt-4 inline-block text-white border-b border-white hover:opacity-70">Ver productos</Link>
+              class="mt-4 inline-block text-fg border-b border-fg hover:opacity-70">Ver productos</Link>
           </div>
 
           <!-- Recorre los productos -->
           <div v-else class="space-y-4">
             <div v-for="item in cartItems" :key="item.id"
-              class="group flex gap-6 p-5 bg-[#141414] border border-gray-800/80 rounded-2xl hover:border-gray-700 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
+              class="group flex gap-6 p-5 bg-surface border border-gray-800/80 rounded-2xl hover:border-gray-700 hover:shadow-xl hover:shadow-black/30 transition-all duration-300">
 
               <div class="w-28 h-28 bg-white rounded-xl p-3 flex-shrink-0 shadow-inner">
                 <img :src="item.image" :alt="item.name" class="w-full h-full object-contain" />
@@ -166,7 +166,7 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
                     <select aria-label="Cantidad"
                       :value="item.cantidad"
                       @change="changeQuantity(item.id, $event.target.value)"
-                      class="appearance-none w-[4.5rem] bg-[#1f1f1f] border border-gray-700 rounded-lg pl-4 pr-8 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-[#ff8c42] hover:border-gray-500 transition-colors cursor-pointer"
+                      class="appearance-none w-[4.5rem] bg-surface-2 border border-gray-700 rounded-lg pl-4 pr-8 py-2.5 text-sm font-semibold text-fg focus:outline-none focus:border-[#ff8c42] hover:border-gray-500 transition-colors cursor-pointer"
                     >
                       <option v-for="n in Math.max(1, item.stock || 1)" :key="n" :value="n">{{ n }}</option>
                     </select>
@@ -178,7 +178,7 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
                       v-if="item.colorId"
                       @click="moverAFavoritos(item)"
                       :title="movidoAFavoritos === item.id ? 'Movido a favoritos' : 'Mover a favoritos'"
-                      class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:text-[#ff8c42] hover:bg-white/5 transition-colors"
+                      class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:text-[#ff8c42] hover:bg-fg/5 transition-colors"
                     >
                       <i :class="movidoAFavoritos === item.id ? 'fa-solid fa-heart text-[#ff8c42]' : 'fa-regular fa-heart'"></i>
                     </button>
@@ -192,7 +192,7 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
 
         <!-- Barra lateral derecha -->
         <div class="lg:col-span-1">
-          <div class="sticky top-28 bg-[#0a0a0a] p-8 border border-gray-800 rounded-2xl shadow-2xl shadow-black/40">
+          <div class="sticky top-28 bg-sunken p-8 border border-gray-800 rounded-2xl shadow-2xl shadow-black/40">
             <div class="flex items-center gap-2.5 mb-6">
               <i class="fa-solid fa-bag-shopping text-[#ff8c42]"></i>
               <h2 class="text-xl font-black uppercase italic">Resumen del pedido</h2>
@@ -230,16 +230,16 @@ onUnmounted(() => window.removeEventListener('cart-error', handleCartError));
             <div class="mt-8 pt-6 border-t border-gray-800">
               <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Opciones de pago</p>
               <div class="flex items-center gap-2">
-                <div class="w-11 h-8 rounded-md bg-white/5 border border-gray-700 flex items-center justify-center text-gray-300">
+                <div class="w-11 h-8 rounded-md bg-fg/5 border border-gray-700 flex items-center justify-center text-gray-300">
                   <i class="fa-brands fa-cc-visa text-base"></i>
                 </div>
-                <div class="w-11 h-8 rounded-md bg-white/5 border border-gray-700 flex items-center justify-center text-gray-300">
+                <div class="w-11 h-8 rounded-md bg-fg/5 border border-gray-700 flex items-center justify-center text-gray-300">
                   <i class="fa-brands fa-cc-mastercard text-base"></i>
                 </div>
-                <div class="w-11 h-8 rounded-md bg-white/5 border border-gray-700 flex items-center justify-center text-gray-300">
+                <div class="w-11 h-8 rounded-md bg-fg/5 border border-gray-700 flex items-center justify-center text-gray-300">
                   <i class="fa-brands fa-cc-amex text-base"></i>
                 </div>
-                <div class="w-11 h-8 rounded-md bg-white/5 border border-gray-700 flex items-center justify-center text-gray-300">
+                <div class="w-11 h-8 rounded-md bg-fg/5 border border-gray-700 flex items-center justify-center text-gray-300">
                   <i class="fa-brands fa-cc-diners-club text-base"></i>
                 </div>
               </div>

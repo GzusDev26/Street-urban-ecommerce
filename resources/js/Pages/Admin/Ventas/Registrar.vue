@@ -35,7 +35,7 @@
         <div v-if="page.props.flash?.ventaId" class="flex items-center gap-2">
           <Link
             :href="`${route('admin.sales.index')}?venta=${page.props.flash.ventaId}`"
-            class="text-xs font-semibold text-green-700 hover:text-green-800 bg-white border border-green-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5"
+            class="text-xs font-semibold text-green-700 hover:text-green-800 bg-surface border border-green-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5"
           >
             <i class="fa-solid fa-receipt text-[11px]"></i> Ver en Historial
           </Link>
@@ -51,7 +51,7 @@
 
       <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_25rem] gap-6 items-start">
         <!-- ======================= IZQUIERDA: catálogo ======================= -->
-        <section class="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-6">
+        <section class="bg-surface rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-6">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
             <h3 class="text-lg font-bold text-gray-900">Buscar prenda</h3>
             <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 bg-gray-50 rounded-full px-3 py-1.5">
@@ -68,7 +68,7 @@
               autocomplete="off"
               aria-label="Buscar por modelo o marca"
               placeholder="Escribe un modelo o una marca..."
-              class="w-full h-12 pl-11 pr-11 rounded-2xl border border-gray-200 bg-white text-base text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
+              class="w-full h-12 pl-11 pr-11 rounded-2xl border border-gray-200 bg-surface text-base text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
             >
             <button
               v-if="searchQuery"
@@ -93,7 +93,7 @@
                 'px-4 h-9 rounded-full text-sm font-semibold border transition-all',
                 filtroCategoria === c
                   ? 'bg-[#ff8c42] border-[#ff8c42] text-white shadow-sm shadow-orange-200'
-                  : 'bg-white border-gray-200 text-gray-600 hover:border-[#ff8c42] hover:text-[#e67e2d]',
+                  : 'bg-surface border-gray-200 text-gray-600 hover:border-[#ff8c42] hover:text-[#e67e2d]',
               ]"
             >{{ c || 'Todas' }}</button>
           </div>
@@ -126,7 +126,7 @@
               <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500">
                   <span class="font-semibold text-gray-700">Toca una casilla para agregar 1 unidad</span>
-                  <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-gray-300 bg-white"></span> Disponibles</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-gray-300 bg-surface"></span> Disponibles</span>
                   <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-amber-300 bg-amber-50"></span> Quedan pocas</span>
                   <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#ff8c42]"></span> En el ticket</span>
                 </div>
@@ -137,7 +137,7 @@
                     type="text"
                     aria-label="Filtrar colores"
                     placeholder="Filtrar color..."
-                    class="h-9 w-44 pl-8 pr-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
+                    class="h-9 w-44 pl-8 pr-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
                   >
                 </div>
               </div>
@@ -177,7 +177,7 @@
                                   ? 'border-dashed border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed'
                                   : restante(c.celdas[t]) <= 3
                                     ? 'border-amber-300 bg-amber-50 text-amber-700 hover:border-[#ff8c42] hover:bg-orange-50 active:scale-95'
-                                    : 'border-gray-200 bg-white text-gray-800 hover:border-[#ff8c42] hover:bg-orange-50 active:scale-95',
+                                    : 'border-gray-200 bg-surface text-gray-800 hover:border-[#ff8c42] hover:bg-orange-50 active:scale-95',
                             ]"
                           >
                             <template v-if="cantidadYaAgregada(c.celdas[t].variantId) > 0">
@@ -211,7 +211,7 @@
                 :aria-label="`Ver colores y tallas de ${m.producto}`"
                 :class="[
                   'group relative text-left rounded-2xl border-2 p-4 transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-100',
-                  enTicketModelo(m) > 0 ? 'border-[#ff8c42] bg-orange-50/60 hover:shadow-md' : 'border-gray-100 bg-white hover:border-[#ff8c42] hover:shadow-md active:scale-[0.99]',
+                  enTicketModelo(m) > 0 ? 'border-[#ff8c42] bg-orange-50/60 hover:shadow-md' : 'border-gray-100 bg-surface hover:border-[#ff8c42] hover:shadow-md active:scale-[0.99]',
                 ]"
               >
                 <div class="flex items-center gap-1.5 min-h-[1.5rem]">
@@ -258,7 +258,7 @@
         </section>
 
         <!-- ======================= DERECHA: ticket ======================= -->
-        <aside class="xl:sticky xl:top-6 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" aria-label="Ticket de venta">
+        <aside class="xl:sticky xl:top-6 bg-surface rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" aria-label="Ticket de venta">
           <header class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
             <span class="w-10 h-10 rounded-2xl bg-orange-50 text-[#ff8c42] flex items-center justify-center"><i class="fa-solid fa-receipt"></i></span>
             <div class="flex-1">
@@ -291,7 +291,7 @@
               </div>
 
               <div class="flex items-center justify-between gap-3 mt-3 pl-12">
-                <div class="inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <div class="inline-flex items-center rounded-xl border border-gray-200 bg-surface overflow-hidden">
                   <button
                     type="button"
                     @click="cambiarCantidad(prenda, -1)"
@@ -343,7 +343,7 @@
                 <label for="venta-documento" class="text-xs font-semibold text-gray-600">Cliente (opcional)</label>
                 <div class="inline-flex p-0.5 bg-gray-100 rounded-lg" role="group" aria-label="Tipo de documento">
                   <button v-for="op in ['DNI', 'RUC']" :key="op" type="button" @click="docTipo = op" :aria-pressed="docTipo === op"
-                    :class="['px-2.5 py-0.5 text-[11px] font-bold rounded-md transition-all', docTipo === op ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">{{ op }}</button>
+                    :class="['px-2.5 py-0.5 text-[11px] font-bold rounded-md transition-all', docTipo === op ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']">{{ op }}</button>
                 </div>
               </div>
 
@@ -351,7 +351,7 @@
                 <i :class="docEstado === 'buscando' ? 'fa-solid fa-spinner fa-spin' : 'fa-regular fa-id-card'" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
                 <input id="venta-documento" v-model="docNumero" type="text" inputmode="numeric" autocomplete="off"
                   :placeholder="docTipo === 'DNI' ? 'DNI del cliente (8 dígitos)' : 'RUC del cliente (11 dígitos)'"
-                  class="w-full h-10 pl-9 pr-3 text-sm tracking-wider placeholder:tracking-normal border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                  class="w-full h-10 pl-9 pr-3 text-sm tracking-wider placeholder:tracking-normal border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
 
               <div v-if="clienteSeleccionado" class="w-full min-h-10 px-3 py-1.5 border border-green-200 bg-green-50 rounded-xl flex items-center justify-between gap-2">
@@ -359,7 +359,7 @@
                   <p class="text-sm font-semibold text-gray-900 truncate leading-tight">{{ clienteSeleccionado.name }}</p>
                   <p class="text-xs text-green-700 truncate"><i class="fa-solid fa-circle-check"></i> Cliente registrado<template v-if="clienteSeleccionado.document_number"> · {{ clienteSeleccionado.document_type }} {{ clienteSeleccionado.document_number }}</template></p>
                 </div>
-                <button type="button" @click="limpiarCliente" aria-label="Quitar el cliente elegido" class="w-7 h-7 rounded-full text-gray-400 hover:text-gray-600 hover:bg-white flex-shrink-0 flex items-center justify-center">
+                <button type="button" @click="limpiarCliente" aria-label="Quitar el cliente elegido" class="w-7 h-7 rounded-full text-gray-400 hover:text-gray-600 hover:bg-surface flex-shrink-0 flex items-center justify-center">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -370,7 +370,7 @@
                 <p v-else class="flex items-center gap-1.5 text-xs text-red-600 mb-2"><i class="fa-solid fa-circle-exclamation"></i> {{ docMensaje }}</p>
                 <label for="venta-cliente" class="sr-only">Nombre del cliente</label>
                 <input id="venta-cliente" v-model="ventaForm.cliente" type="text" maxlength="255" placeholder="Nombre del cliente"
-                  class="w-full h-10 px-3 text-sm font-semibold text-gray-900 border border-orange-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                  class="w-full h-10 px-3 text-sm font-semibold text-gray-900 border border-orange-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
 
               <template v-else-if="!docEstadoNecesitaNombre">
@@ -384,12 +384,12 @@
                     type="text"
                     autocomplete="off"
                     placeholder="O busca por nombre un cliente registrado"
-                    class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-9"
+                    class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-9"
                   >
                 </div>
                 <div
                   v-if="showClienteSuggestions && clienteResultados.length > 0"
-                  class="absolute z-20 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-52 overflow-y-auto"
+                  class="absolute z-20 mt-1.5 w-full bg-surface border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-52 overflow-y-auto"
                 >
                   <button
                     v-for="c in clienteResultados"
@@ -408,12 +408,12 @@
 
             <div>
               <label for="registrar-1" class="block text-xs font-semibold text-gray-600 mb-1">Fecha</label>
-              <input id="registrar-1" v-model="ventaForm.fecha" type="date" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+              <input id="registrar-1" v-model="ventaForm.fecha" type="date" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
             </div>
 
             <div>
               <label for="registrar-2" class="block text-xs font-semibold text-gray-600 mb-1">Notas (opcional)</label>
-              <input id="registrar-2" v-model="ventaForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+              <input id="registrar-2" v-model="ventaForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
             </div>
           </div>
 

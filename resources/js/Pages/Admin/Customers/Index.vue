@@ -37,7 +37,7 @@
                   :name="cliente.name"
                   :id="cliente.id"
                   :icon="cliente.document_type === 'RUC' ? 'fa-solid fa-building' : ''"
-                  :tone="cliente.document_type === 'RUC' ? 'bg-slate-100 text-slate-600' : ''"
+                  :tone="cliente.document_type === 'RUC' ? 'bg-gray-100 text-gray-600' : ''"
                 />
                 <div class="min-w-0">
                   <p class="font-semibold text-gray-900 truncate max-w-[16rem]">{{ cliente.name }}</p>

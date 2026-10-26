@@ -9,12 +9,12 @@ defineProps({
 </script>
 
 <template>
-  <div class="relative overflow-hidden rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 px-6 py-14 text-center">
+  <div class="relative overflow-hidden rounded-3xl border border-orange-100 bg-gradient-to-br from-orange-50 via-surface to-amber-50 px-6 py-14 text-center">
     <div class="pointer-events-none absolute -top-16 -right-16 w-60 h-60 rounded-full bg-orange-100/60 blur-3xl"></div>
     <div class="pointer-events-none absolute -bottom-24 -left-16 w-60 h-60 rounded-full bg-amber-100/60 blur-3xl"></div>
 
     <div class="relative">
-      <div class="mx-auto mb-6 w-20 h-20 rounded-3xl bg-white shadow-lg shadow-orange-100 ring-1 ring-orange-100 flex items-center justify-center text-3xl text-[#ff8c42]">
+      <div class="mx-auto mb-6 w-20 h-20 rounded-3xl bg-surface shadow-lg shadow-orange-100 ring-1 ring-orange-100 flex items-center justify-center text-3xl text-[#ff8c42]">
         <i :class="icon"></i>
       </div>
 

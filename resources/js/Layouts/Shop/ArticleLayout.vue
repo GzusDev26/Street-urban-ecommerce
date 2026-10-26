@@ -6,7 +6,7 @@
   }
 
   article code {
-    background-color: rgb(40, 40, 40);
+    background-color: rgb(var(--gray-800));
   }
 </style>
 

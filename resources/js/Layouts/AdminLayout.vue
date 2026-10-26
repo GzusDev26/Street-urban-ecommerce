@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-[#f4f5f7] text-gray-900">
+  <div class="flex h-screen bg-canvas text-gray-900">
     <!-- Fondo oscuro del menú en móvil -->
     <Transition
       enter-active-class="transition-opacity duration-200 motion-reduce:transition-none"
@@ -122,11 +122,11 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(var(--gray-300));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(var(--gray-400));
 }
 </style>

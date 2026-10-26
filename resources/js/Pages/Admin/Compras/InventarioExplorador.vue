@@ -307,7 +307,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
             :key="m.id"
             type="button"
             @click="irModelo(m)"
-            class="text-left bg-white border border-gray-100 hover:border-[#ff8c42] hover:shadow-sm rounded-2xl p-4 transition-all"
+            class="text-left bg-surface border border-gray-100 hover:border-[#ff8c42] hover:shadow-sm rounded-2xl p-4 transition-all"
           >
             <p class="text-[11px] text-gray-400 mb-0.5">{{ m.categoria }} › {{ m.marca }}</p>
             <p class="font-semibold text-gray-900 truncate">{{ m.nombre }}</p>
@@ -323,7 +323,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           <div
             v-for="c in categorias"
             :key="c.id"
-            class="group relative bg-white border border-gray-100 hover:border-[#ff8c42] hover:shadow-md rounded-2xl transition-all"
+            class="group relative bg-surface border border-gray-100 hover:border-[#ff8c42] hover:shadow-md rounded-2xl transition-all"
           >
             <button type="button" @click="irCategoria(c.id)" class="block w-full text-left p-5">
               <div class="flex items-start justify-between mb-4">
@@ -365,7 +365,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
                 :key="sug.name"
                 type="button"
                 @click="sugerirCategoria(sug)"
-                class="inline-flex items-center gap-1.5 bg-white border border-orange-200 text-[#e67e2d] hover:border-[#ff8c42] hover:bg-orange-50 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-sm transition-colors"
+                class="inline-flex items-center gap-1.5 bg-surface border border-orange-200 text-[#e67e2d] hover:border-[#ff8c42] hover:bg-orange-50 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-sm transition-colors"
               >
                 <i class="fa-solid fa-plus text-[10px]"></i> {{ sug.name }}
               </button>
@@ -393,7 +393,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           <div
             v-for="m in marcasDeCategoria"
             :key="m.id"
-            class="group relative bg-white border border-gray-100 hover:border-[#ff8c42] hover:shadow-md rounded-2xl transition-all"
+            class="group relative bg-surface border border-gray-100 hover:border-[#ff8c42] hover:shadow-md rounded-2xl transition-all"
           >
             <button type="button" @click="irMarca(m.id)" class="block w-full text-left p-5">
               <div class="flex items-start justify-between mb-3">
@@ -430,7 +430,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
                 :key="nombre"
                 type="button"
                 @click="sugerirMarca(nombre)"
-                class="inline-flex items-center gap-1.5 bg-white border border-orange-200 text-[#e67e2d] hover:border-[#ff8c42] hover:bg-orange-50 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-sm transition-colors"
+                class="inline-flex items-center gap-1.5 bg-surface border border-orange-200 text-[#e67e2d] hover:border-[#ff8c42] hover:bg-orange-50 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-sm transition-colors"
               >
                 <i class="fa-solid fa-plus text-[10px]"></i> {{ nombre }}
               </button>
@@ -448,7 +448,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           <div
             v-for="m in modelosDeMarca"
             :key="m.id"
-            :class="['bg-white border border-gray-100 hover:border-gray-200 rounded-2xl p-5 transition-all', !m.activo ? 'opacity-60' : '']"
+            :class="['bg-surface border border-gray-100 hover:border-gray-200 rounded-2xl p-5 transition-all', !m.activo ? 'opacity-60' : '']"
           >
             <button type="button" @click="irModelo(m)" class="block w-full text-left">
               <div class="flex items-start justify-between gap-3">
@@ -538,7 +538,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           v-if="esAdmin && tallasDelModelo.length && coloresSinFoto(modeloActual) > 0"
           class="flex items-center gap-3 mb-4 rounded-xl border border-orange-100 bg-orange-50/70 px-4 py-3 text-sm text-gray-700"
         >
-          <span class="w-8 h-8 rounded-lg bg-white text-[#ff8c42] flex items-center justify-center flex-shrink-0 shadow-sm">
+          <span class="w-8 h-8 rounded-lg bg-surface text-[#ff8c42] flex items-center justify-center flex-shrink-0 shadow-sm">
             <i class="fa-solid fa-camera" aria-hidden="true"></i>
           </span>
           <p>

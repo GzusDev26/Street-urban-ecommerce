@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductColor;
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Support\PublicFile;
 
 class WishlistController extends Controller
 {
@@ -45,7 +45,7 @@ class WishlistController extends Controller
                     'name' => $p->name,
                     'colorNombre' => $color->name,
                     'price' => (float) $p->price,
-                    'image' => $color->image_url ? Storage::disk('public')->url($color->image_url) : null,
+                    'image' => PublicFile::url($color->image_url),
                 ];
             })
             ->values();

@@ -131,17 +131,17 @@ const agregarAlCarrito = async () => {
     <section class="px-4 md:px-8 lg:px-16 max-w-[1400px] mx-auto py-10">
       <!-- Breadcrumb -->
       <div class="text-xs text-gray-400 mb-8 flex items-center gap-2 flex-wrap">
-        <Link :href="route('shop.home')" class="hover:text-white transition-colors">Inicio</Link>
+        <Link :href="route('shop.home')" class="hover:text-fg transition-colors">Inicio</Link>
         <span>/</span>
-        <Link :href="`${route('shop.tienda')}?category=${producto.category}`" class="hover:text-white transition-colors">{{ producto.category }}</Link>
+        <Link :href="`${route('shop.tienda')}?category=${producto.category}`" class="hover:text-fg transition-colors">{{ producto.category }}</Link>
         <span>/</span>
-        <span class="text-white">{{ producto.name }}</span>
+        <span class="text-fg">{{ producto.name }}</span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <!-- Imagen con zoom al pasar el mouse -->
         <div
-          class="relative aspect-square bg-[#1a1a1a] border border-gray-800 rounded-2xl overflow-hidden flex items-center justify-center"
+          class="relative aspect-square bg-surface border border-gray-800 rounded-2xl overflow-hidden flex items-center justify-center"
           :class="currentImage ? 'cursor-zoom-in' : ''"
           @mousemove="onImageMouseMove"
           @mouseenter="zooming = true"
@@ -168,7 +168,7 @@ const agregarAlCarrito = async () => {
 
           <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tight italic mb-4">{{ producto.name }}</h1>
 
-          <p class="text-2xl font-bold text-white mb-6">S/ {{ currentPrecio.toFixed(2) }}</p>
+          <p class="text-2xl font-bold text-fg mb-6">S/ {{ currentPrecio.toFixed(2) }}</p>
 
           <p v-if="producto.description" class="text-sm text-gray-400 leading-relaxed mb-8">{{ producto.description }}</p>
 
@@ -190,7 +190,7 @@ const agregarAlCarrito = async () => {
                   class="flex flex-col items-center gap-2"
                   :title="color.nombre"
                 >
-                  <span class="w-16 h-16 rounded-lg overflow-hidden bg-[#1a1a1a] border border-gray-800">
+                  <span class="w-16 h-16 rounded-lg overflow-hidden bg-surface border border-gray-800">
                     <img v-if="color.imagen" :src="color.imagen" :alt="color.nombre" class="w-full h-full object-cover">
                     <span v-else class="block w-full h-full" :style="{ backgroundColor: color.hex || '#6b7280' }"></span>
                   </span>
@@ -216,10 +216,10 @@ const agregarAlCarrito = async () => {
                   class="relative py-3 rounded-lg text-sm font-semibold border transition-all"
                   :class="[
                     t.stock <= 0
-                      ? 'border-transparent bg-[#1a1a1a] text-gray-600 line-through cursor-not-allowed'
+                      ? 'border-transparent bg-surface text-gray-600 line-through cursor-not-allowed'
                       : selectedTalla === t.talla
                         ? 'bg-[#ff8c42] border-[#ff8c42] text-black'
-                        : 'border-gray-700 text-gray-300 hover:border-gray-400 bg-[#1a1a1a]'
+                        : 'border-gray-700 text-gray-300 hover:border-gray-400 bg-surface'
                   ]"
                 >
                   {{ t.talla }}
@@ -234,7 +234,7 @@ const agregarAlCarrito = async () => {
             <div class="flex items-start gap-3 border border-gray-800 rounded-xl px-4 py-3 mb-8">
               <i class="fa-regular fa-circle-question text-gray-400 mt-0.5"></i>
               <p class="text-xs text-gray-400 leading-relaxed">
-                <span class="text-white font-semibold">Talla real.</span>
+                <span class="text-fg font-semibold">Talla real.</span>
                 Te recomendamos pedir tu talla habitual.
               </p>
             </div>
@@ -267,7 +267,7 @@ const agregarAlCarrito = async () => {
     <button
       v-if="!showComentarios"
       @click="showComentarios = true"
-      class="hidden lg:flex items-center gap-2 fixed top-1/2 right-0 -translate-y-1/2 z-30 bg-[#1a1a1a] border border-gray-700 border-r-0 text-gray-300 text-xs font-black uppercase tracking-widest px-3 py-6 rounded-l-lg hover:bg-[#242424] hover:text-white transition-colors [writing-mode:vertical-rl] rotate-180"
+      class="hidden lg:flex items-center gap-2 fixed top-1/2 right-0 -translate-y-1/2 z-30 bg-surface border border-gray-700 border-r-0 text-gray-300 text-xs font-black uppercase tracking-widest px-3 py-6 rounded-l-lg hover:bg-surface-2 hover:text-fg transition-colors [writing-mode:vertical-rl] rotate-180"
     >
       Comentarios
     </button>
@@ -275,8 +275,8 @@ const agregarAlCarrito = async () => {
     <!-- Panel deslizable de comentarios -->
     <Teleport to="body">
       <div v-if="showComentarios" class="fixed inset-0 z-50 bg-black/50" @click.self="showComentarios = false">
-        <div class="fixed top-0 right-0 h-full w-full max-w-md bg-[#111111] border-l border-gray-800 shadow-2xl overflow-y-auto">
-          <div class="sticky top-0 bg-[#111111] border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+        <div class="fixed top-0 right-0 h-full w-full max-w-md bg-canvas border-l border-gray-800 shadow-2xl overflow-y-auto">
+          <div class="sticky top-0 bg-canvas border-b border-gray-800 px-6 py-4 flex items-center justify-between">
             <h2 class="text-lg font-black uppercase tracking-tight italic">Comentarios</h2>
             <button @click="showComentarios = false" class="p-2 hover:bg-gray-800 rounded-lg transition">
               <i class="fa-solid fa-xmark text-gray-400"></i>

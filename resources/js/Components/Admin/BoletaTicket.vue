@@ -1,8 +1,9 @@
 <template>
-  <div class="boleta-sombra">
-    <article class="boleta" :style="{ '--ancho': ancho + 'mm', '--util': (ancho === 58 ? 48 : 72) + 'mm' }" aria-label="Boleta de venta">
+  <!-- theme-fixed: el papel térmico se ve igual en modo oscuro -->
+  <div class="boleta-sombra theme-fixed">
+    <article class="boleta" :style="{ '--ancho': ancho + 'mm', '--util': (ancho === 58 ? 48 : 72) + 'mm', ...(zoom ? { zoom } : {}) }" aria-label="Boleta de venta">
         <header class="text-center">
-          <p class="sello" aria-hidden="true">{{ business.name?.[0] ?? 'S' }}</p>
+          <img class="logo" src="/image/logo/street-urban-icono-light.png" width="512" height="512" alt="" aria-hidden="true" />
           <h1 class="marca">{{ business.name }}</h1>
           <p class="adorno" aria-hidden="true"><i></i><b></b><i></i></p>
           <div class="datos-negocio">
@@ -81,10 +82,13 @@ import { computed } from 'vue';
 const props = defineProps({
   venta: { type: Object, required: true },
   ancho: { type: Number, default: 58 },
+  // Para la vista previa de Datos del negocio: datos aún sin guardar y tamaño reducido.
+  business: { type: Object, default: null },
+  zoom: { type: Number, default: null },
 });
 
 const page = usePage();
-const business = computed(() => page.props.business);
+const business = computed(() => props.business ?? page.props.business);
 
 const totalFinal = computed(() => (props.venta.prendasDevueltas > 0 ? props.venta.totalNeto : props.venta.total));
 
@@ -160,10 +164,10 @@ const enLetras = computed(() => {
 /* etiqueta pequeña con tracking amplio: da el aire "de marca" sin usar color */
 .boleta .etq { font-size: 7.5px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; }
 
-.boleta .sello {
-  width: 34px; height: 34px; margin: 0 auto 7px;
-  border: 2px solid #000; border-radius: 50%; outline: 1px solid #000; outline-offset: 2px;
-  font-size: 19px; font-weight: 900; line-height: 30px;
+/* Logo en un solo tono, como sale en la impresora térmica. */
+.boleta .logo {
+  display: block; width: 48px; height: 48px; margin: 0 auto 5px;
+  object-fit: contain; filter: grayscale(1) contrast(1.25);
 }
 .boleta .marca { font-size: 14px; font-weight: 900; letter-spacing: 0.24em; text-transform: uppercase; line-height: 1.15; margin-right: -0.24em; }
 

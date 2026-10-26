@@ -28,7 +28,7 @@
       </div>
 
       <!-- Filtros -->
-      <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+      <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
         <div class="flex items-center gap-2 mb-4">
           <i class="fa-solid fa-sliders text-gray-400 text-sm"></i>
           <h3 class="text-sm font-bold text-gray-900">Filtrar reporte</h3>
@@ -77,7 +77,7 @@
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-400 font-medium">Total Ingresos</p>
             <p class="text-3xl font-black text-[#ff8c42] mt-1">S/ {{ stats.totalIngresos.toFixed(2) }}</p>
@@ -86,7 +86,7 @@
             <i class="fa-solid fa-sack-dollar"></i>
           </div>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-400 font-medium">N° de Ventas</p>
             <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.numeroVentas }}</p>
@@ -95,7 +95,7 @@
             <i class="fa-solid fa-cash-register"></i>
           </div>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-400 font-medium">Unidades Vendidas</p>
             <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalUnidades }}</p>
@@ -104,7 +104,7 @@
             <i class="fa-solid fa-boxes-stacked"></i>
           </div>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-400 font-medium">Promedio por Venta</p>
             <p class="text-3xl font-black text-gray-900 mt-1">S/ {{ stats.promedioPorVenta.toFixed(2) }}</p>
@@ -113,7 +113,7 @@
             <i class="fa-solid fa-scale-balanced"></i>
           </div>
         </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-400 font-medium">Utilidad</p>
             <p class="text-3xl font-black text-green-600 mt-1">S/ {{ stats.utilidadTotal.toFixed(2) }}</p>
@@ -135,7 +135,7 @@
       <template v-else>
         <!-- Breakdown -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex items-center gap-2 mb-5">
               <i class="fa-solid fa-tags text-gray-400 text-sm"></i>
               <h3 class="text-sm font-bold text-gray-900">Ingresos por Categoría</h3>
@@ -156,7 +156,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex items-center gap-2 mb-5">
               <i class="fa-solid fa-people-group text-gray-400 text-sm"></i>
               <h3 class="text-sm font-bold text-gray-900">Ingresos por Cliente</h3>
@@ -178,7 +178,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex items-center gap-2 mb-5">
               <i class="fa-solid fa-copyright text-gray-400 text-sm"></i>
               <h3 class="text-sm font-bold text-gray-900">Ingresos por Marca</h3>
@@ -201,7 +201,7 @@
         </div>
 
         <!-- Top productos -->
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
           <div class="flex items-center gap-2 mb-5">
             <i class="fa-solid fa-trophy text-gray-400 text-sm"></i>
             <h3 class="text-lg font-bold text-gray-900">Productos Más Vendidos</h3>

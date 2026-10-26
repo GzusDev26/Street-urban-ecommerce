@@ -51,7 +51,7 @@ const ocultarConRetraso = () => {
       type="text"
       autocomplete="off"
       :placeholder="placeholder"
-      class="w-full h-11 px-4 pr-24 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-500"
+      class="w-full h-11 px-4 pr-24 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-500"
     >
 
     <span
@@ -64,7 +64,7 @@ const ocultarConRetraso = () => {
     <div
       v-if="showDropdown && !disabled"
       role="listbox"
-      class="absolute z-20 mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-56 overflow-y-auto"
+      class="absolute z-20 mt-1.5 w-full bg-surface border border-gray-100 rounded-xl shadow-xl ring-1 ring-black/5 p-1 max-h-56 overflow-y-auto"
     >
       <button
         v-for="op in opcionesFiltradas"

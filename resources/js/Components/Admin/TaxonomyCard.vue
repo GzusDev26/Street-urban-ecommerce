@@ -90,7 +90,7 @@ const confirmarEliminacion = () => {
 </script>
 
 <template>
-  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+  <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
     <div class="flex items-center gap-2 mb-1">
       <i :class="['fa-solid', icon, 'text-gray-400 text-sm']"></i>
       <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>
@@ -116,7 +116,7 @@ const confirmarEliminacion = () => {
         v-if="withSizeType"
         v-model="nuevoTipo"
         aria-label="Tipo de tallas de la nueva categoría"
-        class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
+        class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
       >
         <option v-for="t in TIPOS_TALLA" :key="t.id" :value="t.id">Tallas de {{ t.nombre.toLowerCase() }} ({{ t.ejemplo }})</option>
       </select>
@@ -152,7 +152,7 @@ const confirmarEliminacion = () => {
               v-if="withSizeType"
               v-model="editTipo"
               aria-label="Tipo de tallas"
-              class="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-white"
+              class="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
             >
               <option v-for="t in TIPOS_TALLA" :key="t.id" :value="t.id">Tallas de {{ t.nombre.toLowerCase() }} ({{ t.ejemplo }})</option>
             </select>

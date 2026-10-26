@@ -6,8 +6,12 @@ import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import { syncSurface } from './theme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+// Al pasar de la tienda al admin (o al revés) cambia el diseño base de la paleta.
+router.on('navigate', (event) => syncSurface(event.detail.page.component));
 
 // El token CSRF cambia al cerrar sesión (se invalida la sesión), pero con las navegaciones de
 // Inertia la página no se recarga y la <meta> se quedaría con el viejo: el siguiente formulario

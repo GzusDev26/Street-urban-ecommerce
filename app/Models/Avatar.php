@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
+use App\Support\PublicFile;
 
 class Avatar extends Model
 {
@@ -18,6 +18,6 @@ class Avatar extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk('public')->url($this->path);
+        return PublicFile::url($this->path);
     }
 }

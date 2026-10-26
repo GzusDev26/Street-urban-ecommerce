@@ -21,7 +21,7 @@ const model = defineModel({ type: [String, Number], default: '' });
       :id="fieldId"
       v-bind="$attrs"
       :class="[
-        'w-full h-11 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition',
+        'w-full h-11 rounded-xl border border-gray-200 bg-surface text-sm text-gray-900 placeholder:text-gray-400 transition',
         'hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100',
         icon ? 'pl-10 pr-4' : prefix ? 'pl-9 pr-4' : 'px-4',
       ]"

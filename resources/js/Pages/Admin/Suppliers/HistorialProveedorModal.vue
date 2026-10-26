@@ -30,7 +30,7 @@ onMounted(async () => {
 
 <template>
   <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="emit('close')">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col">
+    <div class="bg-surface rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col">
       <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
         <div class="min-w-0">
           <h2 class="text-xl font-bold text-gray-900 truncate">{{ proveedor.name }}</h2>
@@ -74,7 +74,7 @@ onMounted(async () => {
               />
               <div v-else class="w-full h-full grid grid-cols-2 grid-rows-2 gap-[1px] bg-gray-200">
                 <ColorSwatch v-for="(hex, idx) in compra.colores" :key="idx" :hex="hex" />
-                <div v-if="compra.masColores > 0" class="flex items-center justify-center bg-gray-700 text-white text-[9px] font-bold">
+                <div v-if="compra.masColores > 0" class="flex items-center justify-center bg-gray-700 text-gray-50 text-[9px] font-bold">
                   +{{ compra.masColores }}
                 </div>
               </div>

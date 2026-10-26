@@ -8,7 +8,7 @@ defineProps({
   <div v-if="hex" :style="{ backgroundColor: hex }"></div>
   <div
     v-else
-    class="bg-white"
+    class="bg-surface"
     style="background-image: linear-gradient(135deg, transparent calc(50% - 1px), #d1d5db calc(50% - 1px), #d1d5db calc(50% + 1px), transparent calc(50% + 1px));"
     title="Sin color registrado"
   ></div>

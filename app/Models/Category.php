@@ -8,7 +8,11 @@ class Category extends Model
 {
     public const SIZE_TYPES = ['ropa', 'pantalon', 'calzado'];
 
-    protected $fillable = ['name', 'description', 'slug', 'size_type', 'active'];
+    protected $fillable = ['name', 'description', 'slug', 'size_type', 'image', 'featured', 'active'];
+
+    protected $casts = [
+        'featured' => 'boolean',
+    ];
 
     public function products()
     {
