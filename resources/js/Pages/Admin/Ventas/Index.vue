@@ -75,7 +75,7 @@
           </div>
         </template>
 
-        <div v-if="ventasFiltradas.length > 0" class="px-6 pb-6">
+        <div v-if="ventas.length > 0" class="px-6 pb-6">
           <section v-for="grupo in gruposPaginados" :key="grupo.fecha" class="mb-6 last:mb-0">
             <!-- Cabecera del día -->
             <div class="flex items-center gap-3 mb-3">
@@ -248,11 +248,11 @@
             </div>
           </section>
 
-          <Pagination v-model="paginaActual" :total-items="ventasFiltradas.length" :per-page="perPage" />
+          <Pagination v-model="paginaActual" :total-items="paginacion.total" :per-page="paginacion.porPagina" />
         </div>
 
         <EmptyState
-          v-else-if="ventas.length === 0"
+          v-else-if="!hayFiltros"
           icon="fa-solid fa-cash-register"
           title="Aún no hay ventas registradas"
           text="Cuando registres la primera venta aparecerá aquí."
@@ -304,13 +304,17 @@ import { Head, usePage, Link, router } from '@inertiajs/vue3';
 import { ref, computed, watch, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
-  ventas: Array,
+  ventas: Array, // solo las de la página actual
+  totalesDia: Object, // 'dd/mm/YYYY' => { cantidad, total }
+  paginacion: Object, // { pagina, total, porPagina }
+  filtros: Object, // { buscar, estado }
+  conteos: Object,
   stats: Object,
 });
 
 const page = usePage();
 const esAdmin = computed(() => page.props.auth?.user?.role === 'admin');
-const filtroTexto = ref('');
+const filtroTexto = ref(props.filtros.buscar);
 const expandedId = ref(null);
 const ventaDestacada = ref(null);
 
@@ -350,32 +354,36 @@ const tituloVenta = (venta) => {
   return `${nombresUnicos[0]} + ${nombresUnicos.length - 1} más`;
 };
 
-const filtroEstado = ref('todas');
+const filtroEstado = ref(props.filtros.estado);
 
 const esVigente = (v) => !v.cancelada;
-const tieneDevolucion = (v) => !v.cancelada && v.prendasDevueltas > 0;
 
 const filtrosEstado = computed(() => [
-  { value: 'todas', label: 'Todas', cantidad: props.ventas.length },
-  { value: 'vigentes', label: 'Vigentes', cantidad: props.ventas.filter(esVigente).length },
-  { value: 'devoluciones', label: 'Con devoluciones', cantidad: props.ventas.filter(tieneDevolucion).length },
-  { value: 'canceladas', label: 'Canceladas', cantidad: props.ventas.filter((v) => v.cancelada).length },
+  { value: 'todas', label: 'Todas', cantidad: props.conteos.todas },
+  { value: 'vigentes', label: 'Vigentes', cantidad: props.conteos.vigentes },
+  { value: 'devoluciones', label: 'Con devoluciones', cantidad: props.conteos.devoluciones },
+  { value: 'canceladas', label: 'Canceladas', cantidad: props.conteos.canceladas },
 ]);
 
-const ventasFiltradas = computed(() => {
-  const texto = filtroTexto.value.trim().toLowerCase();
+const hayFiltros = computed(() => filtroTexto.value.trim() !== '' || filtroEstado.value !== 'todas');
 
-  return props.ventas.filter((v) => {
-    if (filtroEstado.value === 'vigentes' && !esVigente(v)) return false;
-    if (filtroEstado.value === 'devoluciones' && !tieneDevolucion(v)) return false;
-    if (filtroEstado.value === 'canceladas' && !v.cancelada) return false;
-    if (!texto) return true;
+// La búsqueda, el estado y la página se resuelven en el servidor: cada cambio pide solo esa página.
+const ir = (extra = {}) => {
+  const query = {
+    buscar: filtroTexto.value.trim() || undefined,
+    estado: filtroEstado.value !== 'todas' ? filtroEstado.value : undefined,
+    ...extra,
+  };
 
-    return (v.cliente || '').toLowerCase().includes(texto) ||
-      v.numero.toLowerCase().includes(texto) ||
-      v.items.some(i => i.producto.toLowerCase().includes(texto));
-  });
+  router.get(route('admin.sales.index'), query, { preserveState: true, preserveScroll: true, replace: true });
+};
+
+let temporizador = null;
+watch(filtroTexto, () => {
+  clearTimeout(temporizador);
+  temporizador = setTimeout(() => ir(), 300);
 });
+watch(filtroEstado, () => ir());
 
 const limpiarFiltros = () => {
   filtroTexto.value = '';
@@ -418,36 +426,25 @@ const etiquetaDia = (texto) => {
   return capitalizada;
 };
 
-const perPage = 15;
-const paginaActual = ref(1);
-
-watch([filtroTexto, filtroEstado], () => {
-  paginaActual.value = 1;
+// La página actual viene del servidor; cambiarla pide la siguiente (conservando búsqueda y filtro).
+const paginaActual = computed({
+  get: () => props.paginacion.pagina,
+  set: (p) => ir({ pagina: p }),
 });
 
-watch(() => ventasFiltradas.value.length, (total) => {
-  const totalPaginas = Math.max(1, Math.ceil(total / perPage));
-  if (paginaActual.value > totalPaginas) paginaActual.value = totalPaginas;
-});
-
-const ventasPaginadas = computed(() => {
-  const inicio = (paginaActual.value - 1) * perPage;
-  return ventasFiltradas.value.slice(inicio, inicio + perPage);
-});
-
-// Agrupa la página actual por día; el total del día se calcula sobre todas las ventas
-// filtradas de esa fecha (aunque el día continúe en otra página) y excluye canceladas.
+// Agrupa la página actual por día; el total del día lo calcula el servidor sobre todas las ventas
+// vigentes de esa fecha (aunque el día continúe en otra página).
 const gruposPaginados = computed(() => {
   const grupos = [];
-  for (const venta of ventasPaginadas.value) {
+  for (const venta of props.ventas) {
     let grupo = grupos[grupos.length - 1];
     if (!grupo || grupo.fecha !== venta.fecha) {
-      const delDia = ventasFiltradas.value.filter((v) => v.fecha === venta.fecha);
+      const delDia = props.totalesDia[venta.fecha] ?? { cantidad: 0, total: 0 };
       grupo = {
         fecha: venta.fecha,
         etiqueta: etiquetaDia(venta.fecha),
-        cantidadVentas: delDia.filter(esVigente).length,
-        total: delDia.filter(esVigente).reduce((acc, v) => acc + v.totalNeto, 0),
+        cantidadVentas: delDia.cantidad,
+        total: delDia.total,
         ventas: [],
       };
       grupos.push(grupo);
@@ -457,16 +454,14 @@ const gruposPaginados = computed(() => {
   return grupos;
 });
 
-// Llega desde "Ver en Historial" (?venta=123) al registrar una venta: la busca, se
-// asegura de estar en la página correcta, la expande y hace scroll hasta ella.
+// Llega desde "Ver en Historial" (?venta=123) al registrar una venta: el servidor abre la página
+// donde está; aquí se expande y se hace scroll hasta ella.
 onMounted(() => {
   const ventaId = Number(new URLSearchParams(window.location.search).get('venta'));
   if (!ventaId) return;
 
-  const indice = props.ventas.findIndex(v => v.id === ventaId);
-  if (indice === -1) return;
+  if (!props.ventas.some((v) => v.id === ventaId)) return; // el servidor ya abrió la página donde está
 
-  paginaActual.value = Math.floor(indice / perPage) + 1;
   expandedId.value = ventaId;
   ventaDestacada.value = ventaId;
 

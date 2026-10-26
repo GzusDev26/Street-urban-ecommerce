@@ -39,7 +39,9 @@ class AvatarAdminController extends Controller
 
     public function destroy(Avatar $avatar)
     {
-        Storage::disk('public')->delete($avatar->path);
+        if (! $avatar->esDelSitio()) {
+            Storage::disk('public')->delete($avatar->path);
+        }
         $avatar->delete();
 
         return back()->with('success', 'Avatar eliminado. Quienes lo tenían elegido vuelven a sus iniciales.');

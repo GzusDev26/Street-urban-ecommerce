@@ -655,7 +655,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
     <ConfirmModal
       v-if="marcaPorQuitar"
       title="Quitar marca"
-      :message="`¿Quitar «${marcaPorQuitar.nombre}» de ${categoriaActual?.name}? Está sin modelos aquí; la marca no se borra y puedes volver a agregarla.`"
+      :message="`¿Quitar «${marcaPorQuitar.nombre}» de ${categoriaActual?.name}? Está sin modelos aquí. Si tampoco está en otra categoría, la marca se elimina del todo.`"
       confirm-text="Sí, quitar"
       variant="danger"
       :loading="procesando"

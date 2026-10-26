@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FormatsName;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use FormatsName;
+
     protected $fillable = ['name', 'brand_id', 'description', 'sku', 'price', 'cost', 'stock', 'category_id', 'image_url', 'active'];
 
     protected $casts = [

@@ -7,6 +7,7 @@ import SearchSelect from '@/Components/Admin/SearchSelect.vue';
 import { GRUPOS_TALLA } from '@/Components/Admin/tallas';
 import { PALETA } from '@/Components/Admin/colores';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
+import ProveedorField from '@/Components/Admin/ProveedorField.vue';
 
 const props = defineProps({
   categoriasExistentes: {
@@ -122,17 +123,16 @@ onMounted(() => {
     prendaForm.value.precioVenta = props.prefill.precioVenta || '';
     // Sugerencia del último proveedor de esta variante — el usuario la puede cambiar
     // si esta vez la está comprando en otro lado.
-    compraForm.value.tienda = props.prefill.tienda || '';
+    if (props.prefill.tienda) proveedor.value = { id: null, nombre: props.prefill.tienda, tipo: null, numero: null, nuevo: false };
     if (props.prefill.productId) cargarColoresProducto();
   }
 });
 
 const capitalizarPrimeraLetra = (str) => (str.length > 0 ? str.charAt(0).toUpperCase() + str.slice(1) : str);
 
-const tiendaCapitalizada = computed({
-  get: () => compraForm.value.tienda,
-  set: (val) => { compraForm.value.tienda = capitalizarPrimeraLetra(val); },
-});
+// Proveedor elegido (opcional): { id, nombre, tipo, numero, nuevo } o null = sin proveedor.
+const proveedor = ref(null);
+const textoProveedor = ref('');
 
 // Las categorías se eligen de la lista (no se crean escribiendo, para no acabar con "Polo" y "Polos").
 // Un administrador puede crear una a propósito con "Nueva categoría", eligiendo su tipo de tallas.
@@ -440,6 +440,9 @@ const tallas = [...new Set(GRUPOS_TALLA.flatMap((g) => g.tallas))];
 const grupoTalla = ref('ropa');
 let grupoElegidoAMano = false;
 
+// Categorías sin tallas ni colores (perfumes...): no se pide el color y la compra va con "Sin color".
+const sinColor = computed(() => !!GRUPOS_TALLA.find((g) => g.id === grupoTalla.value)?.sinColor);
+
 const elegirGrupoTalla = (id) => {
   grupoTalla.value = id;
   grupoElegidoAMano = true;
@@ -490,7 +493,7 @@ const agregarTallaNueva = () => {
 
 const hayDatos = computed(() => prendas.value.length > 0
   || !!(prendaForm.value.categoria || prendaForm.value.marca || prendaForm.value.nombre || prendaForm.value.colorNombre
-    || compraForm.value.tienda || compraForm.value.factura || compraForm.value.notas || unidadesEnGrilla.value > 0));
+    || proveedor.value || compraForm.value.factura || compraForm.value.notas || unidadesEnGrilla.value > 0));
 
 // Indicador de progreso: cada paso se marca como completo cuando ya tiene lo necesario.
 const paso1Listo = computed(() => !!prendaForm.value.productId);
@@ -567,7 +570,8 @@ const agregarPrenda = (repetir = false) => {
       ...f,
       talla,
       cantidad,
-      colorNombre: f.colorNombre.trim() || 'Sin color',
+      colorNombre: (!sinColor.value && f.colorNombre.trim()) || 'Sin color',
+      color: sinColor.value ? null : f.color,
       subtotal: cantidad * f.precioCompra,
     });
   });
@@ -579,7 +583,7 @@ const agregarPrenda = (repetir = false) => {
   if (repetir !== true) grilla.value = {};
   mostrarNuevoColor.value = false;
 
-  if (repetir === true) irAlSiguiente('input[aria-label="Nombre del color"]'); // solo falta el color nuevo
+  if (repetir === true && !sinColor.value) irAlSiguiente('input[aria-label="Nombre del color"]'); // solo falta el color nuevo
 };
 
 const limpiarFormularioPrenda = () => {
@@ -666,11 +670,20 @@ const guardarCompra = () => {
     return;
   }
 
+  // Escribió un proveedor pero no lo eligió: se avisa en vez de guardar la compra sin proveedor en silencio.
+  if (!proveedor.value && textoProveedor.value.trim()) {
+    avisar('Elige el proveedor de la lista (pulsa «Usar como nuevo» o «Registrar…»), o borra lo escrito para guardar la compra sin proveedor.', { titulo: 'Falta elegir el proveedor' });
+    return;
+  }
+
   isSaving.value = true;
 
   router.post(route('admin.purchases.store'), {
     fecha: compraForm.value.fecha,
-    tienda: compraForm.value.tienda,
+    tienda: proveedor.value?.nombre ?? '',
+    proveedorId: proveedor.value?.id ?? null,
+    proveedorDocTipo: proveedor.value?.tipo ?? null,
+    proveedorDocNumero: proveedor.value?.numero ?? null,
     factura: compraForm.value.factura,
     notas: compraForm.value.notas,
     prendas: prendas.value,
@@ -898,8 +911,8 @@ const guardarCompra = () => {
             </div>
           </section>
 
-          <!-- Paso 2: color -->
-          <section class="bg-surface rounded-2xl border border-gray-100 shadow-sm p-5">
+          <!-- Paso 2: color (no aplica en categorías sin tallas ni color) -->
+          <section v-if="!sinColor" class="bg-surface rounded-2xl border border-gray-100 shadow-sm p-5">
             <header class="flex items-center gap-3 mb-4">
               <span :class="['w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors', paso2Listo ? 'bg-green-500 text-white' : 'bg-[#ff8c42] text-white']">
                 <i v-if="paso2Listo" class="fa-solid fa-check text-[11px]"></i><template v-else>2</template>
@@ -966,7 +979,7 @@ const guardarCompra = () => {
               <span :class="['w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors', paso3Listo ? 'bg-green-500 text-white' : 'bg-[#ff8c42] text-white']">
                 <i v-if="paso3Listo" class="fa-solid fa-check text-[11px]"></i><template v-else>3</template>
               </span>
-              <h3 class="font-bold text-gray-900">Tallas y cantidades</h3>
+              <h3 class="font-bold text-gray-900">{{ sinColor ? 'Cantidad' : 'Tallas y cantidades' }}</h3>
               <div class="inline-flex p-0.5 bg-gray-100 rounded-lg" role="group" aria-label="Tipo de tallas">
                 <button
                   v-for="g in GRUPOS_TALLA"
@@ -1130,8 +1143,7 @@ const guardarCompra = () => {
                 <input id="registrar-compra-modal-3" v-model="compraForm.factura" type="text" placeholder="F-001234" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
               <div class="col-span-2">
-                <label for="registrar-compra-modal-2" class="block text-xs font-semibold text-gray-600 mb-1">Tienda/Proveedor</label>
-                <input id="registrar-compra-modal-2" v-model="tiendaCapitalizada" type="text" placeholder="Ej: Centro Comercial Jockey" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                <ProveedorField v-model="proveedor" v-model:texto="textoProveedor" />
               </div>
               <div class="col-span-2">
                 <label for="registrar-compra-modal-4" class="block text-xs font-semibold text-gray-600 mb-1">Notas (opcional)</label>

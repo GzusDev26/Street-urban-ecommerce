@@ -213,6 +213,14 @@ class CategoryBrandController extends Controller
 
         $category->brands()->detach($brand->id);
 
+        // Una marca que ya no está en ninguna categoría ni tiene modelos no sirve para nada: se elimina del todo,
+        // para que no siga apareciendo en la lista de marcas de Compras.
+        if (! $brand->products()->exists() && ! $brand->categories()->exists()) {
+            $brand->delete();
+
+            return back()->with('success', "Marca «{$brand->name}» eliminada.");
+        }
+
         return back()->with('success', "Marca «{$brand->name}» quitada de {$category->name}.");
     }
 

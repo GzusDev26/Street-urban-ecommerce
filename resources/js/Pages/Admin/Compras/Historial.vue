@@ -56,9 +56,9 @@
           <SearchInput v-model="filtroTexto" placeholder="Buscar por producto, proveedor, factura o N° de compra" class="w-full sm:w-96" />
         </template>
 
-        <div v-if="comprasFiltradas.length > 0" class="space-y-3 px-6 pb-6">
+        <div v-if="compras.length > 0" class="space-y-3 px-6 pb-6">
           <div
-            v-for="compra in comprasPaginadas"
+            v-for="compra in compras"
             :key="compra.id"
             :id="`compra-${compra.id}`"
             :class="[
@@ -140,11 +140,11 @@
             </div>
           </div>
 
-          <Pagination v-model="paginaActual" :total-items="comprasFiltradas.length" :per-page="perPage" />
+          <Pagination v-model="paginaActual" :total-items="paginacion.total" :per-page="paginacion.porPagina" />
         </div>
 
         <EmptyState
-          v-else-if="compras.length === 0"
+          v-else-if="totalGeneral === 0"
           icon="fa-solid fa-receipt"
           title="Aún no hay compras registradas"
           text="Registra tu primera compra desde la pestaña Inventario."
@@ -187,7 +187,10 @@ import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import { ref, computed, watch, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
-  compras: Array,
+  compras: Array, // solo las de la página actual
+  paginacion: Object, // { pagina, total, porPagina }
+  filtros: Object, // { buscar }
+  totalGeneral: Number,
   stats: Object,
 });
 
@@ -213,7 +216,7 @@ const confirmarCancelacion = () => {
   });
 };
 
-const filtroTexto = ref('');
+const filtroTexto = ref(props.filtros.buscar);
 const expandedId = ref(null);
 const compraDestacada = ref(null);
 
@@ -227,45 +230,30 @@ const tituloCompra = (compra) => {
   return `${nombresUnicos[0]} + ${nombresUnicos.length - 1} más`;
 };
 
-const comprasFiltradas = computed(() => {
-  const texto = filtroTexto.value.trim().toLowerCase();
-  if (!texto) return props.compras;
+// La búsqueda y la página se resuelven en el servidor: cada cambio pide solo esa página.
+const ir = (extra = {}) => {
+  router.get(route('admin.purchases.historial'), { buscar: filtroTexto.value.trim() || undefined, ...extra }, { preserveState: true, preserveScroll: true, replace: true });
+};
 
-  return props.compras.filter((c) =>
-    (c.proveedor || '').toLowerCase().includes(texto) ||
-    (c.factura || '').toLowerCase().includes(texto) ||
-    c.numero.toLowerCase().includes(texto) ||
-    c.items.some(i => i.producto.toLowerCase().includes(texto))
-  );
-});
-
-const perPage = 15;
-const paginaActual = ref(1);
-
+let temporizador = null;
 watch(filtroTexto, () => {
-  paginaActual.value = 1;
+  clearTimeout(temporizador);
+  temporizador = setTimeout(() => ir(), 300);
 });
 
-watch(() => comprasFiltradas.value.length, (total) => {
-  const totalPaginas = Math.max(1, Math.ceil(total / perPage));
-  if (paginaActual.value > totalPaginas) paginaActual.value = totalPaginas;
+const paginaActual = computed({
+  get: () => props.paginacion.pagina,
+  set: (p) => ir({ pagina: p }),
 });
 
-const comprasPaginadas = computed(() => {
-  const inicio = (paginaActual.value - 1) * perPage;
-  return comprasFiltradas.value.slice(inicio, inicio + perPage);
-});
-
-// Llega desde "Historial de Compras" de un proveedor (?compra=123): la busca, se
-// asegura de estar en la página correcta, la expande y hace scroll hasta ella.
+// Llega desde "Historial de Compras" de un proveedor (?compra=123): el servidor abre la página
+// donde está; aquí se expande y se hace scroll hasta ella.
 onMounted(() => {
   const compraId = Number(new URLSearchParams(window.location.search).get('compra'));
   if (!compraId) return;
 
-  const indice = props.compras.findIndex(c => c.id === compraId);
-  if (indice === -1) return;
+  if (!props.compras.some((c) => c.id === compraId)) return; // el servidor ya abrió la página donde está
 
-  paginaActual.value = Math.floor(indice / perPage) + 1;
   expandedId.value = compraId;
   compraDestacada.value = compraId;
 

@@ -4,16 +4,16 @@
     <template #breadcrumb>Configuración</template>
     <template #header>Datos del Negocio</template>
 
-    <div class="max-w-6xl grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-6 items-start" :class="{ 'pb-24': hayCambios }">
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_440px] 2xl:grid-cols-[minmax(0,1fr)_520px] gap-6 items-start" :class="{ 'pb-24': hayCambios }">
       <!-- Formulario -->
-      <form id="form-negocio" class="space-y-6 min-w-0" novalidate @submit.prevent="guardar">
+      <form id="form-negocio" class="grid grid-cols-1 2xl:grid-cols-2 gap-6 items-start min-w-0" novalidate @submit.prevent="guardar">
         <Transition
           enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
           enter-from-class="opacity-0 -translate-y-1"
           leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
           leave-to-class="opacity-0"
         >
-          <div v-if="aviso" role="status" class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium">
+          <div v-if="aviso" role="status" class="2xl:col-span-2 flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm font-medium">
             <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
             <span class="flex-1">{{ aviso }}</span>
             <button type="button" class="w-8 h-8 -mr-1 rounded-lg flex items-center justify-center hover:bg-green-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500" aria-label="Cerrar aviso" @click="aviso = null">
@@ -111,7 +111,7 @@
         </section>
 
         <!-- Inventario -->
-        <section class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm" aria-labelledby="inventario-titulo">
+        <section class="2xl:col-span-2 bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm" aria-labelledby="inventario-titulo">
           <header class="flex items-start gap-3 mb-5">
             <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0" aria-hidden="true">
               <i class="fa-solid fa-boxes-stacked"></i>
@@ -156,7 +156,7 @@
       </form>
 
       <!-- Vista previa -->
-      <aside class="lg:sticky lg:top-0 bg-surface rounded-2xl border border-gray-100 shadow-sm overflow-hidden" aria-label="Vista previa">
+      <aside class="xl:sticky xl:top-0 bg-surface rounded-2xl border border-gray-100 shadow-sm overflow-hidden" aria-label="Vista previa">
         <div class="px-5 pt-4 pb-3 flex items-center gap-2">
           <h3 class="text-sm font-bold text-gray-900">Vista previa</h3>
           <span class="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-600">
@@ -193,26 +193,29 @@
           <BoletaTicket :venta="VENTA_EJEMPLO" :business="negocioPreview" :zoom="1.05" />
         </div>
 
-        <!-- Página de Contacto de la tienda (siempre oscura, como la tienda por defecto) -->
-        <div v-show="pestana === 'contacto'" id="panel-contacto" role="tabpanel" aria-labelledby="tab-contacto" class="p-5">
-          <div class="theme-shop-dark bg-canvas text-fg rounded-xl p-5">
-            <p class="text-[10px] uppercase tracking-[0.25em] text-[#ff8c42] font-semibold">Ponte en contacto</p>
-            <p class="mt-2 text-lg font-black uppercase italic leading-tight">Tu opinión <span class="text-[#ff8c42]">nos importa</span></p>
-            <p class="mt-2 text-xs text-gray-400 leading-relaxed">En {{ negocioPreview.name }}, cada mensaje cuenta.</p>
+        <!-- Datos de contacto tal como los verá el cliente en la tienda -->
+        <div v-show="pestana === 'contacto'" id="panel-contacto" role="tabpanel" aria-labelledby="tab-contacto" class="mt-4 px-5 pb-5">
+          <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <p class="text-[11px] uppercase tracking-[0.2em] text-[#e67e2d] font-bold">Ponte en contacto</p>
+            <p class="mt-1 text-base font-bold text-gray-900 leading-snug">{{ negocioPreview.name }}</p>
 
-            <ul class="mt-5 space-y-3">
-              <li v-for="c in canalesContacto" :key="c.label" class="flex items-center gap-3 rounded-xl border border-gray-800 bg-surface px-3 py-2.5">
-                <span class="w-9 h-9 rounded-lg bg-[#ff8c42]/15 text-[#ff8c42] flex items-center justify-center flex-shrink-0" aria-hidden="true">
+            <ul class="mt-4 space-y-2.5">
+              <li
+                v-for="c in canalesContacto"
+                :key="c.label"
+                :class="['flex items-center gap-3 rounded-xl border px-3 py-2.5', c.valor ? 'bg-surface border-gray-200' : 'border-dashed border-gray-200']"
+              >
+                <span :class="['w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0', c.valor ? 'bg-orange-50 text-[#e67e2d]' : 'bg-gray-100 text-gray-400']" aria-hidden="true">
                   <i :class="c.icon" class="text-sm"></i>
                 </span>
                 <span class="min-w-0">
-                  <span class="block text-[10px] uppercase tracking-wider text-gray-500">{{ c.label }}</span>
-                  <span :class="['block text-sm truncate', c.valor ? 'text-fg font-semibold' : 'text-gray-500 italic']">{{ c.valor || 'No se mostrará' }}</span>
+                  <span class="block text-[11px] uppercase tracking-wider font-semibold text-gray-500">{{ c.label }}</span>
+                  <span :class="['block text-sm truncate', c.valor ? 'text-gray-900 font-semibold' : 'text-gray-400 italic']">{{ c.valor || 'No se mostrará' }}</span>
                 </span>
               </li>
             </ul>
           </div>
-          <p class="mt-3 text-xs text-gray-400">Los campos vacíos no aparecen en la tienda.</p>
+          <p class="mt-3 text-xs text-gray-500">Los campos vacíos no aparecen en la tienda.</p>
         </div>
       </aside>
     </div>

@@ -96,7 +96,7 @@
           </div>
         </template>
 
-        <template v-if="variants.length > 0" #toolbar>
+        <template v-if="stats.totalVariantes > 0" #toolbar>
           <div class="flex flex-wrap items-center gap-3 w-full">
             <SearchInput v-model="filtroTexto" placeholder="Buscar por modelo o marca" class="w-full sm:w-72" />
             <SelectDropdown v-model="filtroCategoria" :options="opcionesCategoria" size="sm" class="min-w-[190px]" />
@@ -112,7 +112,7 @@
           </div>
         </template>
 
-        <DataTable v-if="variantesFiltradas.length > 0">
+        <DataTable v-if="variantesPaginadas.length > 0">
           <template #head>
             <tr>
               <th class="text-left">Producto</th>
@@ -217,18 +217,20 @@
           </template>
 
           <template #footer>
-            <Pagination v-model="paginaActual" :total-items="variantesFiltradas.length" :per-page="perPage" />
+            <Pagination v-model="paginaActual" :total-items="totalLista" :per-page="porPagina" />
           </template>
         </DataTable>
 
         <EmptyState
-          v-else-if="variants.length === 0"
+          v-else-if="stats.totalVariantes === 0"
           icon="fa-solid fa-box"
           title="Aún no hay productos registrados por compra"
           text="Registra tu primera compra para empezar a llenar el inventario."
         >
           <PrimaryButton @click="showModal = true">Registrar nueva compra</PrimaryButton>
         </EmptyState>
+
+        <p v-else-if="!lista" class="px-6 pb-8 text-sm text-gray-500" role="status"><i class="fa-solid fa-spinner fa-spin mr-2" aria-hidden="true"></i>Cargando la lista…</p>
 
         <EmptyState
           v-else
@@ -249,8 +251,8 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import RegistrarCompraModal from './RegistrarCompraModal.vue';
 import InventarioExplorador from './InventarioExplorador.vue';
-import { ref, computed, watch } from 'vue';
-import { Head, usePage, Link } from '@inertiajs/vue3';
+import { ref, computed, watch, onMounted } from 'vue';
+import { Head, usePage, Link, router } from '@inertiajs/vue3';
 import ListCard from '@/Components/Admin/ListCard.vue';
 import PrimaryButton from '@/Components/Admin/PrimaryButton.vue';
 import DataTable from '@/Components/Admin/DataTable.vue';
@@ -262,7 +264,7 @@ import Pagination from '@/Components/Admin/Pagination.vue';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
 
 const props = defineProps({
-  variants: Array,
+  lista: Object, // solo existe cuando se abre la vista «Lista»: { data, paginacion }
   modelos: Array,
   stats: Object,
   categorias: Array,
@@ -294,6 +296,7 @@ const vista = ref(leerVista());
 
 const cambiarVista = (id) => {
   vista.value = id;
+  if (id === 'lista') cargarLista();
   try {
     localStorage.setItem(CLAVE_VISTA, id);
   } catch {
@@ -341,10 +344,10 @@ const opcionesStock = computed(() => [
   { value: 'con', label: 'Con stock' },
 ]);
 
-const opcionesCategoria = computed(() => {
-  const presentes = [...new Set(props.variants.map(v => v.categoria))].sort();
-  return [{ value: '', label: 'Todas las categorías' }, ...presentes.map(c => ({ value: c, label: c }))];
-});
+const opcionesCategoria = computed(() => [
+  { value: '', label: 'Todas las categorías' },
+  ...props.categorias.map((c) => ({ value: c, label: c })),
+]);
 
 const hayFiltrosActivos = computed(() => !!(filtroTexto.value || filtroCategoria.value || filtroStock.value));
 
@@ -354,40 +357,35 @@ const limpiarFiltros = () => {
   filtroStock.value = '';
 };
 
-const variantesFiltradas = computed(() => {
-  const texto = filtroTexto.value.trim().toLowerCase();
+// La lista se pide al servidor ya filtrada y paginada: cada cambio de filtro o de página trae solo esa página.
+const variantesPaginadas = computed(() => props.lista?.data ?? []);
+const totalLista = computed(() => props.lista?.paginacion.total ?? 0);
+const porPagina = computed(() => props.lista?.paginacion.porPagina ?? 15);
 
-  return props.variants.filter((v) => {
-    if (filtroCategoria.value && v.categoria !== filtroCategoria.value) return false;
+const cargarLista = (extra = {}) => {
+  router.get(route('admin.purchases.index'), {
+    buscar: filtroTexto.value.trim() || undefined,
+    categoria: filtroCategoria.value || undefined,
+    stock: filtroStock.value || undefined,
+    ...extra,
+  }, { only: ['lista'], preserveState: true, preserveScroll: true, replace: true });
+};
 
-    if (filtroStock.value === 'sin' && v.stock !== 0) return false;
-    if (filtroStock.value === 'bajo' && (v.stock === 0 || v.stock >= umbralStockBajo.value)) return false;
-    if (filtroStock.value === 'con' && v.stock === 0) return false;
-
-    if (texto) {
-      const coincide = v.producto.toLowerCase().includes(texto) || v.marca.toLowerCase().includes(texto);
-      if (!coincide) return false;
-    }
-
-    return true;
-  });
+const paginaActual = computed({
+  get: () => props.lista?.paginacion.pagina ?? 1,
+  set: (p) => cargarLista({ pagina: p }),
 });
 
-const perPage = 15;
-const paginaActual = ref(1);
-
-watch([filtroTexto, filtroCategoria, filtroStock], () => {
-  paginaActual.value = 1;
+let temporizador = null;
+watch(filtroTexto, () => {
+  clearTimeout(temporizador);
+  temporizador = setTimeout(() => cargarLista(), 300);
 });
+watch([filtroCategoria, filtroStock], () => cargarLista());
 
-watch(() => variantesFiltradas.value.length, (total) => {
-  const totalPaginas = Math.max(1, Math.ceil(total / perPage));
-  if (paginaActual.value > totalPaginas) paginaActual.value = totalPaginas;
-});
-
-const variantesPaginadas = computed(() => {
-  const inicio = (paginaActual.value - 1) * perPage;
-  return variantesFiltradas.value.slice(inicio, inicio + perPage);
+// Si la última vez se dejó la vista «Lista», se pide al abrir.
+onMounted(() => {
+  if (vista.value === 'lista') cargarLista();
 });
 
 const expandedVariantId = ref(null);

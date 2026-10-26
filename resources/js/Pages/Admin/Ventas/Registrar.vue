@@ -59,27 +59,46 @@
             </span>
           </div>
 
-          <!-- Buscador grande -->
-          <div class="relative mb-4">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-            <input
-              v-model="searchQuery"
-              type="text"
-              autocomplete="off"
-              aria-label="Buscar por modelo o marca"
-              placeholder="Escribe un modelo o una marca..."
-              class="w-full h-12 pl-11 pr-11 rounded-2xl border border-gray-200 bg-surface text-base text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
-            >
+          <!-- Buscador grande (también lee códigos de barras: pistola o cámara) -->
+          <div class="flex gap-2 mb-2">
+            <div class="relative flex-1 min-w-0">
+              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                autocomplete="off"
+                aria-label="Buscar por modelo, marca o código de barras"
+                placeholder="Escribe un modelo o una marca, o escanea un código..."
+                class="w-full h-12 pl-11 pr-11 rounded-2xl border border-gray-200 bg-surface text-base text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
+                @keydown.enter.prevent="alEnter"
+              >
+              <button
+                v-if="searchQuery"
+                type="button"
+                @click="searchQuery = ''"
+                aria-label="Limpiar búsqueda"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center justify-center"
+              >
+                <i class="fa-solid fa-xmark text-sm"></i>
+              </button>
+            </div>
             <button
-              v-if="searchQuery"
               type="button"
-              @click="searchQuery = ''"
-              aria-label="Limpiar búsqueda"
-              class="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center justify-center"
+              class="h-12 px-4 rounded-2xl border border-gray-200 bg-surface text-gray-700 hover:border-[#ff8c42] hover:text-[#e67e2d] font-semibold text-sm flex items-center gap-2 transition-colors flex-shrink-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-100"
+              @click="camaraRespuesta = null; camaraAbierta = true"
             >
-              <i class="fa-solid fa-xmark text-sm"></i>
+              <i class="fa-solid fa-barcode" aria-hidden="true"></i>
+              <span class="hidden sm:inline">Escanear</span><span class="sm:hidden sr-only">Escanear código</span>
             </button>
           </div>
+          <p
+            v-if="mensajeEscaneo"
+            :class="['mb-3 text-sm font-medium flex items-center gap-2', mensajeEscaneo.error ? 'text-red-500' : 'text-green-600']"
+            role="status"
+          >
+            <i :class="mensajeEscaneo.error ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check'" aria-hidden="true"></i> {{ mensajeEscaneo.texto }}
+          </p>
+          <div v-else class="mb-2"></div>
 
           <!-- Categorías como chips -->
           <div class="flex flex-wrap gap-2 mb-5" role="group" aria-label="Categorías">
@@ -240,6 +259,11 @@
                 </div>
               </button>
             </div>
+            <div v-if="hayMas" class="mt-4 flex justify-center">
+              <button type="button" class="h-11 px-6 rounded-xl border border-gray-200 bg-surface text-sm font-semibold text-gray-700 hover:border-[#ff8c42] hover:text-[#e67e2d] transition-colors disabled:opacity-60" :disabled="cargandoMas" @click="verMas">
+                <i v-if="cargandoMas" class="fa-solid fa-spinner fa-spin mr-1.5" aria-hidden="true"></i>Ver más modelos
+              </button>
+            </div>
           </template>
 
           <EmptyHero
@@ -330,6 +354,9 @@
                     >
                   </label>
                   <p class="text-sm font-bold text-gray-900 tabular-nums mt-0.5">S/ {{ subtotalDe(prenda).toFixed(2) }}</p>
+                  <p v-if="bajoCosto(prenda)" class="mt-0.5 flex items-center justify-end gap-1 text-[11px] font-semibold text-amber-600" role="status">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Menos que su costo (S/ {{ prenda.costo.toFixed(2) }})
+                  </p>
                 </div>
               </div>
             </li>
@@ -452,19 +479,31 @@
       :resumen="boletaAbierta.resumen"
       @close="boletaAbierta = null"
     />
+    <CamaraScanner
+      v-if="camaraAbierta"
+      continuo
+      titulo="Escanear prendas"
+      :respuesta="camaraRespuesta"
+      :resumen="resumenTicket"
+      @codigo="alLeerConCamara"
+      @terminar="terminarEscaneo"
+      @close="camaraAbierta = false"
+    />
   </AdminLayout>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick, defineAsyncComponent } from 'vue';
 import axios from 'axios';
-import { avisar } from '@/alerts';
+import { avisar, confirmar } from '@/alerts';
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
 import BoletaModal from './BoletaModal.vue';
 import EmptyHero from '@/Components/Admin/EmptyHero.vue';
 import { ORDEN_TALLAS } from '@/Components/Admin/tallas';
+
+const CamaraScanner = defineAsyncComponent(() => import('@/Components/Admin/CamaraScanner.vue')); // carga la librería de la cámara solo al abrirla
 
 const props = defineProps({
   categorias: {
@@ -666,13 +705,36 @@ const enTicketModelo = (m) => prendas.value
 // Une la variante con los datos del modelo, como la espera el ticket.
 const conModelo = (m, v) => ({ ...v, producto: m.producto, marca: m.marca });
 
+// Los modelos llegan de 30 en 30: si la última página vino llena, se ofrece «Ver más modelos».
+let paginaBusqueda = 1;
+const hayMas = ref(false);
+const cargandoMas = ref(false);
+
+const verMas = async () => {
+  cargandoMas.value = true;
+  try {
+    const params = new URLSearchParams();
+    if (searchQuery.value.trim()) params.set('q', searchQuery.value.trim());
+    if (filtroCategoria.value) params.set('categoria', filtroCategoria.value);
+    params.set('pagina', paginaBusqueda + 1);
+
+    const mas = await (await fetch(`/admin/ventas/buscar-variantes?${params.toString()}`)).json();
+    paginaBusqueda += 1;
+    searchResults.value = [...searchResults.value, ...mas];
+    hayMas.value = mas.length === 30;
+  } finally {
+    cargandoMas.value = false;
+  }
+};
+
 const ejecutarBusqueda = () => {
   clearTimeout(searchTimer);
 
   const q = searchQuery.value.trim();
   const cat = filtroCategoria.value;
 
-  if (q.length < 2 && !cat) {
+  // Una letra suelta no busca nada útil. Sin texto ni categoría se listan los modelos con stock.
+  if (q.length === 1) {
     searchResults.value = [];
     busquedaRealizada.value = false;
     return;
@@ -687,9 +749,11 @@ const ejecutarBusqueda = () => {
 
       const res = await fetch(`/admin/ventas/buscar-variantes?${params.toString()}`);
       searchResults.value = await res.json();
+      paginaBusqueda = 1;
+      hayMas.value = searchResults.value.length === 30; // una página llena puede tener más detrás
 
       // Un solo modelo coincide: se abre directo su cuadrícula de colores y tallas (un toque menos).
-      if (searchResults.value.length === 1) {
+      if (searchResults.value.length === 1 && (q || cat)) {
         abrirModelo(searchResults.value[0]);
       } else {
         // Cambió la búsqueda o la categoría: se vuelve a la lista de modelos encontrados.
@@ -707,12 +771,76 @@ const ejecutarBusqueda = () => {
 
 watch(filtroCategoria, ejecutarBusqueda);
 watch(searchQuery, ejecutarBusqueda);
+ejecutarBusqueda(); // al abrir, ya se ven los modelos con stock
+
+// --- Código de barras (pistola USB/Bluetooth o cámara) ---------------------------------------
+// La pistola "teclea" el código y pulsa Enter, así que basta con detectarlo en el buscador: letras opcionales
+// (códigos propios "SU000123") y varios dígitos. Un texto como "air force" sigue siendo una búsqueda normal.
+const pareceCodigo = (t) => /^[A-Za-z]{0,3}\d{4,}$/.test(t.replace(/\s+/g, ''));
+
+const camaraAbierta = ref(false);
+const mensajeEscaneo = ref(null);
+let mensajeTimer = null;
+
+const mostrarMensajeEscaneo = (texto, error = false) => {
+  clearTimeout(mensajeTimer);
+  mensajeEscaneo.value = { texto, error };
+  mensajeTimer = setTimeout(() => { mensajeEscaneo.value = null; }, 3500);
+};
+
+// Devuelve { error, texto } para que la cámara muestre qué pasó con la lectura.
+const procesarCodigo = async (codigo) => {
+  try {
+    const { data: v } = await axios.get(route('admin.sales.search-codigo'), { params: { codigo } });
+    const nombre = `${v.producto} · ${v.color} · ${v.talla}`;
+
+    if (restante(v) <= 0) return { error: true, texto: `${nombre}: ya agregaste todo el stock.` };
+
+    agregarRapido(v);
+    return { error: false, texto: nombre };
+  } catch (e) {
+    return { error: true, texto: e.response?.data?.message || 'No se pudo leer el código.' };
+  }
+};
+
+// Desde el buscador (pistola o escritura): aviso en línea bajo el campo.
+const agregarPorCodigo = async (codigo) => {
+  const r = await procesarCodigo(codigo);
+  mostrarMensajeEscaneo(r.error ? r.texto : `Agregado: ${r.texto}`, r.error);
+};
+
+// Desde la cámara: la lectura se queda en pantalla hasta elegir seguir o ir a la venta.
+const camaraRespuesta = ref(null);
+const alLeerConCamara = async (codigo) => {
+  camaraRespuesta.value = null;
+  camaraRespuesta.value = await procesarCodigo(codigo);
+};
+const terminarEscaneo = async () => {
+  camaraAbierta.value = false;
+  await nextTick();
+  document.querySelector('[aria-label="Ticket de venta"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+const resumenTicket = computed(() => {
+  const n = totalPrendas();
+  return `${n} ${n === 1 ? 'prenda' : 'prendas'} · S/ ${totalVenta().toFixed(2)}`;
+});
+
+const alEnter = () => {
+  const texto = searchQuery.value.trim();
+  if (!pareceCodigo(texto)) return;
+
+  searchQuery.value = '';
+  agregarPorCodigo(texto);
+};
 
 // Cuánto de una variante ya está en el ticket, para no exceder el stock real.
 const cantidadYaAgregada = (variantId) =>
   prendas.value.filter((p) => p.variantId === variantId).reduce((sum, p) => sum + p.cantidad, 0);
 
 const restante = (v) => v.stock - cantidadYaAgregada(v.variantId);
+
+// Vender por debajo del costo no se bloquea (a veces es una liquidación), pero se avisa para que no sea un descuido.
+const bajoCosto = (p) => p.costo > 0 && precioValido(p.precioVenta) && Number(p.precioVenta) < p.costo;
 
 const precioValido = (n) => n !== '' && n != null && Number(n) >= 0;
 
@@ -738,6 +866,7 @@ const agregarRapido = (v) => {
     stock: v.stock,
     cantidad: 1,
     precioVenta: v.precioVenta,
+    costo: Number(v.costo) || 0,
   });
 };
 
@@ -780,12 +909,19 @@ const avisarVentaGuardada = (resumen) => {
   boletaAbierta.value = { ventaId, resumen };
 };
 
-const guardarVenta = () => {
+const guardarVenta = async () => {
   if (prendas.value.length === 0) return;
 
   if (prendas.value.some((p) => !precioValido(p.precioVenta))) {
     avisar('Todas las prendas del ticket necesitan un precio de venta.', { titulo: 'Revisa los precios' });
     return;
+  }
+
+  const bajoElCosto = prendas.value.filter(bajoCosto);
+  if (bajoElCosto.length) {
+    const nombres = bajoElCosto.map((p) => `${p.producto} · ${p.color} · ${p.talla}`).join('; ');
+    const seguir = await confirmar(`Estas prendas se venden por debajo de su costo y darán pérdida: ${nombres}`, { titulo: '¿Guardar igual?', confirmarTexto: 'Sí, guardar', cancelarTexto: 'Revisar precios' });
+    if (!seguir) return;
   }
 
   isSaving.value = true;
@@ -815,8 +951,7 @@ const guardarVenta = () => {
       docNumero.value = '';
       prendas.value = [];
       searchQuery.value = '';
-      searchResults.value = [];
-      busquedaRealizada.value = false;
+      ejecutarBusqueda();
     },
     onError: (errors) => {
       const primerError = Object.values(errors)[0];

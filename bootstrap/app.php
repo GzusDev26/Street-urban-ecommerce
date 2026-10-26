@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Detrás de un túnel (ngrok, cloudflared) la petición llega por HTTPS pero Laravel la ve como HTTP y arma
+        // los enlaces con http://, que el navegador bloquea. Solo en local se confía en ese proxy; en producción
+        // hay que listar las IP del proxy real.
+        $middleware->trustProxies(at: env('APP_ENV') === 'local' ? '*' : null);
+
         $middleware->alias([
             'admin.only' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);

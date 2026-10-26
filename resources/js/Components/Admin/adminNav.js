@@ -24,9 +24,10 @@ export function buildAdminNav(esAdmin) {
         {
           name: 'Compras',
           icon: 'fa-boxes-stacked',
-          active: 'admin.purchases.*',
+          active: ['admin.purchases.*', 'admin.codigos.*'],
           children: [
             { name: 'Inventario', href: route('admin.purchases.index'), active: 'admin.purchases.index' },
+            { name: 'Códigos y etiquetas', href: route('admin.codigos.index'), active: 'admin.codigos.*' },
             { name: 'Historial', href: route('admin.purchases.historial'), active: 'admin.purchases.historial' },
             { name: 'Reportes', href: route('admin.purchases.reportes'), active: 'admin.purchases.reportes' },
           ],

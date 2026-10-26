@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\BusinessSettingController;
 use App\Http\Controllers\Admin\CategoryBrandController;
 use App\Http\Controllers\Admin\AvatarAdminController;
+use App\Http\Controllers\Admin\CodigoController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Api\CartController as ApiCartController;
 use App\Http\Controllers\Auth\VerificationController;
@@ -42,18 +43,27 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/compras', [PurchaseController::class, 'index'])->name('admin.purchases.index');
     Route::post('/compras', [PurchaseController::class, 'store'])->name('admin.purchases.store');
     Route::get('/compras/buscar-productos', [PurchaseController::class, 'searchProducts'])->name('admin.purchases.search');
+    Route::get('/compras/buscar-proveedores', [PurchaseController::class, 'searchSuppliers'])->name('admin.purchases.search-suppliers');
+    Route::get('/compras/proveedor-documento', [PurchaseController::class, 'buscarProveedorDocumento'])->name('admin.purchases.supplier-document');
     Route::get('/compras/variantes/{variant}/lotes', [PurchaseController::class, 'lotes'])->name('admin.purchases.lotes');
     Route::get('/compras/historial', [PurchaseController::class, 'historial'])->name('admin.purchases.historial');
     Route::get('/compras/reportes', [PurchaseController::class, 'reportes'])->name('admin.purchases.reportes');
+    Route::get('/compras/reportes/exportar', [PurchaseController::class, 'exportarReporte'])->name('admin.purchases.reportes.exportar');
     Route::patch('/compras/{compra}/cancelar', [PurchaseController::class, 'cancel'])->name('admin.purchases.cancel');
+
+    Route::get('/codigos', [CodigoController::class, 'index'])->name('admin.codigos.index');
+    Route::get('/codigos/etiquetas', [CodigoController::class, 'etiquetas'])->name('admin.codigos.etiquetas');
+    Route::patch('/codigos/{variant}', [CodigoController::class, 'update'])->name('admin.codigos.update');
 
     Route::get('/ventas', [SaleController::class, 'index'])->name('admin.sales.index');
     Route::get('/ventas/registrar', [SaleController::class, 'create'])->name('admin.sales.create');
     Route::post('/ventas', [SaleController::class, 'store'])->name('admin.sales.store');
     Route::get('/ventas/buscar-variantes', [SaleController::class, 'searchVariants'])->name('admin.sales.search');
+    Route::get('/ventas/buscar-codigo', [SaleController::class, 'buscarCodigo'])->name('admin.sales.search-codigo');
     Route::get('/ventas/buscar-clientes', [SaleController::class, 'searchClientes'])->name('admin.sales.search-clientes');
     Route::get('/ventas/buscar-documento', [SaleController::class, 'buscarDocumento'])->name('admin.sales.buscar-documento');
     Route::get('/ventas/reportes', [SaleController::class, 'reportes'])->name('admin.sales.reportes');
+    Route::get('/ventas/reportes/exportar', [SaleController::class, 'exportarReporte'])->name('admin.sales.reportes.exportar');
     Route::get('/ventas/{venta}/boleta', [SaleController::class, 'boleta'])->name('admin.sales.boleta');
     Route::get('/ventas/{venta}/boleta/datos', [SaleController::class, 'boletaDatos'])->name('admin.sales.boleta.datos');
     Route::patch('/ventas/{venta}/cancelar', [SaleController::class, 'cancel'])->name('admin.sales.cancel');

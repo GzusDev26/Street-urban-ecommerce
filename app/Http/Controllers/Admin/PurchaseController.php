@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductColor;
@@ -11,7 +12,10 @@ use App\Models\ProductVariant;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Supplier;
+use App\Services\ApiPeruService;
+use App\Support\ExcelReport;
 use App\Support\NameMatcher;
+use App\Support\ReportePeriodo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,20 +28,74 @@ class PurchaseController extends Controller
 {
     private const NAME_MATCH = 'LOWER(TRIM(name)) = ?';
 
-    public function index()
+    public function index(Request $request)
     {
-        $variants = ProductVariant::with([
+        // Valor real de inventario: suma de lo que queda de cada lote a su costo real (FIFO),
+        // no cantidad total x último costo, ya que un mismo producto puede tener lotes a precios distintos.
+        $valorInventario = PurchaseItem::where('quantity_remaining', '>', 0)
+            ->get()
+            ->sum(fn ($item) => $item->quantity_remaining * $item->unit_cost);
+
+        return Inertia::render('Admin/Compras/Index', [
+            // La vista «Lista» (variantes con sus lotes) se pide aparte, ya filtrada y paginada, solo cuando se abre.
+            'lista' => Inertia::optional(fn () => $this->listaVariantes($request)),
+            'modelos' => $this->modelosParaArbol(),
+            'categorias' => Category::orderBy('name')->pluck('name'),
+            'categoriasInfo' => Category::with('brands')->orderBy('name')->get()->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'sizeType' => $c->size_type,
+                // Marcas dentro de la categoría, tengan modelos o no todavía.
+                'marcas' => $c->brands->sortBy('name')->map(fn ($b) => ['id' => $b->id, 'name' => $b->name])->values(),
+            ]),
+            'marcas' => Brand::orderBy('name')->pluck('name'),
+            // Marcas de todo el negocio (una sola "Nike" sirve para polos, zapatillas...).
+            'marcasInfo' => Brand::orderBy('name')->get(['id', 'name']),
+            'stats' => [
+                'totalProductos' => Product::count(),
+                'totalVariantes' => ProductVariant::count(),
+                'sinStock' => ProductVariant::where('stock', 0)->count(),
+                'valorInventario' => $valorInventario,
+            ],
+        ]);
+    }
+
+    // Vista «Lista» del inventario: variantes filtradas y paginadas en la base de datos.
+    private function listaVariantes(Request $request): array
+    {
+        $buscar = trim((string) $request->query('buscar', ''));
+        $categoria = $request->query('categoria');
+        $stock = $request->query('stock');
+        $umbral = BusinessSetting::current()->low_stock_threshold;
+
+        $query = ProductVariant::query()
+            ->with([
                 'product.category',
                 'product.brand',
                 'productColor',
                 'purchaseItems' => fn ($q) => $q->with('purchase')->latest('created_at'),
             ])
+            ->whereHas('product', function ($p) use ($buscar, $categoria) {
+                if ($buscar !== '') {
+                    $p->where(fn ($q) => $q->where('name', 'like', "%{$buscar}%")
+                        ->orWhereHas('brand', fn ($b) => $b->where('name', 'like', "%{$buscar}%")));
+                }
+                if ($categoria) {
+                    $p->whereHas('category', fn ($c) => $c->where('name', $categoria));
+                }
+            })
+            ->when($stock === 'sin', fn ($q) => $q->where('stock', 0))
+            ->when($stock === 'bajo', fn ($q) => $q->where('stock', '>', 0)->where('stock', '<', $umbral))
+            ->when($stock === 'con', fn ($q) => $q->where('stock', '>', 0))
             ->orderByDesc('updated_at')
-            ->get()
-            ->map(function ($variant) {
-                // Último lote registrado de esta variante: se usa para sugerir el mismo
-                // proveedor al "Reabastecer" (una variante puede haberse comprado a más
-                // de un proveedor en el tiempo, así que es solo una sugerencia editable).
+            ->orderByDesc('id');
+
+        $paginador = $query->paginate(self::POR_PAGINA, ['*'], 'pagina', max(1, (int) $request->query('pagina', 1)));
+
+        return [
+            'data' => $paginador->getCollection()->map(function ($variant) {
+                // Último lote registrado de esta variante: se usa para sugerir el mismo proveedor al
+                // «Reabastecer» (una variante puede haberse comprado a más de un proveedor; es solo una sugerencia).
                 $ultimoLote = $variant->purchaseItems->first();
 
                 return [
@@ -54,35 +112,9 @@ class PurchaseController extends Controller
                     'precioVenta' => (float) $variant->product->price,
                     'ultimoProveedor' => $ultimoLote?->purchase?->supplier ?: null,
                 ];
-            });
-
-        // Valor real de inventario: suma de lo que queda de cada lote a su costo real (FIFO),
-        // no cantidad total x último costo, ya que un mismo producto puede tener lotes a precios distintos.
-        $valorInventario = PurchaseItem::where('quantity_remaining', '>', 0)
-            ->get()
-            ->sum(fn ($item) => $item->quantity_remaining * $item->unit_cost);
-
-        return Inertia::render('Admin/Compras/Index', [
-            'variants' => $variants,
-            'modelos' => $this->modelosParaArbol(),
-            'categorias' => Category::orderBy('name')->pluck('name'),
-            'categoriasInfo' => Category::with('brands')->orderBy('name')->get()->map(fn ($c) => [
-                'id' => $c->id,
-                'name' => $c->name,
-                'sizeType' => $c->size_type,
-                // Marcas dentro de la categoría, tengan modelos o no todavía.
-                'marcas' => $c->brands->sortBy('name')->map(fn ($b) => ['id' => $b->id, 'name' => $b->name])->values(),
-            ]),
-            'marcas' => Brand::orderBy('name')->pluck('name'),
-            // Marcas de todo el negocio (una sola "Nike" sirve para polos, zapatillas...).
-            'marcasInfo' => Brand::orderBy('name')->get(['id', 'name']),
-            'stats' => [
-                'totalProductos' => Product::count(),
-                'totalVariantes' => $variants->count(),
-                'sinStock' => $variants->where('stock', 0)->count(),
-                'valorInventario' => $valorInventario,
-            ],
-        ]);
+            })->values(),
+            'paginacion' => ['pagina' => $paginador->currentPage(), 'total' => $paginador->total(), 'porPagina' => self::POR_PAGINA],
+        ];
     }
 
     // Todo el inventario agrupable por categoría → marca → modelo → color × talla. El árbol se arma
@@ -152,26 +184,71 @@ class PurchaseController extends Controller
         ];
     }
 
-    public function historial()
+    private const POR_PAGINA = 15;
+
+    // Historial de compras: la búsqueda y la paginación se hacen en la base de datos, para cargar solo
+    // las 15 compras que muestra la pantalla (y no todo el historial).
+    public function historial(Request $request)
     {
-        $compras = Purchase::with(['items.variant.product.brand', 'items.variant.productColor', 'user', 'cancelledBy'])
+        $buscar = trim((string) $request->query('buscar', ''));
+        $filtrada = fn () => $this->comprasFiltradas($buscar);
+
+        // Desde el historial de un proveedor (?compra=123) se abre la página donde está esa compra.
+        $compraId = (int) $request->query('compra');
+        $pagina = max(1, (int) $request->query('pagina', 1));
+        if ($compraId && ! $request->has('pagina')) {
+            $objetivo = Purchase::find($compraId);
+            if ($objetivo && $filtrada()->whereKey($compraId)->exists()) {
+                $antes = $filtrada()->where(fn ($q) => $q
+                    ->where('purchase_date', '>', $objetivo->purchase_date->toDateString())
+                    ->orWhere(fn ($q2) => $q2->where('purchase_date', $objetivo->purchase_date->toDateString())->where('id', '>', $objetivo->id)))->count();
+                $pagina = intdiv($antes, self::POR_PAGINA) + 1;
+            }
+        }
+
+        $paginador = $filtrada()
+            ->with(['items.variant.product.brand', 'items.variant.productColor', 'user', 'cancelledBy'])
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
-            ->get()
-            ->map(fn ($p) => $this->mapCompra($p));
+            ->paginate(self::POR_PAGINA, ['*'], 'pagina', $pagina);
 
         // Las compras canceladas se siguen mostrando en el historial (por trazabilidad),
         // pero no cuentan como gasto real.
-        $vigentes = $compras->reject('cancelada');
+        $vigentes = Purchase::whereNull('cancelled_at');
+        $numeroCompras = (clone $vigentes)->count();
+        $gastado = (float) (clone $vigentes)->sum('total');
 
         return Inertia::render('Admin/Compras/Historial', [
-            'compras' => $compras,
+            'compras' => $paginador->getCollection()->map(fn ($p) => $this->mapCompra($p))->values(),
+            'paginacion' => ['pagina' => $paginador->currentPage(), 'total' => $paginador->total(), 'porPagina' => self::POR_PAGINA],
+            'filtros' => ['buscar' => $buscar],
+            'totalGeneral' => Purchase::count(),
             'stats' => [
-                'totalCompras' => $vigentes->count(),
-                'totalGastado' => $vigentes->sum('total'),
-                'promedioCompra' => $vigentes->count() > 0 ? $vigentes->sum('total') / $vigentes->count() : 0,
+                'totalCompras' => $numeroCompras,
+                'totalGastado' => $gastado,
+                'promedioCompra' => $numeroCompras > 0 ? $gastado / $numeroCompras : 0,
             ],
         ]);
+    }
+
+    private function comprasFiltradas(string $buscar)
+    {
+        $query = Purchase::query();
+
+        if ($buscar !== '') {
+            $query->where(function ($q) use ($buscar) {
+                $q->where('supplier', 'like', "%{$buscar}%")
+                    ->orWhere('invoice_number', 'like', "%{$buscar}%")
+                    ->orWhereHas('items.variant.product', fn ($p) => $p->where('name', 'like', "%{$buscar}%"));
+
+                // "C-00012", "c12" o "12" buscan por número de compra.
+                if (preg_match('/^c?-?0*(\d+)$/i', $buscar, $m)) {
+                    $q->orWhere('id', (int) $m[1]);
+                }
+            });
+        }
+
+        return $query;
     }
 
     // Revierte una compra completa: descuenta de las variantes el stock que esa compra
@@ -219,13 +296,87 @@ class PurchaseController extends Controller
 
     public function reportes(Request $request)
     {
-        $desde = $request->query('desde');
-        $hasta = $request->query('hasta');
-        $proveedor = $request->query('proveedor');
-        $categoria = $request->query('categoria');
+        $r = $this->datosReporte($request);
 
-        $itemsQuery = PurchaseItem::with(['purchase', 'variant.product.category', 'variant.product.brand'])
+        return Inertia::render('Admin/Compras/Reportes', [
+            'filtros' => $r['filtros'],
+            'proveedores' => Purchase::whereNotNull('supplier')->where('supplier', '!=', '')->distinct()->orderBy('supplier')->pluck('supplier'),
+            'categorias' => Category::orderBy('name')->pluck('name'),
+            'stats' => $r['stats'],
+            'serie' => $r['serie'],
+            'anterior' => $r['anterior'],
+            'porCategoria' => $r['porCategoria'],
+            'porProveedor' => $r['porProveedor'],
+            'porMarca' => $r['porMarca'],
+            'topProductos' => $r['productos']->take(10)->values(),
+            'totalProductos' => $r['productos']->count(),
+        ]);
+    }
+
+    // Descarga en Excel el mismo reporte que se ve en pantalla (mismos filtros), pero completo: todos los productos
+    // y el detalle línea por línea de cada compra.
+    public function exportarReporte(Request $request)
+    {
+        $r = $this->datosReporte($request);
+        $f = $r['filtros'];
+        $negocio = BusinessSetting::current();
+
+        $periodo = match (true) {
+            (bool) ($f['desde'] && $f['hasta']) => \Illuminate\Support\Carbon::parse($f['desde'])->format('d/m/Y').' al '.\Illuminate\Support\Carbon::parse($f['hasta'])->format('d/m/Y'),
+            (bool) $f['desde'] => 'Desde el '.\Illuminate\Support\Carbon::parse($f['desde'])->format('d/m/Y'),
+            (bool) $f['hasta'] => 'Hasta el '.\Illuminate\Support\Carbon::parse($f['hasta'])->format('d/m/Y'),
+            default => 'Todo el historial',
+        };
+
+        $total = (float) $r['stats']['totalInvertido'];
+        $porcentaje = fn ($valor) => $total > 0 ? $valor / $total : 0;
+
+        // En el total, N° de compras es el real: una compra con prendas de dos categorías (o marcas) se cuenta en cada una.
+        $agrupada = fn (string $nombre, string $titulo, $filas) => ExcelReport::tabla(
+            $nombre,
+            [['#', 'entero', 5], [$titulo, 'texto', 32], ['N° de compras', 'entero', 14], ['Unidades', 'entero', 12], ['Total invertido', 'dinero', 18], ['% del total', 'porcentaje', 12]],
+            $filas->values()->map(fn ($x, $i) => [$i + 1, $x['label'], $x['compras'], $x['unidades'], round($x['total'], 2), $porcentaje($x['total'])])->all(),
+            [null, 'TOTAL', $r['stats']['numeroCompras'], $filas->sum('unidades'), round($filas->sum('total'), 2), $total > 0 ? 1 : 0],
+        );
+
+        $hojas = [
+            ExcelReport::resumen('Resumen', 'Reporte de compras · '.$negocio->name, [
+                ['Período', $periodo],
+                ['Proveedor', $f['proveedor'] ?: 'Todos'],
+                ['Categoría', $f['categoria'] ?: 'Todas'],
+                ['Generado', now()->format('d/m/Y H:i')],
+                ['# Totales'],
+                ['Total invertido', $total, 'dinero'],
+                ['N° de compras', $r['stats']['numeroCompras'], 'entero'],
+                ['Unidades compradas', $r['stats']['totalUnidades'], 'entero'],
+                ['Promedio por compra', round($r['stats']['promedioPorCompra'], 2), 'dinero'],
+            ]),
+            $agrupada('Por categoría', 'Categoría', $r['porCategoria']),
+            $agrupada('Por proveedor', 'Proveedor', $r['porProveedor']),
+            $agrupada('Por marca', 'Marca', $r['porMarca']),
+            ExcelReport::tabla(
+                'Productos',
+                [['#', 'entero', 5], ['Producto', 'texto', 30], ['Marca', 'texto', 18], ['Categoría', 'texto', 18], ['N° de compras', 'entero', 14], ['Unidades', 'entero', 12], ['Costo promedio', 'dinero', 16], ['Total invertido', 'dinero', 18], ['% del total', 'porcentaje', 12]],
+                $r['productos']->values()->map(fn ($x, $i) => [$i + 1, $x['label'], $x['marca'], $x['categoria'], $x['numeroCompras'], $x['unidades'], round($x['costoPromedio'], 2), round($x['total'], 2), $porcentaje($x['total'])])->all(),
+                [null, 'TOTAL', null, null, $r['stats']['numeroCompras'], $r['productos']->sum('unidades'), null, round($r['productos']->sum('total'), 2), $total > 0 ? 1 : 0],
+            ),
+            ExcelReport::tabla(
+                'Detalle',
+                [['Fecha', 'fecha', 12], ['N° compra', 'texto', 12], ['Proveedor', 'texto', 34], ['Factura', 'texto', 14], ['Producto', 'texto', 28], ['Marca', 'texto', 16], ['Categoría', 'texto', 16], ['Color', 'texto', 14], ['Talla', 'texto', 9], ['Cantidad', 'entero', 12], ['Costo de compra (unid.)', 'dinero', 20], ['Subtotal', 'dinero', 16]],
+                $r['detalle']->all(),
+                [null, null, null, null, null, null, null, null, 'TOTAL', $r['detalle']->sum(9), null, round($r['detalle']->sum(11), 2)],
+            ),
+        ];
+
+        return ExcelReport::descargar('reporte-compras-'.now()->format('Y-m-d').'.xlsx', $hojas, 'Reporte de compras');
+    }
+
+    // Líneas de compra del reporte. Las compras canceladas no cuentan: esa plata no se invirtió.
+    private function itemsReporte(?string $desde, ?string $hasta, ?string $proveedor, ?string $categoria)
+    {
+        $itemsQuery = PurchaseItem::with(['purchase', 'variant.product.category', 'variant.product.brand', 'variant.productColor'])
             ->whereHas('purchase', function ($q) use ($desde, $hasta, $proveedor) {
+                $q->whereNull('cancelled_at');
                 if ($desde) {
                     $q->whereDate('purchase_date', '>=', $desde);
                 }
@@ -241,72 +392,101 @@ class PurchaseController extends Controller
             $itemsQuery->whereHas('variant.product.category', fn ($q) => $q->where('name', $categoria));
         }
 
-        $items = $itemsQuery->get();
+        return $itemsQuery->get();
+    }
+
+    // Datos del reporte de compras, compartidos por la pantalla y la descarga de Excel. Las compras canceladas no
+    // cuentan: esa plata no se invirtió.
+    private function datosReporte(Request $request): array
+    {
+        $desde = $request->query('desde');
+        $hasta = $request->query('hasta');
+        $proveedor = $request->query('proveedor');
+        $categoria = $request->query('categoria');
+
+        $items = $this->itemsReporte($desde, $hasta, $proveedor, $categoria);
 
         $numeroCompras = $items->pluck('purchase_id')->unique()->count();
         $totalInvertido = $items->sum('subtotal');
 
-        $porCategoria = $items->groupBy(fn ($i) => $i->variant->product->category->name ?? 'Sin categoría')
-            ->map(fn ($group, $nombre) => [
-                'label' => $nombre,
-                'total' => $group->sum('subtotal'),
-                'unidades' => $group->sum('quantity'),
+        $agrupar = fn ($clave, $etiqueta) => $items->groupBy($clave)
+            ->map(fn ($group) => [
+                'label' => $etiqueta($group),
+                'total' => (float) $group->sum('subtotal'),
+                'unidades' => (int) $group->sum('quantity'),
                 'compras' => $group->pluck('purchase_id')->unique()->count(),
             ])
             ->sortByDesc('total')->values();
+
+        $porCategoria = $agrupar(fn ($i) => $i->variant->product->category->name ?? 'Sin categoría', fn ($g) => $g->first()->variant->product->category->name ?? 'Sin categoría');
 
         // Se agrupa por supplier_id cuando la compra está vinculada a un proveedor real,
         // para no confundir a dos proveedores distintos que se escribieron con el mismo nombre.
-        $porProveedor = $items->groupBy(fn ($i) => $this->claveProveedor($i->purchase))
-            ->map(fn ($group) => [
-                'label' => $group->first()->purchase->supplier ?: 'Sin proveedor',
-                'total' => $group->sum('subtotal'),
-                'unidades' => $group->sum('quantity'),
-                'compras' => $group->pluck('purchase_id')->unique()->count(),
-            ])
-            ->sortByDesc('total')->values();
+        $porProveedor = $agrupar(fn ($i) => $this->claveProveedor($i->purchase), fn ($g) => $g->first()->purchase->supplier ?: 'Sin proveedor');
 
-        $porMarca = $items->groupBy(fn ($i) => $i->variant->product->brand->name ?? 'Sin marca')
-            ->map(fn ($group, $nombre) => [
-                'label' => $nombre,
-                'total' => $group->sum('subtotal'),
-                'unidades' => $group->sum('quantity'),
-                'compras' => $group->pluck('purchase_id')->unique()->count(),
-            ])
-            ->sortByDesc('total')->values();
+        $porMarca = $agrupar(fn ($i) => $i->variant->product->brand->name ?? 'Sin marca', fn ($g) => $g->first()->variant->product->brand->name ?? 'Sin marca');
 
-        $topProductos = $items->groupBy(fn ($i) => $i->variant->product->name)
-            ->map(function ($group, $nombre) {
+        $productos = $items->groupBy(fn ($i) => $i->variant->product->id)
+            ->map(function ($group) {
                 $unidades = $group->sum('quantity');
                 $total = $group->sum('subtotal');
+                $producto = $group->first()->variant->product;
 
                 return [
-                    'label' => $nombre,
-                    'marca' => $group->first()->variant->product->brand->name ?? '-',
-                    'categoria' => $group->first()->variant->product->category->name ?? 'Sin categoría',
-                    'unidades' => $unidades,
+                    'label' => $producto->name,
+                    'marca' => $producto->brand->name ?? '-',
+                    'categoria' => $producto->category->name ?? 'Sin categoría',
+                    'unidades' => (int) $unidades,
                     'numeroCompras' => $group->pluck('purchase_id')->unique()->count(),
                     'costoPromedio' => $unidades > 0 ? $total / $unidades : 0,
-                    'total' => $total,
+                    'total' => (float) $total,
                 ];
             })
-            ->sortByDesc('unidades')->values()->take(10);
+            ->sortByDesc('unidades')->values();
 
-        return Inertia::render('Admin/Compras/Reportes', [
+        // Una fila por línea de compra, para el Excel (más reciente primero).
+        $detalle = $items->sortByDesc(fn ($i) => $i->purchase->purchase_date->format('Ymd').str_pad($i->purchase_id, 8, '0', STR_PAD_LEFT))
+            ->map(fn ($i) => [
+                $i->purchase->purchase_date,
+                'C-'.str_pad($i->purchase_id, 5, '0', STR_PAD_LEFT),
+                $i->purchase->supplier ?: 'Sin proveedor',
+                $i->purchase->invoice_number,
+                $i->variant->product->name,
+                $i->variant->product->brand->name ?? '-',
+                $i->variant->product->category->name ?? 'Sin categoría',
+                $i->variant->productColor->name ?? 'Sin color',
+                $i->variant->size,
+                (int) $i->quantity,
+                (float) $i->unit_cost,
+                (float) $i->subtotal,
+            ])->values();
+
+        return [
             'filtros' => compact('desde', 'hasta', 'proveedor', 'categoria'),
-            'proveedores' => Purchase::whereNotNull('supplier')->where('supplier', '!=', '')->distinct()->orderBy('supplier')->pluck('supplier'),
-            'categorias' => Category::orderBy('name')->pluck('name'),
             'stats' => [
-                'totalInvertido' => $totalInvertido,
+                'totalInvertido' => (float) $totalInvertido,
                 'numeroCompras' => $numeroCompras,
-                'totalUnidades' => $items->sum('quantity'),
+                'totalUnidades' => (int) $items->sum('quantity'),
                 'promedioPorCompra' => $numeroCompras > 0 ? $totalInvertido / $numeroCompras : 0,
             ],
+            'serie' => ReportePeriodo::serie(
+                $items->groupBy(fn ($i) => $i->purchase->purchase_date->format('Y-m-d')),
+                $desde,
+                $hasta,
+                fn ($g) => ['total' => round($g->sum('subtotal'), 2), 'compras' => $g->pluck('purchase_id')->unique()->count()],
+                ['total' => 0, 'compras' => 0],
+            ),
+            'anterior' => ReportePeriodo::anterior($desde, $hasta, function ($d, $h) use ($proveedor, $categoria) {
+                $previos = $this->itemsReporte($d, $h, $proveedor, $categoria);
+
+                return ['total' => (float) $previos->sum('subtotal'), 'compras' => $previos->pluck('purchase_id')->unique()->count()];
+            }),
             'porCategoria' => $porCategoria,
             'porProveedor' => $porProveedor,
             'porMarca' => $porMarca,
-            'topProductos' => $topProductos,
-        ]);
+            'productos' => $productos,
+            'detalle' => $detalle,
+        ];
     }
 
     public function lotes(ProductVariant $variant)
@@ -370,11 +550,65 @@ class PurchaseController extends Controller
         return response()->json($products);
     }
 
+    // Sugerencias de proveedores ya registrados, por nombre o por documento.
+    public function searchSuppliers(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+
+        if (mb_strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        return response()->json(
+            Supplier::where('name', 'like', "%{$q}%")
+                ->orWhere('document_number', 'like', "%{$q}%")
+                ->orderBy('name')
+                ->limit(8)
+                ->get(['id', 'name', 'document_type', 'document_number'])
+        );
+    }
+
+    // Un RUC (11 dígitos) o DNI (8) escrito en Proveedor: primero se mira si ya es proveedor; si no, se consulta
+    // SUNAT/RENIEC solo para traer el nombre. No se crea nada aquí: el proveedor nuevo se registra al guardar la compra.
+    public function buscarProveedorDocumento(Request $request, ApiPeruService $apiPeru)
+    {
+        $request->validate(['numero' => 'required|digits_between:8,11']);
+
+        $numero = $request->numero;
+        $tipo = match (true) {
+            preg_match('/^\d{8}$/', $numero) === 1 => 'DNI',
+            preg_match('/^(10|20)\d{9}$/', $numero) === 1 => 'RUC',
+            default => null,
+        };
+
+        if (!$tipo) {
+            return response()->json(['message' => 'Escribe un DNI de 8 dígitos o un RUC de 11 (empieza con 10 o 20).'], 422);
+        }
+
+        $existente = Supplier::where('document_number', $numero)->first(['id', 'name', 'document_type', 'document_number']);
+        if ($existente) {
+            return response()->json(['existe' => true, 'proveedor' => $existente]);
+        }
+
+        try {
+            $datos = $tipo === 'DNI' ? $apiPeru->dni($numero) : $apiPeru->ruc($numero);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json(['message' => 'No se pudo consultar el documento. Escribe el nombre a mano.'], 422);
+        }
+
+        return response()->json(['existe' => false, 'tipo' => $tipo, 'numero' => $numero, 'nombre' => $datos['nombre']]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'fecha' => 'required|date',
             'tienda' => 'nullable|string|max:255',
+            'proveedorId' => 'nullable|integer|exists:suppliers,id',
+            'proveedorDocTipo' => 'nullable|in:DNI,RUC',
+            'proveedorDocNumero' => 'nullable|digits_between:8,11',
             'factura' => 'nullable|string|max:255',
             'notas' => 'nullable|string',
             'prendas' => 'required|array|min:1',
@@ -398,14 +632,32 @@ class PurchaseController extends Controller
             // toda compra con proveedor quede vinculada a un registro real.
             $proveedorVinculado = null;
 
-            if (!empty($validated['tienda'])) {
-                $nombreProveedor = trim($validated['tienda']);
+            $nombreProveedor = trim((string) ($validated['tienda'] ?? ''));
+            $docNumero = $validated['proveedorDocNumero'] ?? null;
+            $docTipo = $docNumero ? ($validated['proveedorDocTipo'] ?? (strlen($docNumero) === 8 ? 'DNI' : 'RUC')) : null;
 
+            // Orden de búsqueda: el elegido de la lista, luego el mismo documento, luego el mismo nombre.
+            if (!empty($validated['proveedorId'])) {
+                $proveedorVinculado = Supplier::find($validated['proveedorId']);
+            }
+
+            if (!$proveedorVinculado && $docNumero) {
+                $proveedorVinculado = Supplier::where('document_number', $docNumero)->first();
+            }
+
+            if (!$proveedorVinculado && $nombreProveedor !== '') {
                 $proveedorVinculado = Supplier::whereRaw(self::NAME_MATCH, [mb_strtolower($nombreProveedor)])->first();
+            }
 
-                if (!$proveedorVinculado) {
-                    $proveedorVinculado = Supplier::create(['name' => $nombreProveedor]);
-                }
+            if (!$proveedorVinculado && $nombreProveedor !== '') {
+                $proveedorVinculado = Supplier::create([
+                    'name' => $nombreProveedor,
+                    'document_type' => $docTipo,
+                    'document_number' => $docNumero,
+                ]);
+            } elseif ($proveedorVinculado && $docNumero && !$proveedorVinculado->document_number) {
+                // Ya existía solo con nombre: se le completa el documento.
+                $proveedorVinculado->update(['document_type' => $docTipo, 'document_number' => $docNumero]);
             }
 
             $purchase = Purchase::create([

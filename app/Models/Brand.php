@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FormatsName;
 use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
+    use FormatsName;
+
     protected $fillable = ['name', 'description', 'slug', 'active'];
 
     protected $casts = [

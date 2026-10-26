@@ -25,6 +25,16 @@ export const GRUPOS_TALLA = [
     icono: 'fa-solid fa-shoe-prints',
     tallas: ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
   },
+  {
+    // Productos sin tallas ni colores (perfumes, accesorios): una sola presentación. Al comprar no se pide el color.
+    id: 'unico',
+    nombre: 'Sin tallas ni color',
+    detalle: 'Una sola presentación',
+    ejemplo: 'Perfumes, accesorios',
+    icono: 'fa-solid fa-spray-can-sparkles',
+    tallas: ['Único'],
+    sinColor: true,
+  },
 ];
 
 export const ORDEN_TALLAS = ['Único', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];

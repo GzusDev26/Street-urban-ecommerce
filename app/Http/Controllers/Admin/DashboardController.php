@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -21,27 +22,45 @@ class DashboardController extends Controller
         return round((($actual - $anterior) / $anterior) * 100, 1);
     }
 
+    // Ingresos de las ventas vigentes entre dos fechas, ya descontando lo devuelto (igual que los reportes).
+    private function ingresosNetos(Carbon $desde, Carbon $hasta): float
+    {
+        return (float) SaleItem::join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->whereNull('sales.cancelled_at')
+            ->whereBetween('sales.sale_date', [$desde->toDateString(), $hasta->toDateString()])
+            ->sum(DB::raw('(sale_items.quantity - sale_items.returned_quantity) * sale_items.unit_price'));
+    }
+
     private function semanaVentas(): array
     {
         $hoy = Carbon::today();
         $inicioSemana = $hoy->copy()->subDays(6);
         $abrevs = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-        $filas = Sale::selectRaw('sale_date, (cancelled_at is not null) as cancelada, count(*) as cantidad, sum(total) as monto')
+        $filas = Sale::selectRaw('sale_date, (cancelled_at is not null) as cancelada, count(*) as cantidad')
             ->whereBetween('sale_date', [$inicioSemana->toDateString(), $hoy->toDateString()])
             ->groupBy('sale_date', 'cancelada')
             ->get();
+
+        // El monto de cada día es neto de devoluciones y solo cuenta ventas vigentes.
+        $montos = SaleItem::join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->whereNull('sales.cancelled_at')
+            ->whereBetween('sales.sale_date', [$inicioSemana->toDateString(), $hoy->toDateString()])
+            ->selectRaw('sales.sale_date as fecha, sum((sale_items.quantity - sale_items.returned_quantity) * sale_items.unit_price) as monto')
+            ->groupBy('sales.sale_date')
+            ->pluck('monto', 'fecha');
 
         $porFecha = [];
         foreach ($filas as $fila) {
             $fecha = $fila->sale_date->toDateString();
             $porFecha[$fecha] ??= ['ventas' => 0, 'canceladas' => 0, 'monto' => 0.0];
             $porFecha[$fecha][$fila->cancelada ? 'canceladas' : 'ventas'] = (int) $fila->cantidad;
+        }
 
-            // El monto de ingreso solo cuenta lo que sí se concretó (no lo cancelado).
-            if (!$fila->cancelada) {
-                $porFecha[$fecha]['monto'] = (float) $fila->monto;
-            }
+        foreach ($montos as $fecha => $monto) {
+            $fecha = Carbon::parse($fecha)->toDateString();
+            $porFecha[$fecha] ??= ['ventas' => 0, 'canceladas' => 0, 'monto' => 0.0];
+            $porFecha[$fecha]['monto'] = (float) $monto;
         }
 
         $semana = [];
@@ -68,7 +87,8 @@ class DashboardController extends Controller
             ->join('product_variants', 'product_variants.id', '=', 'sale_items.product_variant_id')
             ->join('products', 'products.id', '=', 'product_variants.product_id')
             ->whereNull('sales.cancelled_at')
-            ->selectRaw('products.name, sum(sale_items.quantity) as unidades')
+            ->selectRaw('products.name, sum(sale_items.quantity - sale_items.returned_quantity) as unidades')
+            ->havingRaw('sum(sale_items.quantity - sale_items.returned_quantity) > 0')
             ->groupBy('products.id', 'products.name')
             ->orderByDesc('unidades')
             ->limit(3)
@@ -114,7 +134,7 @@ class DashboardController extends Controller
                     'customer' => $v->customer_name ?: 'Sin cliente registrado',
                     'product' => $producto,
                     'colorHex' => $v->items->first()?->variant?->productColor?->hex,
-                    'amount' => (float) $v->total,
+                    'amount' => (float) $v->items->sum(fn ($i) => $i->net_subtotal),
                     'cancelada' => $v->cancelled_at !== null,
                 ];
             });
@@ -130,8 +150,8 @@ class DashboardController extends Controller
         $ventasEsteMesQuery = Sale::whereNull('cancelled_at')->whereBetween('sale_date', [$inicioMes, $hoy]);
         $ventasMesPasadoQuery = Sale::whereNull('cancelled_at')->whereBetween('sale_date', [$inicioMesPasado, $finMesPasado]);
 
-        $totalVentasEsteMes = (float) $ventasEsteMesQuery->sum('total');
-        $totalVentasMesPasado = (float) $ventasMesPasadoQuery->sum('total');
+        $totalVentasEsteMes = $this->ingresosNetos($inicioMes, $hoy);
+        $totalVentasMesPasado = $this->ingresosNetos($inicioMesPasado, $finMesPasado);
         $numVentasEsteMes = (clone $ventasEsteMesQuery)->count();
         $numVentasMesPasado = (clone $ventasMesPasadoQuery)->count();
 

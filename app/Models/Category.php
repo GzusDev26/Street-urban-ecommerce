@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FormatsName;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    public const SIZE_TYPES = ['ropa', 'pantalon', 'calzado'];
+    use FormatsName;
+
+    public const SIZE_TYPES = ['ropa', 'pantalon', 'calzado', 'unico'];
 
     protected $fillable = ['name', 'description', 'slug', 'size_type', 'image', 'featured', 'active'];
 

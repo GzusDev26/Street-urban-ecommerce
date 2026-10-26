@@ -65,7 +65,7 @@ const guardar = () => {
     </FormField>
 
     <FormField label="¿Qué tallas usa?" group hint="Elige según lo que vende esta categoría. Define las tallas que se ofrecen al comprar.">
-      <div class="grid grid-cols-3 gap-2" role="group" aria-label="Tipo de tallas">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" role="group" aria-label="Tipo de tallas">
         <button
           v-for="g in GRUPOS_TALLA"
           :key="g.id"

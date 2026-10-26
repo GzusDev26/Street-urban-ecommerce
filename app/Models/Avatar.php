@@ -18,6 +18,13 @@ class Avatar extends Model
 
     public function getUrlAttribute(): string
     {
-        return PublicFile::url($this->path);
+        return $this->esDelSitio() ? $this->path : PublicFile::url($this->path);
+    }
+
+    // Los avatares base viven en public/image/avatares (van en Git, ruta que empieza con "/");
+    // los que sube un admin están en storage/app/public/avatars.
+    public function esDelSitio(): bool
+    {
+        return str_starts_with($this->path, '/image/');
     }
 }
