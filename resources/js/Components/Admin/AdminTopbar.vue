@@ -1,8 +1,8 @@
 <template>
   <!-- 72px de alto, igual que la marca del aside: así sus bordes inferiores forman una sola línea.
-       relative z-30: backdrop-blur crea su propio contexto de apilamiento, y sin esto el menú de usuario
+       sticky (celular) / relative (escritorio) + z-30: backdrop-blur crea su propio contexto de apilamiento, y sin esto el menú de usuario
        queda detrás de las tarjetas del contenido. -->
-  <header class="relative z-30 h-[72px] flex-shrink-0 bg-surface/90 backdrop-blur border-b border-gray-200/80">
+  <header class="sticky top-0 lg:relative z-30 h-[72px] flex-shrink-0 bg-surface/95 backdrop-blur border-b border-gray-200/80">
     <div class="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
       <!-- Izquierda: control del aside + ubicación -->
       <div class="flex items-center gap-3 sm:gap-4 min-w-0">

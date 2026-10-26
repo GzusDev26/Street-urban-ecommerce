@@ -4,9 +4,9 @@
     <template #breadcrumb>Compras</template>
     <template #header>Compras</template>
 
-    <div class="space-y-6">
-      <!-- Tabs -->
-      <div class="flex gap-2 border-b border-gray-200">
+    <div class="space-y-5 sm:space-y-6">
+      <!-- Tabs (en el celular se deslizan hacia el lado si no caben) -->
+      <div class="flex gap-2 border-b border-gray-200 overflow-x-auto whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0">
         <Link
           :href="route('admin.purchases.index')"
           class="px-4 py-2.5 text-sm font-semibold text-[#ff8c42] border-b-2 border-[#ff8c42]"
@@ -33,22 +33,22 @@
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Total Productos</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalProductos }}</p>
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
+        <div class="bg-surface rounded-2xl border border-gray-100 px-3.5 py-3 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Productos</p>
+          <p class="text-xl sm:text-3xl font-black text-gray-900 mt-1 tabular-nums">{{ stats.totalProductos }}</p>
         </div>
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Variantes Registradas</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalVariantes }}</p>
+        <div class="bg-surface rounded-2xl border border-gray-100 px-3.5 py-3 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Variantes</p>
+          <p class="text-xl sm:text-3xl font-black text-gray-900 mt-1 tabular-nums">{{ stats.totalVariantes }}</p>
         </div>
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Sin Stock</p>
-          <p class="text-3xl font-black text-red-500 mt-1">{{ stats.sinStock }}</p>
+        <div class="bg-surface rounded-2xl border border-gray-100 px-3.5 py-3 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Sin stock</p>
+          <p class="text-xl sm:text-3xl font-black text-red-500 mt-1 tabular-nums">{{ stats.sinStock }}</p>
         </div>
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Valor de Inventario</p>
-          <p class="text-3xl font-black text-[#ff8c42] mt-1">S/ {{ stats.valorInventario.toFixed(2) }}</p>
+        <div class="bg-surface rounded-2xl border border-gray-100 px-3.5 py-3 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Valor del inventario</p>
+          <p class="text-lg min-[380px]:text-xl sm:text-3xl font-black text-[#ff8c42] mt-1 tabular-nums whitespace-nowrap">S/ {{ dinero(stats.valorInventario) }}</p>
         </div>
       </div>
 
@@ -63,7 +63,7 @@
               role="tab"
               :aria-selected="vista === op.id"
               @click="cambiarVista(op.id)"
-              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+              :class="['flex items-center gap-2 px-3.5 h-10 sm:h-auto sm:py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
             >
               <i :class="op.icono" class="text-xs"></i> {{ op.nombre }}
             </button>
@@ -89,7 +89,7 @@
               role="tab"
               :aria-selected="vista === op.id"
               @click="cambiarVista(op.id)"
-              :class="['flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
+              :class="['flex items-center gap-2 px-3.5 h-10 sm:h-auto sm:py-1.5 rounded-lg text-sm font-semibold transition-all', vista === op.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700']"
             >
               <i :class="op.icono" class="text-xs"></i> {{ op.nombre }}
             </button>
@@ -97,22 +97,124 @@
         </template>
 
         <template v-if="stats.totalVariantes > 0" #toolbar>
-          <div class="flex flex-wrap items-center gap-3 w-full">
-            <SearchInput v-model="filtroTexto" placeholder="Buscar por modelo o marca" class="w-full sm:w-72" />
-            <SelectDropdown v-model="filtroCategoria" :options="opcionesCategoria" size="sm" class="min-w-[190px]" />
-            <SelectDropdown v-model="filtroStock" :options="opcionesStock" size="sm" class="min-w-[170px]" />
+          <div class="w-full space-y-2.5 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+            <!-- Búsqueda (y, en el celular, «Registrar compra» como botón compacto al lado) -->
+            <div class="flex gap-2 sm:contents">
+              <SearchInput v-model="filtroTexto" placeholder="Modelo o marca" class="flex-1 min-w-0 sm:flex-none sm:w-72" />
+              <button
+                type="button"
+                class="sm:hidden w-11 h-11 rounded-xl bg-[#ff8c42] hover:bg-[#f27d30] active:scale-95 text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-orange-200"
+                aria-label="Registrar nueva compra"
+                @click="showModal = true"
+              ><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+            </div>
+
+            <!-- Celular: panel con dos filas separadas por una línea; la etiqueta queda fija y solo las fichas se deslizan -->
+            <div class="sm:hidden rounded-2xl border border-gray-100 bg-gray-50 divide-y divide-gray-100">
+              <div class="flex items-center" role="group" aria-label="Filtrar por stock">
+                <span class="w-[5.5rem] pl-3.5 text-[11px] font-bold uppercase tracking-wider text-gray-400 flex-shrink-0">Stock</span>
+                <div class="flex-1 min-w-0 flex gap-2 overflow-x-auto py-2 pr-3">
+                  <button
+                    v-for="o in opcionesStock"
+                    :key="'s' + o.value"
+                    type="button"
+                    :aria-pressed="filtroStock === o.value"
+                    :class="['h-10 px-4 flex-shrink-0 whitespace-nowrap rounded-full text-sm font-semibold border transition-colors', filtroStock === o.value ? 'bg-[#ff8c42] border-[#ff8c42] text-white shadow-sm' : 'bg-surface border-gray-200 text-gray-600']"
+                    @click="filtroStock = o.value"
+                  >{{ o.corto }}</button>
+                </div>
+              </div>
+              <div class="flex items-center" role="group" aria-label="Filtrar por categoría">
+                <span class="w-[5.5rem] pl-3.5 text-[11px] font-bold uppercase tracking-wider text-gray-400 flex-shrink-0">Categoría</span>
+                <div class="flex-1 min-w-0 flex gap-2 overflow-x-auto py-2 pr-3">
+                  <button
+                    v-for="o in opcionesCategoria"
+                    :key="'c' + o.value"
+                    type="button"
+                    :aria-pressed="filtroCategoria === o.value"
+                    :class="['h-10 px-4 flex-shrink-0 whitespace-nowrap rounded-full text-sm font-semibold border transition-colors', filtroCategoria === o.value ? 'bg-fg border-fg text-canvas' : 'bg-surface border-gray-200 text-gray-600']"
+                    @click="filtroCategoria = o.value"
+                  >{{ o.value === '' ? 'Todas' : o.label }}</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Escritorio: listas desplegables -->
+            <SelectDropdown v-model="filtroCategoria" :options="opcionesCategoria" size="sm" class="hidden sm:block sm:min-w-[190px]" />
+            <SelectDropdown v-model="filtroStock" :options="opcionesStock" size="sm" class="hidden sm:block sm:min-w-[170px]" />
             <button
               v-if="hayFiltrosActivos"
               @click="limpiarFiltros"
-              class="text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
+              class="text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 h-11 sm:h-auto px-3 sm:py-2 rounded-xl flex items-center gap-1.5 transition-colors"
             >
-              <i class="fa-solid fa-xmark text-xs"></i> Limpiar
+              <i class="fa-solid fa-xmark text-xs"></i> Limpiar filtros
             </button>
-            <PrimaryButton class="lg:ml-auto" @click="showModal = true">Registrar nueva compra</PrimaryButton>
+            <PrimaryButton class="hidden sm:inline-flex lg:ml-auto" @click="showModal = true">Registrar nueva compra</PrimaryButton>
           </div>
         </template>
 
-        <DataTable v-if="variantesPaginadas.length > 0">
+        <!-- Celular: una tarjeta por variante (la tabla de 5 columnas no cabe) -->
+        <ul v-if="variantesPaginadas.length > 0" class="md:hidden px-4 pb-2 space-y-2.5">
+          <li v-for="v in variantesPaginadas" :key="'m' + v.id" class="rounded-2xl border border-gray-100 bg-surface overflow-hidden">
+            <div class="flex">
+              <!-- Franja de estado del stock -->
+              <span :class="['w-1.5 flex-shrink-0 my-3 ml-2.5 rounded-full', v.stock === 0 ? 'bg-red-400' : v.stock < umbralStockBajo ? 'bg-yellow-400' : 'bg-green-500']" aria-hidden="true"></span>
+              <div class="flex-1 min-w-0 py-3.5 pr-3.5 pl-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="font-semibold text-gray-900 leading-tight truncate">{{ v.producto }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">{{ v.marca }} · {{ v.categoria }}</p>
+                    <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-gray-600">
+                      <span class="inline-flex items-center gap-1.5"><ColorSwatch :hex="v.colorHex" class="w-3.5 h-3.5 rounded-full border border-gray-200" />{{ v.color }}</span>
+                      <span class="font-semibold bg-gray-100 rounded-md px-2 py-0.5">Talla {{ v.talla }}</span>
+                    </div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <p :class="['text-2xl font-black leading-none tabular-nums', v.stock === 0 ? 'text-red-500' : v.stock < umbralStockBajo ? 'text-yellow-600' : 'text-gray-900']">{{ v.stock }}</p>
+                    <p class="text-[11px] text-gray-500 mt-1">{{ v.stock === 0 ? 'sin stock' : v.stock === 1 ? 'unidad' : 'unidades' }}</p>
+                  </div>
+                </div>
+
+                <div class="mt-2 flex items-center justify-between text-xs text-gray-500 tabular-nums">
+                  <span>Costo S/ {{ dinero(v.precioCompra) }}</span>
+                  <span class="font-bold text-gray-900 text-sm">Venta S/ {{ dinero(v.precioVenta) }}</span>
+                </div>
+
+                <div class="mt-3 flex items-center gap-2">
+                  <button
+                    type="button"
+                    class="flex-1 h-11 rounded-xl bg-orange-50 hover:bg-[#ff8c42] text-[#e67e2d] hover:text-white text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+                    @click="reabastecer(v)"
+                  ><i class="fa-solid fa-plus text-xs" aria-hidden="true"></i> Reabastecer</button>
+                  <button
+                    type="button"
+                    class="h-11 px-3.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold flex items-center gap-2 flex-shrink-0"
+                    :aria-expanded="expandedVariantId === v.id"
+                    @click="toggleLotes(v.id)"
+                  ><i :class="expandedVariantId === v.id ? 'fa-solid fa-chevron-up' : 'fa-solid fa-layer-group'" class="text-xs" aria-hidden="true"></i> Lotes</button>
+                </div>
+
+            <div v-if="expandedVariantId === v.id" class="mt-3 rounded-xl bg-gray-50 p-3">
+              <p v-if="loadingLotes" class="text-xs text-gray-500">Cargando lotes…</p>
+              <p v-else-if="(lotesCache[v.id] || []).length === 0" class="text-xs text-gray-500">Sin lotes registrados.</p>
+              <ul v-else class="divide-y divide-gray-200">
+                <li v-for="lote in lotesCache[v.id]" :key="lote.id" class="py-2 first:pt-0 last:pb-0 text-xs">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-mono text-[11px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{{ lote.numeroCompra }}</span>
+                    <span class="text-gray-900 font-semibold tabular-nums">S/ {{ dinero(lote.costoUnitario) }} c/u</span>
+                  </div>
+                  <p class="mt-1 text-gray-500">{{ lote.fecha }} · {{ lote.proveedor || 'Sin proveedor' }}</p>
+                  <p class="text-gray-500">Comprado {{ lote.cantidad }} · <span :class="lote.cantidadRestante === 0 ? 'text-red-400 font-semibold' : 'text-gray-900 font-semibold'">quedan {{ lote.cantidadRestante }}</span></p>
+                </li>
+              </ul>
+            </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div v-if="variantesPaginadas.length > 0" class="md:hidden px-4 pb-4"><Pagination v-model="paginaActual" :total-items="totalLista" :per-page="porPagina" /></div>
+
+        <DataTable v-if="variantesPaginadas.length > 0" class="hidden md:block">
           <template #head>
             <tr>
               <th class="text-left">Producto</th>
@@ -125,15 +227,20 @@
             </tr>
           </template>
 
-          <template v-for="v in variantesPaginadas" :key="v.id">
-            <tr>
+          <template v-for="(v, i) in variantesPaginadas" :key="v.id">
+            <tr :class="mismoModelo(i) ? '[&>td]:!pt-2 [&>td]:!pb-2 !border-t-0' : ''">
               <td>
-                <p class="font-semibold text-gray-900 truncate max-w-[18rem]">{{ v.producto }}</p>
-                <p class="text-xs text-gray-500 mt-0.5 truncate max-w-[18rem]">{{ v.marca }} <span class="text-gray-300">·</span> {{ v.categoria }}</p>
+                <!-- Las variantes seguidas del mismo modelo no repiten el nombre: se agrupan bajo una línea -->
+                <div v-if="mismoModelo(i)" class="flex items-center gap-2 pl-1 text-gray-300" aria-hidden="true"><i class="fa-solid fa-turn-up fa-rotate-90 text-[10px]"></i></div>
+                <template v-else>
+                  <p class="font-semibold text-gray-900 truncate max-w-[18rem]">{{ v.producto }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5 truncate max-w-[18rem]">{{ v.marca }} <span class="text-gray-300">·</span> {{ v.categoria }}</p>
+                </template>
+                <span v-if="mismoModelo(i)" class="sr-only">{{ v.producto }}</span>
               </td>
 
               <td>
-                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">{{ v.talla }}</span>
+                <span class="inline-flex items-center justify-center min-w-[2.5rem] h-7 px-2 rounded-lg text-xs font-bold bg-gray-100 text-gray-700">{{ v.talla }}</span>
               </td>
 
               <td class="hidden md:table-cell">
@@ -151,21 +258,21 @@
                       v.stock === 0 ? 'bg-red-100 text-red-500' : v.stock < umbralStockBajo ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600',
                     ]"
                   >
-                    {{ v.stock === 0 ? 'Sin stock' : v.stock }}
+                    <span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle" :class="v.stock === 0 ? 'bg-red-400' : v.stock < umbralStockBajo ? 'bg-yellow-500' : 'bg-green-500'" aria-hidden="true"></span>{{ v.stock === 0 ? 'Sin stock' : `${v.stock} ${v.stock === 1 ? 'unidad' : 'unidades'}` }}
                   </span>
                   <button
                     @click="reabastecer(v)"
                     title="Reabastecer stock"
                     aria-label="Reabastecer stock"
-                    class="w-6 h-6 rounded-full bg-orange-50 hover:bg-[#ff8c42] text-[#ff8c42] hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                    class="w-8 h-8 rounded-full bg-orange-50 hover:bg-[#ff8c42] text-[#ff8c42] hover:text-white flex items-center justify-center transition-[transform,background-color,color] duration-200 hover:scale-110 active:scale-95"
                   >
-                    <i class="fa-solid fa-plus text-[10px]"></i>
+                    <i class="fa-solid fa-plus text-xs"></i>
                   </button>
                 </div>
               </td>
 
-              <td class="text-right text-gray-600 tabular-nums whitespace-nowrap hidden lg:table-cell">S/ {{ v.precioCompra.toFixed(2) }}</td>
-              <td class="text-right text-gray-900 font-semibold tabular-nums whitespace-nowrap">S/ {{ v.precioVenta.toFixed(2) }}</td>
+              <td class="text-right text-gray-600 tabular-nums whitespace-nowrap hidden lg:table-cell">S/ {{ dinero(v.precioCompra) }}</td>
+              <td class="text-right text-gray-900 font-semibold tabular-nums whitespace-nowrap">S/ {{ dinero(v.precioVenta) }}</td>
 
               <td>
                 <div class="flex justify-end">
@@ -208,7 +315,7 @@
                       <td class="py-2 pr-4 text-center font-semibold" :class="lote.cantidadRestante === 0 ? 'text-red-400' : 'text-gray-900'">
                         {{ lote.cantidadRestante }}
                       </td>
-                      <td class="py-2 text-right text-gray-900">S/ {{ lote.costoUnitario.toFixed(2) }}</td>
+                      <td class="py-2 text-right text-gray-900">S/ {{ dinero(lote.costoUnitario) }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -333,15 +440,23 @@ const cerrarModal = () => {
   prefillData.value = null;
 };
 
+const mismoModelo = (i) => {
+  const a = variantesPaginadas.value[i];
+  const b = variantesPaginadas.value[i - 1];
+  return !!b && a.productId === b.productId;
+};
+
+const dinero = (n) => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 const filtroTexto = ref('');
 const filtroCategoria = ref('');
 const filtroStock = ref('');
 
 const opcionesStock = computed(() => [
-  { value: '', label: 'Todo el stock' },
-  { value: 'sin', label: 'Sin stock' },
-  { value: 'bajo', label: `Stock bajo (< ${umbralStockBajo.value})` },
-  { value: 'con', label: 'Con stock' },
+  { value: '', label: 'Todo el stock', corto: 'Todo' },
+  { value: 'sin', label: 'Sin stock', corto: 'Sin stock' },
+  { value: 'bajo', label: `Stock bajo (< ${umbralStockBajo.value})`, corto: 'Stock bajo' },
+  { value: 'con', label: 'Con stock', corto: 'Con stock' },
 ]);
 
 const opcionesCategoria = computed(() => [

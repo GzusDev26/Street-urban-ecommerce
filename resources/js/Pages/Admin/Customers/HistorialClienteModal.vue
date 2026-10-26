@@ -1,4 +1,5 @@
 <script setup>
+import { useBloqueoScroll } from '@/useBloqueoScroll';
 import { ref, onMounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
@@ -26,6 +27,8 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+useBloqueoScroll(); // la página de atrás no se mueve mientras está abierto
 </script>
 
 <template>

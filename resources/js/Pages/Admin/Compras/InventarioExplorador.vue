@@ -40,6 +40,19 @@ const verBajas = ref(false);
 
 const buscando = computed(() => busqueda.value.trim().length >= 2);
 
+// Celular: en vez de la ruta completa, un botón «‹ nivel anterior» y el nombre del nivel actual.
+const subirNivel = () => {
+  if (modeloActual.value) irMarca(marcaId.value);
+  else if (marcaActual.value) irCategoria(categoriaId.value);
+  else irInicio();
+};
+const etiquetaPadre = computed(() => {
+  if (modeloActual.value) return marcaActual.value?.nombre ?? 'Marcas';
+  if (marcaActual.value) return categoriaActual.value?.name ?? 'Categorías';
+  return 'Inventario';
+});
+const tituloNivel = computed(() => modeloActual.value?.nombre ?? marcaActual.value?.nombre ?? categoriaActual.value?.name ?? 'Inventario');
+
 const irInicio = () => { categoriaId.value = null; marcaId.value = null; modeloId.value = null; };
 const irCategoria = (id) => { categoriaId.value = id; marcaId.value = null; modeloId.value = null; };
 const irMarca = (id) => { marcaId.value = id; modeloId.value = null; };
@@ -250,31 +263,39 @@ const modeloParaTallas = computed(() => modeloActual.value && {
 });
 
 // Tarjeta punteada "+ Crear ..." que cierra cada fila de tarjetas.
-const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h-[10rem] rounded-2xl border-2 border-dashed border-orange-200 hover:border-[#ff8c42] hover:bg-orange-50/50 text-[#ff8c42] font-semibold text-sm transition-colors';
+const claseTarjetaNueva = 'flex sm:flex-col items-center justify-center gap-3 sm:gap-2 min-h-[4rem] sm:min-h-[10rem] rounded-2xl border-2 border-dashed border-orange-200 hover:border-[#ff8c42] hover:bg-orange-50/50 text-[#ff8c42] font-semibold text-sm transition-colors';
 </script>
 
 <template>
   <div>
     <!-- Barra: migas + búsqueda + acciones -->
-    <div class="flex flex-wrap items-center justify-between gap-3 px-6 pb-4">
-      <nav aria-label="Ubicación en el inventario" class="flex flex-wrap items-center gap-1.5 text-sm min-w-0">
+    <div class="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 pb-4">
+      <!-- Celular: volver un nivel + dónde estás -->
+      <div v-if="categoriaActual" class="sm:hidden w-full flex items-center gap-2">
+        <button type="button" class="h-11 pl-2.5 pr-3.5 rounded-xl bg-orange-50 text-[#e67e2d] text-sm font-semibold flex items-center gap-1.5 flex-shrink-0" @click="subirNivel">
+          <i class="fa-solid fa-chevron-left text-xs" aria-hidden="true"></i><span class="max-w-[8rem] truncate">{{ etiquetaPadre }}</span>
+        </button>
+        <p class="ml-auto min-w-0 truncate text-base font-bold text-gray-900">{{ tituloNivel }}</p>
+      </div>
+
+      <nav aria-label="Ubicación en el inventario" :class="['flex-wrap items-center gap-1.5 text-sm min-w-0', categoriaActual ? 'hidden sm:flex' : 'flex']">
         <button
           type="button"
           @click="irInicio"
-          :class="['font-semibold rounded-lg px-2 py-1 transition-colors', !categoriaActual ? 'text-gray-900' : 'text-gray-500 hover:text-[#ff8c42] hover:bg-orange-50']"
+          :class="['font-semibold rounded-lg px-2 h-10 sm:h-auto sm:py-1 inline-flex items-center transition-colors', !categoriaActual ? 'text-gray-900' : 'text-gray-500 hover:text-[#ff8c42] hover:bg-orange-50']"
         >
           <i class="fa-solid fa-boxes-stacked text-xs mr-1.5"></i>Inventario
         </button>
 
         <template v-if="categoriaActual">
           <i class="fa-solid fa-chevron-right text-[9px] text-gray-300"></i>
-          <button type="button" @click="irCategoria(categoriaActual.id)" :class="['font-semibold rounded-lg px-2 py-1 transition-colors', !marcaActual ? 'text-gray-900' : 'text-gray-500 hover:text-[#ff8c42] hover:bg-orange-50']">
+          <button type="button" @click="irCategoria(categoriaActual.id)" :class="['font-semibold rounded-lg px-2 h-10 sm:h-auto sm:py-1 inline-flex items-center transition-colors', !marcaActual ? 'text-gray-900' : 'text-gray-500 hover:text-[#ff8c42] hover:bg-orange-50']">
             {{ categoriaActual.name }}
           </button>
         </template>
         <template v-if="marcaActual">
           <i class="fa-solid fa-chevron-right text-[9px] text-gray-300"></i>
-          <button type="button" @click="irMarca(marcaActual.id)" :class="['font-semibold rounded-lg px-2 py-1 transition-colors', !modeloActual ? 'text-gray-900' : 'text-gray-500 hover:text-[#ff8c42] hover:bg-orange-50']">
+          <button type="button" @click="irMarca(marcaActual.id)" :class="['font-semibold rounded-lg px-2 h-10 sm:h-auto sm:py-1 inline-flex items-center transition-colors', !modeloActual ? 'text-gray-900' : 'text-gray-500 hover:text-[#ff8c42] hover:bg-orange-50']">
             {{ marcaActual.nombre }}
           </button>
         </template>
@@ -289,14 +310,14 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
         <button
           type="button"
           @click="accionComprar"
-          class="bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.98] text-white text-sm font-bold py-2.5 px-5 rounded-xl shadow-sm shadow-orange-200 transition-all flex items-center gap-2 whitespace-nowrap"
+          class="w-full sm:w-auto justify-center bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.98] text-white text-sm font-bold h-12 sm:h-auto sm:py-2.5 px-5 rounded-xl shadow-sm shadow-orange-200 transition-all flex items-center gap-2 whitespace-nowrap"
         >
           <i class="fa-solid fa-plus text-xs"></i> {{ textoComprar }}
         </button>
       </div>
     </div>
 
-    <div class="px-6 pb-6">
+    <div class="px-4 sm:px-6 pb-6">
       <!-- ============ BÚSQUEDA (lista plana) ============ -->
       <template v-if="buscando">
         <p class="text-xs text-gray-500 mb-3">{{ resultadosBusqueda.length }} resultado{{ resultadosBusqueda.length === 1 ? '' : 's' }}</p>
@@ -319,27 +340,31 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
 
       <!-- ============ NIVEL 0: categorías ============ -->
       <template v-else-if="!categoriaActual">
-        <div v-if="categorias.length" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div v-if="categorias.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
           <div
             v-for="c in categorias"
             :key="c.id"
             class="group relative bg-surface border border-gray-100 hover:border-[#ff8c42] hover:shadow-md rounded-2xl transition-all"
           >
-            <button type="button" @click="irCategoria(c.id)" class="block w-full text-left p-5">
-              <div class="flex items-start justify-between mb-4">
+            <button type="button" @click="irCategoria(c.id)" :class="['flex sm:block items-center gap-3.5 w-full text-left p-3.5 sm:p-5 min-h-[4.5rem]', esAdmin ? 'max-sm:pr-[6.5rem]' : '']">
+              <div class="flex items-start justify-between sm:mb-4 flex-shrink-0">
                 <span class="w-11 h-11 rounded-xl bg-orange-50 text-[#ff8c42] flex items-center justify-center group-hover:bg-[#ff8c42] group-hover:text-white transition-colors">
                   <i :class="grupoDeTallas(c.sizeType).icono"></i>
                 </span>
-                <span v-if="c.sinStock > 0" class="text-[11px] font-bold text-red-500 bg-red-50 rounded-full px-2 py-0.5">{{ c.sinStock }} sin stock</span>
+                <span v-if="c.sinStock > 0" class="hidden sm:inline text-[11px] font-bold text-red-500 bg-red-50 rounded-full px-2 py-0.5">{{ c.sinStock }} sin stock</span>
               </div>
-              <p class="font-bold text-gray-900 text-lg leading-tight">{{ c.name }}</p>
-              <p class="text-xs text-gray-500 mt-1">
-                {{ c.marcas }} marca{{ c.marcas === 1 ? '' : 's' }} · {{ c.modelos }} modelo{{ c.modelos === 1 ? '' : 's' }}
-              </p>
-              <p class="text-sm font-semibold text-gray-700 mt-3">{{ c.unidades }} <span class="font-normal text-gray-400">unidades</span></p>
+              <div class="min-w-0 flex-1 sm:flex-none">
+                <p class="font-bold text-gray-900 text-base sm:text-lg leading-tight truncate">{{ c.name }}</p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ c.marcas }} marca{{ c.marcas === 1 ? '' : 's' }} · {{ c.modelos }} modelo{{ c.modelos === 1 ? '' : 's' }}
+                </p>
+                <p class="sm:hidden text-xs mt-0.5"><span class="font-semibold text-gray-700">{{ c.unidades }} unidades</span><span v-if="c.sinStock > 0" class="ml-2 font-bold text-red-500">{{ c.sinStock }} sin stock</span></p>
+              </div>
+              <p class="hidden sm:block text-sm font-semibold text-gray-700 mt-3">{{ c.unidades }} <span class="font-normal text-gray-400">unidades</span></p>
+              <i v-if="!esAdmin" class="sm:hidden fa-solid fa-chevron-right text-xs text-gray-300" aria-hidden="true"></i>
             </button>
 
-            <div v-if="esAdmin" class="absolute top-3 right-3 flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+            <div v-if="esAdmin" class="absolute max-sm:top-1/2 max-sm:-translate-y-1/2 sm:top-3 right-2 sm:right-3 flex gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
               <ActionButton icon="fa-solid fa-pen" label="Editar categoría" tone="blue" @click="modalCategoria = { categoria: c }" />
               <ActionButton v-if="c.vacia" icon="fa-solid fa-trash" label="Eliminar categoría" tone="red" @click="categoriaPorEliminar = c" />
             </div>
@@ -389,23 +414,27 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
 
       <!-- ============ NIVEL 1: marcas de la categoría ============ -->
       <template v-else-if="!marcaActual">
-        <div v-if="marcasDeCategoria.length" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div v-if="marcasDeCategoria.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
           <div
             v-for="m in marcasDeCategoria"
             :key="m.id"
             class="group relative bg-surface border border-gray-100 hover:border-[#ff8c42] hover:shadow-md rounded-2xl transition-all"
           >
-            <button type="button" @click="irMarca(m.id)" class="block w-full text-left p-5">
-              <div class="flex items-start justify-between mb-3">
+            <button type="button" @click="irMarca(m.id)" :class="['flex sm:block items-center gap-3.5 w-full text-left p-3.5 sm:p-5 min-h-[4.5rem]', esAdmin && m.sinModelos ? 'max-sm:pr-14' : '']">
+              <div class="flex items-start justify-between sm:mb-3 flex-shrink-0">
                 <span class="w-10 h-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center text-sm font-black">{{ m.nombre.charAt(0).toUpperCase() }}</span>
-                <span v-if="m.sinStock > 0" class="text-[11px] font-bold text-red-500 bg-red-50 rounded-full px-2 py-0.5">{{ m.sinStock }} sin stock</span>
+                <span v-if="m.sinStock > 0" class="hidden sm:inline text-[11px] font-bold text-red-500 bg-red-50 rounded-full px-2 py-0.5">{{ m.sinStock }} sin stock</span>
               </div>
-              <p class="font-bold text-gray-900 leading-tight">{{ m.nombre }}</p>
-              <p class="text-xs text-gray-500 mt-1">{{ m.modelos }} modelo{{ m.modelos === 1 ? '' : 's' }}</p>
-              <p class="text-sm font-semibold text-gray-700 mt-3">{{ m.unidades }} <span class="font-normal text-gray-400">unidades</span></p>
+              <div class="min-w-0 flex-1 sm:flex-none">
+                <p class="font-bold text-gray-900 leading-tight truncate">{{ m.nombre }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ m.modelos }} modelo{{ m.modelos === 1 ? '' : 's' }}</p>
+                <p class="sm:hidden text-xs mt-0.5"><span class="font-semibold text-gray-700">{{ m.unidades }} unidades</span><span v-if="m.sinStock > 0" class="ml-2 font-bold text-red-500">{{ m.sinStock }} sin stock</span></p>
+              </div>
+              <p class="hidden sm:block text-sm font-semibold text-gray-700 mt-3">{{ m.unidades }} <span class="font-normal text-gray-400">unidades</span></p>
+              <i v-if="!(esAdmin && m.sinModelos)" class="sm:hidden fa-solid fa-chevron-right text-xs text-gray-300" aria-hidden="true"></i>
             </button>
 
-            <div v-if="esAdmin && m.sinModelos" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+            <div v-if="esAdmin && m.sinModelos" class="absolute max-sm:top-1/2 max-sm:-translate-y-1/2 sm:top-3 right-2 sm:right-3 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
               <ActionButton icon="fa-solid fa-xmark" label="Quitar de esta categoría" tone="red" @click="marcaPorQuitar = m" />
             </div>
           </div>
@@ -448,7 +477,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           <div
             v-for="m in modelosDeMarca"
             :key="m.id"
-            :class="['bg-surface border border-gray-100 hover:border-gray-200 rounded-2xl p-5 transition-all', !m.activo ? 'opacity-60' : '']"
+            :class="['bg-surface border border-gray-100 hover:border-gray-200 rounded-2xl p-4 sm:p-5 transition-all', !m.activo ? 'opacity-60' : '']"
           >
             <button type="button" @click="irModelo(m)" class="block w-full text-left">
               <div class="flex items-start justify-between gap-3">
@@ -481,7 +510,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
             </button>
 
             <div class="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-gray-50">
-              <button type="button" @click="comprarModelo(m)" class="text-sm font-semibold text-[#ff8c42] hover:bg-orange-50 px-3 py-1.5 rounded-lg transition-colors">
+              <button type="button" @click="comprarModelo(m)" class="text-sm font-semibold text-[#e67e2d] bg-orange-50 sm:bg-transparent hover:bg-orange-50 h-11 sm:h-auto px-4 sm:px-3 sm:py-1.5 rounded-xl sm:rounded-lg transition-colors">
                 <i class="fa-solid fa-plus text-xs mr-1"></i>Comprar
               </button>
               <div v-if="esAdmin" class="flex items-center gap-0.5">
@@ -551,14 +580,14 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
           <table class="w-full text-sm">
             <thead class="bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500">
               <tr>
-                <th class="text-left font-semibold py-3 px-5">Color</th>
+                <th class="text-left font-semibold py-3 px-3 sm:px-5 sticky left-0 z-[1] bg-gray-50">Color</th>
                 <th v-for="t in tallasDelModelo" :key="t" class="text-center font-semibold py-3 px-2 min-w-[3.5rem]">{{ t }}</th>
                 <th class="text-right font-semibold py-3 px-5">Total</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
               <tr v-for="c in modeloActual.colores" :key="c.id">
-                <td class="py-3 px-5">
+                <td class="py-3 px-3 sm:px-5 sticky left-0 z-[1] bg-surface">
                   <div class="flex items-center gap-3">
                     <ColorPhoto :color="c" :editable="esAdmin" />
                     <div class="min-w-0">
@@ -574,14 +603,14 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
                     type="button"
                     @click="comprarCelda(modeloActual, c, t)"
                     :title="`Comprar más: ${c.nombre} talla ${t}`"
-                    :class="['min-w-[2.5rem] text-xs font-bold px-2 py-1.5 rounded-lg hover:ring-2 hover:ring-[#ff8c42] transition-all', claseStock(varianteDe(c, t).stock)]"
+                    :class="['min-w-[2.75rem] h-10 sm:h-auto text-xs font-bold px-2 sm:py-1.5 rounded-lg hover:ring-2 hover:ring-[#ff8c42] transition-all', claseStock(varianteDe(c, t).stock)]"
                   >{{ varianteDe(c, t).stock }}</button>
                   <button
                     v-else
                     type="button"
                     @click="comprarCelda(modeloActual, c, t)"
                     :title="`Agregar talla ${t} a ${c.nombre}`"
-                    class="min-w-[2.5rem] text-xs text-gray-300 hover:text-[#ff8c42] hover:bg-orange-50 px-2 py-1.5 rounded-lg transition-colors"
+                    class="min-w-[2.75rem] h-10 sm:h-auto text-xs text-gray-300 hover:text-[#ff8c42] hover:bg-orange-50 px-2 sm:py-1.5 rounded-lg transition-colors"
                   >—</button>
                 </td>
 
@@ -590,7 +619,7 @@ const claseTarjetaNueva = 'flex flex-col items-center justify-center gap-2 min-h
             </tbody>
             <tfoot class="bg-gray-50/60 border-t border-gray-100">
               <tr class="text-xs font-bold text-gray-600">
-                <td class="py-2.5 px-5">Total</td>
+                <td class="py-2.5 px-3 sm:px-5 sticky left-0 z-[1] bg-gray-50">Total</td>
                 <td v-for="t in tallasDelModelo" :key="t" class="py-2.5 px-2 text-center tabular-nums">{{ stockDeTalla(t) }}</td>
                 <td class="py-2.5 px-5 text-right tabular-nums text-gray-900">{{ modeloActual.stock }}</td>
               </tr>

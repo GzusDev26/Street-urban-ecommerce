@@ -83,6 +83,7 @@
 </template>
 
 <script setup>
+import { bloquearScroll } from '@/useBloqueoScroll';
 import { computed, nextTick, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 
@@ -123,6 +124,12 @@ const results = computed(() => {
 });
 
 watch(results, () => { activeIndex.value = 0; });
+
+let liberarScroll = null;
+watch(() => props.open, (isOpen) => {
+  if (isOpen) liberarScroll = bloquearScroll();
+  else { liberarScroll?.(); liberarScroll = null; }
+});
 
 watch(() => props.open, async (isOpen) => {
   if (!isOpen) return;

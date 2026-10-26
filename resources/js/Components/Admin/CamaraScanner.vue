@@ -1,6 +1,8 @@
 <script setup>
+import { useBloqueoScroll } from '@/useBloqueoScroll';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { BrowserMultiFormatReader } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 
 // Lector de códigos de barras / QR con la cámara del celular. Emite `codigo` por cada lectura.
 // Con `continuo` se queda abierto (para escanear varias prendas seguidas); si no, se cierra tras la primera.
@@ -42,9 +44,15 @@ const iniciar = async () => {
   }
 
   try {
-    const lector = new BrowserMultiFormatReader();
+    // Solo los formatos que usa una tienda (más rápido y con menos lecturas falsas) y modo exigente; la imagen se pide
+    // en 720p (la que más imágenes por segundo procesa en celulares) y con enfoque continuo, porque el código de barras necesita nitidez para leerse.
+    const pistas = new Map([
+      [DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93, BarcodeFormat.CODABAR, BarcodeFormat.ITF, BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX]],
+      [DecodeHintType.TRY_HARDER, true],
+    ]);
+    const lector = new BrowserMultiFormatReader(pistas, { delayBetweenScanAttempts: 80 });
     controles = await lector.decodeFromConstraints(
-      { video: { facingMode: { ideal: 'environment' } } },
+      { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 }, advanced: [{ focusMode: 'continuous' }] } },
       video.value,
       (resultado) => {
         if (!resultado || cerrado || pausado.value) return;
@@ -91,6 +99,8 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', alTeclear);
   detener();
 });
+
+useBloqueoScroll(); // la página de atrás no se mueve mientras está abierto
 </script>
 
 <template>

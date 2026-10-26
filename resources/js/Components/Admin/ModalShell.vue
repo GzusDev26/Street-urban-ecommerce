@@ -1,4 +1,5 @@
 <script setup>
+import { bloquearScroll } from '@/useBloqueoScroll';
 import { onMounted, onBeforeUnmount, ref } from 'vue';
 
 defineProps({
@@ -23,14 +24,16 @@ const alTeclear = (e) => {
   if (e.key === 'Escape') emit('close');
 };
 
+let liberarScroll = null;
+
 // Evita que la página de atrás se desplace mientras el modal está abierto.
 onMounted(() => {
   document.addEventListener('keydown', alTeclear);
-  document.body.style.overflow = 'hidden';
+  liberarScroll = bloquearScroll();
 });
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', alTeclear);
-  document.body.style.overflow = '';
+  liberarScroll?.();
 });
 </script>
 

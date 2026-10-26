@@ -48,18 +48,19 @@ const irA = (p) => {
       <button
         @click="irA(page - 1)"
         :disabled="page === 1"
-        class="w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-colors"
+        class="w-10 h-10 sm:w-8 sm:h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-colors"
+        aria-label="Página anterior"
       >
         <i class="fa-solid fa-chevron-left text-xs"></i>
       </button>
 
       <template v-for="(p, idx) in paginas" :key="idx">
-        <span v-if="p === '...'" class="w-8 h-8 flex items-center justify-center text-gray-300 text-xs">…</span>
+        <span v-if="p === '...'" class="w-6 sm:w-8 h-10 sm:h-8 flex items-center justify-center text-gray-300 text-xs">…</span>
         <button
           v-else
           @click="irA(p)"
           :class="[
-            'w-8 h-8 rounded-lg text-sm font-semibold flex items-center justify-center transition-colors',
+            'w-10 h-10 sm:w-8 sm:h-8 rounded-lg text-sm font-semibold flex items-center justify-center transition-colors',
             p === page ? 'bg-[#ff8c42] text-white' : 'text-gray-500 hover:bg-gray-100',
           ]"
         >
@@ -70,7 +71,8 @@ const irA = (p) => {
       <button
         @click="irA(page + 1)"
         :disabled="page === totalPages"
-        class="w-8 h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-colors"
+        class="w-10 h-10 sm:w-8 sm:h-8 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent flex items-center justify-center transition-colors"
+        aria-label="Página siguiente"
       >
         <i class="fa-solid fa-chevron-right text-xs"></i>
       </button>

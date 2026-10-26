@@ -12,7 +12,7 @@
         <i class="fa-solid fa-circle-exclamation"></i> {{ page.props.errors.imagen }}
       </div>
 
-      <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
+      <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
         <div class="flex items-center gap-2 mb-1">
           <i class="fa-solid fa-images text-gray-400 text-sm"></i>
           <h3 class="text-lg font-bold text-gray-900">Galería de Avatares</h3>
@@ -22,14 +22,14 @@
         </p>
 
         <label
-          class="flex items-center justify-center gap-2 border-2 border-dashed border-orange-200 hover:bg-orange-50 rounded-xl py-4 mb-6 cursor-pointer transition-colors text-sm font-semibold text-[#ff8c42]"
+          class="flex items-center justify-center gap-2 border-2 border-dashed border-orange-200 hover:bg-orange-50 rounded-xl py-5 sm:py-4 mb-6 cursor-pointer transition-colors text-sm font-semibold text-[#ff8c42]"
         >
           <i class="fa-solid fa-upload text-xs"></i>
           {{ subiendo ? 'Subiendo...' : 'Subir Avatar' }}
           <input type="file" accept="image/*" class="hidden" :disabled="subiendo" @change="subirAvatar" />
         </label>
 
-        <div v-if="avatares.length > 0" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+        <div v-if="avatares.length > 0" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4">
           <div v-for="avatar in avatares" :key="avatar.id" class="relative group">
             <div class="w-full aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
               <img :src="avatar.url" alt="Avatar" class="w-full h-full object-cover" />
@@ -37,9 +37,10 @@
             <button
               @click="eliminar(avatar)"
               title="Eliminar"
-              class="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Eliminar avatar"
+              class="absolute -top-2 -right-2 w-8 h-8 sm:w-6 sm:h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-sm sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
             >
-              <i class="fa-solid fa-xmark text-[10px]"></i>
+              <i class="fa-solid fa-xmark text-xs sm:text-[10px]"></i>
             </button>
             <span v-if="avatar.enUso > 0" class="absolute bottom-1 right-1 text-[9px] font-bold bg-black/60 text-white px-1.5 py-0.5 rounded-full">
               {{ avatar.enUso }}

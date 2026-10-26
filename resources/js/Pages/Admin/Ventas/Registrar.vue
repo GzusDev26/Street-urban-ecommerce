@@ -4,9 +4,9 @@
     <template #breadcrumb>Ventas / Registrar</template>
     <template #header>Registrar Nueva Venta</template>
 
-    <div class="space-y-6">
-      <!-- Tabs -->
-      <div class="flex gap-2 border-b border-gray-200">
+    <div class="space-y-5 sm:space-y-6 pb-28 xl:pb-0">
+      <!-- Tabs (en el celular se deslizan hacia el lado si no caben) -->
+      <div class="flex gap-2 border-b border-gray-200 overflow-x-auto whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0">
         <Link
           :href="route('admin.sales.create')"
           class="px-4 py-2.5 text-sm font-semibold text-[#ff8c42] border-b-2 border-[#ff8c42]"
@@ -51,10 +51,10 @@
 
       <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_25rem] gap-6 items-start">
         <!-- ======================= IZQUIERDA: catálogo ======================= -->
-        <section class="bg-surface rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-6">
+        <section class="bg-surface rounded-3xl border border-gray-100 shadow-sm p-4 sm:p-6">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
             <h3 class="text-lg font-bold text-gray-900">Buscar prenda</h3>
-            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 bg-gray-50 rounded-full px-3 py-1.5">
+            <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 bg-gray-50 rounded-full px-3 py-1.5">
               <i class="fa-solid fa-boxes-stacked text-gray-400"></i> Solo se venden prendas con stock registrado
             </span>
           </div>
@@ -68,7 +68,7 @@
                 type="text"
                 autocomplete="off"
                 aria-label="Buscar por modelo, marca o código de barras"
-                placeholder="Escribe un modelo o una marca, o escanea un código..."
+                placeholder="Modelo, marca o código…"
                 class="w-full h-12 pl-11 pr-11 rounded-2xl border border-gray-200 bg-surface text-base text-gray-900 placeholder:text-gray-400 transition hover:border-gray-300 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100"
                 @keydown.enter.prevent="alEnter"
               >
@@ -84,7 +84,7 @@
             </div>
             <button
               type="button"
-              class="h-12 px-4 rounded-2xl border border-gray-200 bg-surface text-gray-700 hover:border-[#ff8c42] hover:text-[#e67e2d] font-semibold text-sm flex items-center gap-2 transition-colors flex-shrink-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-100"
+              class="h-12 w-12 sm:w-auto sm:px-4 rounded-2xl border border-gray-200 bg-surface text-gray-700 hover:border-[#ff8c42] hover:text-[#e67e2d] font-semibold text-sm flex items-center justify-center gap-2 transition-colors flex-shrink-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-100"
               @click="camaraRespuesta = null; camaraAbierta = true"
             >
               <i class="fa-solid fa-barcode" aria-hidden="true"></i>
@@ -101,7 +101,7 @@
           <div v-else class="mb-2"></div>
 
           <!-- Categorías como chips -->
-          <div class="flex flex-wrap gap-2 mb-5" role="group" aria-label="Categorías">
+          <div class="flex gap-2 mb-4 sm:mb-5 overflow-x-auto sm:flex-wrap sm:overflow-visible -mx-4 px-4 sm:mx-0 sm:px-0 pb-1" role="group" aria-label="Categorías">
             <button
               v-for="c in opcionesCategoria"
               :key="c || 'todas'"
@@ -109,7 +109,7 @@
               @click="filtroCategoria = c"
               :aria-pressed="filtroCategoria === c"
               :class="[
-                'px-4 h-9 rounded-full text-sm font-semibold border transition-all',
+                'px-4 h-11 sm:h-9 flex-shrink-0 rounded-full text-sm font-semibold border transition-all',
                 filtroCategoria === c
                   ? 'bg-[#ff8c42] border-[#ff8c42] text-white shadow-sm shadow-orange-200'
                   : 'bg-surface border-gray-200 text-gray-600 hover:border-[#ff8c42] hover:text-[#e67e2d]',
@@ -144,8 +144,8 @@
 
               <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500">
-                  <span class="font-semibold text-gray-700">Toca una casilla para agregar 1 unidad</span>
-                  <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-gray-300 bg-surface"></span> Disponibles</span>
+                  <span class="font-semibold text-gray-700 w-full sm:w-auto">Toca una casilla para agregar 1 unidad</span>
+                  <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-gray-300 bg-surface"></span> Hay</span>
                   <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-amber-300 bg-amber-50"></span> Quedan pocas</span>
                   <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#ff8c42]"></span> En el ticket</span>
                 </div>
@@ -165,13 +165,13 @@
                 <table class="w-full text-sm">
                   <thead class="bg-gray-50/80 text-xs uppercase tracking-wider text-gray-500">
                     <tr>
-                      <th class="text-left font-semibold py-3 px-4">Color</th>
+                      <th class="text-left font-semibold py-3 px-3 sm:px-4 sticky left-0 z-[1] bg-gray-50">Color</th>
                       <th v-for="t in tallasDelModelo" :key="t" class="text-center font-semibold py-3 px-1.5 min-w-[4rem]">{{ t }}</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-100">
                     <tr v-for="c in coloresVisibles" :key="c.nombre" data-color>
-                      <td class="py-2.5 px-4">
+                      <td class="py-2.5 px-3 sm:px-4 sticky left-0 z-[1] bg-surface">
                         <div class="flex items-center gap-2.5 whitespace-nowrap">
                           <span class="w-8 h-8 rounded-lg bg-gray-50 ring-1 ring-black/5 flex items-center justify-center flex-shrink-0">
                             <ColorSwatch :hex="c.hex" class="w-[18px] h-[18px] rounded-full border border-gray-200" />
@@ -282,14 +282,36 @@
         </section>
 
         <!-- ======================= DERECHA: ticket ======================= -->
-        <aside class="xl:sticky xl:top-6 bg-surface rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" aria-label="Ticket de venta">
-          <header class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+        <aside
+          id="ticket-venta"
+          :class="[
+            'bg-surface border border-gray-100 shadow-sm flex flex-col',
+            'max-xl:fixed max-xl:inset-x-0 max-xl:bottom-0 max-xl:z-[55] max-xl:max-h-[92dvh] max-xl:overflow-y-auto max-xl:overscroll-contain max-xl:rounded-t-3xl max-xl:shadow-2xl max-xl:transition-transform max-xl:duration-300 max-xl:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:max-xl:transition-none',
+            ticketAbierto ? 'max-xl:translate-y-0' : 'max-xl:translate-y-full max-xl:invisible',
+            'xl:sticky xl:top-6 xl:rounded-3xl xl:overflow-hidden',
+          ]"
+          ref="hoja"
+          :style="esMovil && arrastre.activo ? { transform: `translateY(${arrastre.y}px)`, transition: 'none' } : undefined"
+          @touchstart.passive="iniciarArrastre"
+          @touchmove="moverArrastre"
+          @touchend="terminarArrastre"
+          @touchcancel="terminarArrastre"
+          :role="esMovil ? 'dialog' : undefined"
+          :aria-modal="esMovil ? 'true' : undefined"
+          aria-label="Ticket de venta"
+        >
+          <!-- Asa y cierre (solo celular) -->
+          <div class="xl:hidden flex justify-center pt-2.5 pb-1.5 flex-shrink-0" data-arrastre aria-hidden="true"><span class="w-10 h-1 rounded-full bg-gray-300"></span></div>
+          <header class="px-5 py-4 border-b border-gray-100 flex items-center gap-3" data-arrastre>
             <span class="w-10 h-10 rounded-2xl bg-orange-50 text-[#ff8c42] flex items-center justify-center"><i class="fa-solid fa-receipt"></i></span>
             <div class="flex-1">
               <h3 class="font-bold text-gray-900 leading-tight">Ticket</h3>
               <p class="text-xs text-gray-400">Venta en mostrador</p>
             </div>
             <span class="text-xs font-bold text-[#e67e2d] bg-orange-50 rounded-full px-2.5 py-1">{{ totalPrendas() }} prenda{{ totalPrendas() === 1 ? '' : 's' }}</span>
+            <button type="button" class="xl:hidden -mr-2 w-11 h-11 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 flex items-center justify-center" aria-label="Cerrar el ticket y seguir agregando" @click="ticketAbierto = false">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
           </header>
 
           <!-- Líneas -->
@@ -299,7 +321,7 @@
             <p class="text-xs text-gray-400 mt-1">Toca una prenda para agregarla.</p>
           </div>
 
-          <ul v-else class="divide-y divide-gray-50 max-h-[26rem] overflow-y-auto">
+          <ul v-else class="divide-y divide-gray-50 xl:max-h-[26rem] xl:overflow-y-auto">
             <li v-for="prenda in prendas" :key="prenda.id" data-linea class="px-5 py-3.5">
               <div class="flex items-start gap-3">
                 <span class="w-9 h-9 rounded-xl bg-gray-50 ring-1 ring-black/5 flex items-center justify-center flex-shrink-0">
@@ -309,7 +331,7 @@
                   <p class="text-sm font-semibold text-gray-900 truncate leading-tight">{{ prenda.producto }}</p>
                   <p class="text-xs text-gray-400 truncate">{{ prenda.marca }} · Talla {{ prenda.talla }} · {{ prenda.color }}</p>
                 </div>
-                <button @click="eliminarPrenda(prenda.id)" type="button" :aria-label="`Quitar ${prenda.producto} talla ${prenda.talla} del ticket`" class="w-7 h-7 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center flex-shrink-0 transition-colors">
+                <button @click="eliminarPrenda(prenda.id)" type="button" :aria-label="`Quitar ${prenda.producto} talla ${prenda.talla} del ticket`" class="w-11 h-11 xl:w-7 xl:h-7 -mr-2 xl:mr-0 -mt-1.5 xl:mt-0 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center flex-shrink-0 transition-colors">
                   <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
               </div>
@@ -321,7 +343,7 @@
                     @click="cambiarCantidad(prenda, -1)"
                     :disabled="prenda.cantidad <= 1"
                     :aria-label="`Restar 1 a ${prenda.producto} talla ${prenda.talla}`"
-                    class="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-orange-50 hover:text-[#ff8c42] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
+                    class="w-11 h-11 xl:w-9 xl:h-9 flex items-center justify-center text-gray-500 hover:bg-orange-50 hover:text-[#ff8c42] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
                   ><i class="fa-solid fa-minus text-xs"></i></button>
                   <input
                     :value="prenda.cantidad"
@@ -330,14 +352,14 @@
                     min="1"
                     inputmode="numeric"
                     :aria-label="`Cantidad de ${prenda.producto} talla ${prenda.talla}`"
-                    class="w-10 text-center text-sm font-bold text-gray-900 border-0 p-0 focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    class="w-11 xl:w-10 text-center text-sm font-bold text-gray-900 border-0 p-0 focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   >
                   <button
                     type="button"
                     @click="cambiarCantidad(prenda, 1)"
                     :disabled="cantidadYaAgregada(prenda.variantId) >= prenda.stock"
                     :aria-label="`Sumar 1 a ${prenda.producto} talla ${prenda.talla}`"
-                    class="w-9 h-9 flex items-center justify-center text-white bg-[#ff8c42] hover:bg-[#f27d30] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    class="w-11 h-11 xl:w-9 xl:h-9 flex items-center justify-center text-white bg-[#ff8c42] hover:bg-[#f27d30] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   ><i class="fa-solid fa-plus text-xs"></i></button>
                 </div>
 
@@ -350,7 +372,7 @@
                       step="0.01"
                       min="0"
                       :aria-label="`Precio de ${prenda.producto} talla ${prenda.talla}`"
-                      class="w-16 h-7 text-right text-xs font-semibold text-gray-700 border border-gray-200 rounded-lg px-1.5 focus:outline-none focus:border-[#ff8c42] focus:ring-2 focus:ring-orange-100"
+                      class="w-20 xl:w-16 h-10 xl:h-7 text-right text-sm xl:text-xs font-semibold text-gray-700 border border-gray-200 rounded-lg px-2 xl:px-1.5 focus:outline-none focus:border-[#ff8c42] focus:ring-2 focus:ring-orange-100"
                     >
                   </label>
                   <p class="text-sm font-bold text-gray-900 tabular-nums mt-0.5">S/ {{ subtotalDe(prenda).toFixed(2) }}</p>
@@ -363,9 +385,9 @@
           </ul>
 
           <!-- Datos de la venta -->
-          <div class="px-5 py-4 grid grid-cols-2 gap-x-3 gap-y-3 border-t border-gray-100">
-            <p class="col-span-2 text-[11px] font-bold uppercase tracking-wider text-gray-400">Datos de la venta</p>
-            <div class="relative col-span-2">
+          <div class="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-3 border-t border-gray-100">
+            <p class="sm:col-span-2 text-[11px] font-bold uppercase tracking-wider text-gray-400">Datos de la venta</p>
+            <div class="relative sm:col-span-2">
               <div class="flex items-center justify-between mb-1">
                 <label for="venta-documento" class="text-xs font-semibold text-gray-600">Cliente (opcional)</label>
                 <div class="inline-flex p-0.5 bg-gray-100 rounded-lg" role="group" aria-label="Tipo de documento">
@@ -378,7 +400,7 @@
                 <i :class="docEstado === 'buscando' ? 'fa-solid fa-spinner fa-spin' : 'fa-regular fa-id-card'" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
                 <input id="venta-documento" v-model="docNumero" type="text" inputmode="numeric" autocomplete="off"
                   :placeholder="docTipo === 'DNI' ? 'DNI del cliente (8 dígitos)' : 'RUC del cliente (11 dígitos)'"
-                  class="w-full h-10 pl-9 pr-3 text-sm tracking-wider placeholder:tracking-normal border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                  class="w-full h-11 sm:h-10 pl-9 pr-3 text-sm tracking-wider placeholder:tracking-normal border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
 
               <div v-if="clienteSeleccionado" class="w-full min-h-10 px-3 py-1.5 border border-green-200 bg-green-50 rounded-xl flex items-center justify-between gap-2">
@@ -397,7 +419,7 @@
                 <p v-else class="flex items-center gap-1.5 text-xs text-red-600 mb-2"><i class="fa-solid fa-circle-exclamation"></i> {{ docMensaje }}</p>
                 <label for="venta-cliente" class="sr-only">Nombre del cliente</label>
                 <input id="venta-cliente" v-model="ventaForm.cliente" type="text" maxlength="255" placeholder="Nombre del cliente"
-                  class="w-full h-10 px-3 text-sm font-semibold text-gray-900 border border-orange-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+                  class="w-full h-11 sm:h-10 px-3 text-sm font-semibold text-gray-900 border border-orange-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
               </div>
 
               <template v-else-if="!docEstadoNecesitaNombre">
@@ -411,7 +433,7 @@
                     type="text"
                     autocomplete="off"
                     placeholder="O busca por nombre un cliente registrado"
-                    class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-9"
+                    class="w-full h-11 sm:h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100 pl-9"
                   >
                 </div>
                 <div
@@ -435,17 +457,17 @@
 
             <div>
               <label for="registrar-1" class="block text-xs font-semibold text-gray-600 mb-1">Fecha</label>
-              <input id="registrar-1" v-model="ventaForm.fecha" type="date" class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+              <input id="registrar-1" v-model="ventaForm.fecha" type="date" class="w-full h-11 sm:h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
             </div>
 
             <div>
               <label for="registrar-2" class="block text-xs font-semibold text-gray-600 mb-1">Notas (opcional)</label>
-              <input id="registrar-2" v-model="ventaForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
+              <input id="registrar-2" v-model="ventaForm.notas" type="text" placeholder="Cualquier detalle importante..." class="w-full h-11 sm:h-10 px-3 text-sm border border-gray-200 rounded-xl bg-surface placeholder:text-gray-400 focus:outline-none focus:border-[#ff8c42] focus:ring-4 focus:ring-orange-100">
             </div>
           </div>
 
           <!-- Totales y guardar -->
-          <footer class="px-5 py-4 border-t border-gray-100 bg-gray-50/70 space-y-3">
+          <footer class="px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-gray-100 bg-gray-50 space-y-3 max-xl:sticky max-xl:bottom-0 max-xl:z-10 max-xl:shadow-[0_-8px_16px_-12px_rgba(0,0,0,0.25)]">
             <div class="flex items-center justify-between text-sm text-gray-500">
               <span>Prendas</span>
               <span class="font-semibold text-gray-900 tabular-nums">{{ totalPrendas() }}</span>
@@ -459,7 +481,7 @@
               @click="guardarVenta"
               :disabled="isSaving || prendas.length === 0"
               type="button"
-              class="w-full h-12 flex items-center justify-center gap-2 bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl shadow-md shadow-orange-200 transition-all"
+              class="w-full h-12 flex items-center justify-center gap-2 bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base sm:text-sm rounded-xl shadow-md shadow-orange-200 transition-all"
             >
               <i :class="isSaving ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'"></i> {{ isSaving ? 'Guardando...' : 'Guardar Venta' }}
             </button>
@@ -467,11 +489,31 @@
               v-if="prendas.length > 0"
               @click="vaciarTicket"
               type="button"
-              class="w-full text-xs font-semibold text-gray-400 hover:text-red-500 transition-colors"
+              class="w-full h-10 text-xs font-semibold text-gray-400 hover:text-red-500 transition-colors"
             >Vaciar ticket</button>
           </footer>
         </aside>
       </div>
+    </div>
+    <!-- Celular: fondo del ticket y barra fija con el resumen -->
+    <div v-if="ticketAbierto" class="xl:hidden fixed inset-0 z-[54] bg-black/50" aria-hidden="true" @click="ticketAbierto = false"></div>
+    <div v-if="prendas.length > 0 && !ticketAbierto" class="xl:hidden fixed inset-x-0 bottom-0 z-40 px-3 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-canvas via-canvas/95 to-transparent pointer-events-none">
+      <button
+        type="button"
+        class="pointer-events-auto w-full h-14 rounded-2xl bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.99] text-white shadow-xl shadow-orange-300/40 flex items-center gap-3 px-4 transition-all"
+        aria-controls="ticket-venta"
+        :aria-expanded="ticketAbierto"
+        @click="ticketAbierto = true"
+      >
+        <span class="relative w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+          <i class="fa-solid fa-receipt"></i>
+        </span>
+        <span class="flex-1 text-left leading-tight">
+          <span class="block text-xs font-semibold text-white/80">{{ totalPrendas() }} prenda{{ totalPrendas() === 1 ? '' : 's' }} en el ticket</span>
+          <span class="block text-lg font-black tabular-nums">S/ {{ totalVenta().toFixed(2) }}</span>
+        </span>
+        <span class="text-sm font-bold flex items-center gap-1.5">Ver ticket <i class="fa-solid fa-chevron-up text-xs" aria-hidden="true"></i></span>
+      </button>
     </div>
     <BoletaModal
       v-if="boletaAbierta"
@@ -493,7 +535,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, defineAsyncComponent } from 'vue';
+import { ref, reactive, computed, watch, nextTick, defineAsyncComponent } from 'vue';
 import axios from 'axios';
 import { avisar, confirmar } from '@/alerts';
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
@@ -810,6 +852,59 @@ const agregarPorCodigo = async (codigo) => {
 };
 
 // Desde la cámara: la lectura se queda en pantalla hasta elegir seguir o ir a la venta.
+// Celular: el ticket es una hoja que sube desde abajo; en pantalla grande es la columna de la derecha.
+const ticketAbierto = ref(false);
+const esMovil = ref(typeof window !== 'undefined' && !window.matchMedia('(min-width: 1280px)').matches);
+if (typeof window !== 'undefined') {
+  const mq = window.matchMedia('(min-width: 1280px)');
+  mq.addEventListener('change', (e) => {
+    esMovil.value = !e.matches;
+    if (e.matches) ticketAbierto.value = false;
+  });
+}
+// Bajar la hoja con el dedo para cerrarla: se arrastra desde el asa o la cabecera, o desde cualquier parte cuando la
+// lista está arriba del todo. Si se suelta pasados 120 px (o con un gesto rápido) se cierra; si no, vuelve a su sitio.
+const hoja = ref(null);
+const arrastre = reactive({ candidato: false, activo: false, desdeCabecera: false, inicio: 0, y: 0, t0: 0 });
+
+const iniciarArrastre = (e) => {
+  if (!esMovil.value) return;
+  arrastre.candidato = true;
+  arrastre.activo = false;
+  arrastre.desdeCabecera = !!e.target.closest('[data-arrastre]');
+  arrastre.inicio = e.touches[0].clientY;
+  arrastre.t0 = Date.now();
+  arrastre.y = 0;
+};
+
+const moverArrastre = (e) => {
+  if (!arrastre.candidato) return;
+
+  const dy = e.touches[0].clientY - arrastre.inicio;
+  if (!arrastre.activo) {
+    const arribaDelTodo = (hoja.value?.scrollTop ?? 0) <= 0;
+    if (dy > 8 && (arrastre.desdeCabecera || arribaDelTodo)) arrastre.activo = true;
+    else return;
+  }
+
+  e.preventDefault();
+  arrastre.y = Math.max(0, dy);
+};
+
+const terminarArrastre = () => {
+  if (arrastre.activo) {
+    const velocidad = arrastre.y / Math.max(1, Date.now() - arrastre.t0);
+    if (arrastre.y > 120 || velocidad > 0.6) ticketAbierto.value = false;
+  }
+  arrastre.candidato = false;
+  arrastre.activo = false;
+  arrastre.y = 0;
+};
+
+watch(ticketAbierto, (abierto) => {
+  document.body.style.overflow = abierto && esMovil.value ? 'hidden' : '';
+});
+
 const camaraRespuesta = ref(null);
 const alLeerConCamara = async (codigo) => {
   camaraRespuesta.value = null;
@@ -818,7 +913,8 @@ const alLeerConCamara = async (codigo) => {
 const terminarEscaneo = async () => {
   camaraAbierta.value = false;
   await nextTick();
-  document.querySelector('[aria-label="Ticket de venta"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (esMovil.value) ticketAbierto.value = true;
+  else document.querySelector('#ticket-venta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 const resumenTicket = computed(() => {
   const n = totalPrendas();
@@ -901,6 +997,8 @@ const totalPrendas = () => prendas.value.reduce((sum, p) => sum + p.cantidad, 0)
 
 // Al guardar se abre la boleta en un modal (con imprimir, ver en historial o seguir vendiendo).
 const boletaAbierta = ref(null); // { ventaId, resumen }
+// Al abrirse la boleta, la hoja del ticket (celular) se cierra.
+watch(boletaAbierta, (b) => { if (b) ticketAbierto.value = false; });
 
 const avisarVentaGuardada = (resumen) => {
   const ventaId = page.props.flash?.ventaId;

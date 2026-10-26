@@ -27,10 +27,10 @@ const clasesCambio = computed(() => {
 
 <template>
   <section class="bg-surface rounded-3xl border border-gray-100 shadow-sm overflow-hidden grid grid-cols-1 xl:grid-cols-[380px_minmax(0,1fr)]">
-    <div class="p-7 flex flex-col xl:border-r border-b xl:border-b-0 border-gray-100 bg-gradient-to-br from-orange-50/70 to-transparent">
+    <div class="p-5 sm:p-7 flex flex-col xl:border-r border-b xl:border-b-0 border-gray-100 bg-gradient-to-br from-orange-50/70 to-transparent">
       <p class="text-sm font-semibold text-[#e67e2d]">{{ periodo }}</p>
-      <p class="mt-5 text-sm font-medium text-gray-500">{{ etiqueta }}</p>
-      <p class="mt-1 text-[3.25rem] leading-none font-black text-gray-900 tracking-tight">{{ valor }}</p>
+      <p class="mt-4 sm:mt-5 text-sm font-medium text-gray-500">{{ etiqueta }}</p>
+      <p class="mt-1 text-[2.5rem] sm:text-[3.25rem] leading-none font-black text-gray-900 tracking-tight">{{ valor }}</p>
 
       <p v-if="cambio" class="mt-3 text-sm">
         <span v-if="cambio.pct == null" class="text-gray-500">En el período anterior ({{ cambio.rango }}) no hubo {{ cambio.sustantivo }}, así que no hay con qué comparar.</span>
@@ -44,7 +44,7 @@ const clasesCambio = computed(() => {
       </p>
       <p v-else class="mt-3 text-sm text-gray-500">Elige un rango de fechas para compararlo con el período anterior.</p>
 
-      <dl class="mt-auto pt-7 grid grid-cols-2 gap-x-4 gap-y-5">
+      <dl class="mt-auto pt-6 sm:pt-7 grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-y-5">
         <div v-for="m in minis" :key="m.etiqueta">
           <dt class="flex items-center gap-2 text-xs font-medium text-gray-500"><i :class="[m.icono, m.tono]" class="text-[11px]" aria-hidden="true"></i>{{ m.etiqueta }}</dt>
           <dd class="mt-0.5 text-xl font-bold text-gray-900 tabular-nums">{{ m.valor }}</dd>
@@ -53,6 +53,6 @@ const clasesCambio = computed(() => {
       </dl>
     </div>
 
-    <div class="p-6 min-w-0"><slot /></div>
+    <div class="p-4 sm:p-6 min-w-0"><slot /></div>
   </section>
 </template>

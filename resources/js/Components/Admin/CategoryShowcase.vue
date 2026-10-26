@@ -52,7 +52,7 @@ const subirFoto = (categoria, event) => {
 </script>
 
 <template>
-  <section class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm" aria-labelledby="vitrina-titulo">
+  <section class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm" aria-labelledby="vitrina-titulo">
     <header class="flex flex-wrap items-start justify-between gap-4 mb-5">
       <div class="flex items-start gap-3">
         <span class="w-10 h-10 rounded-xl bg-orange-50 text-[#ff8c42] flex items-center justify-center flex-shrink-0" aria-hidden="true">
@@ -65,7 +65,7 @@ const subirFoto = (categoria, event) => {
           </p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
         <span class="text-sm text-gray-500"><b class="text-gray-900">{{ destacadas }}</b> en el Home</span>
         <a :href="route('shop.home')" target="_blank" rel="noopener" class="h-10 px-4 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]">
           Ver Home <i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i><span class="sr-only">(se abre en otra pestaña)</span>
@@ -78,7 +78,7 @@ const subirFoto = (categoria, event) => {
       No hay categorías en el Home: la sección «Explora por categoría» se verá vacía.
     </p>
 
-    <ul v-if="ordenadas.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <ul v-if="ordenadas.length" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
       <li v-for="cat in ordenadas" :key="cat.id" :class="['rounded-xl border overflow-hidden transition-colors', cat.featured ? 'border-[#ff8c42]/40' : 'border-gray-200']">
         <!-- Miniatura como en el Home -->
         <div class="theme-shop-dark relative aspect-[4/3] bg-[#0b0b0c] overflow-hidden">
@@ -124,7 +124,7 @@ const subirFoto = (categoria, event) => {
           <button
             type="button"
             :disabled="subiendo === cat.id"
-            class="w-full h-9 rounded-lg border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 flex items-center justify-center gap-2 transition-colors disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]"
+            class="w-full h-11 sm:h-9 rounded-lg border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 flex items-center justify-center gap-2 transition-colors disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]"
             @click="elegirFoto(cat)"
           >
             <i class="fa-regular fa-image" aria-hidden="true"></i>

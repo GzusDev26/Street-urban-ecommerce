@@ -4,21 +4,21 @@
     <template #breadcrumb>Dashboard</template>
     <template #header>Dashboard</template>
 
-    <div class="space-y-6">
-      <!-- Metric Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div class="space-y-5 sm:space-y-6">
+      <!-- Metric Cards (2×2 en el celular) -->
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
         <div
           v-for="metric in metrics"
           :key="metric.label"
-          class="relative bg-surface rounded-2xl border border-gray-100 p-6 pl-7 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+          class="relative bg-surface rounded-2xl border border-gray-100 p-4 pl-5 sm:p-6 sm:pl-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
         >
           <span :class="['absolute left-0 top-0 bottom-0 w-1.5', metric.accent]"></span>
           <div>
-            <p class="text-sm text-gray-400 font-medium">{{ metric.label }}</p>
-            <p class="text-3xl font-black text-gray-900 mt-1">{{ metric.value }}</p>
+            <p class="text-xs sm:text-sm text-gray-500 font-medium">{{ metric.label }}</p>
+            <p class="text-xl min-[400px]:text-2xl sm:text-3xl font-black text-gray-900 mt-0.5 sm:mt-1 tabular-nums whitespace-nowrap">{{ metric.value }}</p>
             <p
               :class="[
-                'text-xs font-semibold mt-2',
+                'text-[11px] sm:text-xs font-semibold mt-1.5 sm:mt-2',
                 metric.change.type === 'up' ? 'text-green-500' : metric.change.type === 'down' ? 'text-red-500' : 'text-gray-300 italic font-medium',
               ]"
             >
@@ -28,7 +28,7 @@
               ></i>{{ metric.change.text }}
             </p>
           </div>
-          <div :class="['w-14 h-14 rounded-xl flex items-center justify-center text-xl flex-shrink-0', metric.iconBg, metric.iconColor]">
+          <div :class="['order-first sm:order-last w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-base sm:text-xl flex-shrink-0', metric.iconBg, metric.iconColor]">
             <i :class="['fa-solid', metric.icon]"></i>
           </div>
         </div>
@@ -37,14 +37,14 @@
       <!-- Chart + Sidebar widgets -->
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
         <!-- Weekly sales chart -->
-        <div class="xl:col-span-2 bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-          <div class="flex items-start justify-between mb-6">
+        <div class="xl:col-span-2 bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+          <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 mb-5 sm:mb-6">
             <div>
               <h3 class="text-lg font-bold text-gray-900">Ventas Semanales</h3>
               <p class="text-xs text-gray-400">Últimos 7 días</p>
             </div>
-            <div class="text-right">
-              <p class="text-2xl font-black text-gray-900">S/ {{ totalSemanaMonto.toFixed(2) }}</p>
+            <div class="sm:text-right">
+              <p class="text-xl sm:text-2xl font-black text-gray-900 tabular-nums">S/ {{ totalSemanaMonto.toFixed(2) }}</p>
               <p class="text-xs text-gray-400">
                 {{ totalSemanaVentas }} venta{{ totalSemanaVentas === 1 ? '' : 's' }} esta semana
                 <span v-if="totalSemanaCanceladas > 0" class="text-red-400"> · {{ totalSemanaCanceladas }} canceladas</span>
@@ -59,7 +59,7 @@
                 <div v-for="n in 4" :key="n" class="border-t border-gray-50 w-full"></div>
               </div>
 
-              <div class="relative h-full flex items-end justify-between gap-3">
+              <div class="relative h-full flex items-end justify-between gap-1.5 sm:gap-3">
                 <div v-for="day in weeklySales" :key="day.label" class="flex-1 flex items-end justify-center gap-1.5 h-full">
                   <div class="w-1/2 h-full flex flex-col items-center justify-end">
                     <span v-if="day.ventas > 0" class="text-[10px] font-bold text-gray-600 mb-1">{{ day.ventas }}</span>
@@ -73,17 +73,19 @@
               </div>
             </div>
 
-            <div class="flex items-start justify-between gap-3 pt-2">
+            <div class="flex items-start justify-between gap-1.5 sm:gap-3 pt-2">
               <div v-for="day in weeklySales" :key="day.label" class="flex-1 text-center">
-                <p class="text-[11px] text-gray-400">{{ day.label }}</p>
-                <p :class="['text-[11px] font-bold mt-0.5', day.monto > 0 ? 'text-gray-700' : 'text-gray-300']">
-                  S/ {{ day.monto.toFixed(2) }}
+                <p class="text-[11px] text-gray-500">{{ day.label }}</p>
+                <p :class="['text-[10px] sm:text-[11px] font-bold mt-0.5 tabular-nums', day.monto > 0 ? 'text-gray-700' : 'text-gray-300']">
+                  <span class="sm:hidden">{{ montoCorto(day.monto) }}</span>
+                  <span class="hidden sm:inline">S/ {{ day.monto.toFixed(2) }}</span>
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="flex items-center gap-6 mt-4 pt-4 border-t border-gray-50 text-xs text-gray-500">
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-1 mt-4 pt-4 border-t border-gray-50 text-xs text-gray-500">
+            <span class="sm:hidden w-full text-[11px] text-gray-400">Montos en soles (K = miles)</span>
             <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#ff8c42]"></span>Ventas</span>
             <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-200"></span>Canceladas</span>
           </div>
@@ -91,19 +93,19 @@
 
         <!-- Quick actions + Top products -->
         <div class="space-y-5">
-          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 class="text-sm font-bold text-gray-900 mb-4">Acciones Rápidas</h3>
+          <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h3 class="text-sm font-bold text-gray-900 mb-3 sm:mb-4">Acciones Rápidas</h3>
             <div class="space-y-2.5">
               <Link
                 :href="route('admin.sales.create')"
-                class="w-full bg-gradient-to-r from-[#ff8c42] to-[#e67e2d] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 text-white text-sm font-bold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+                class="w-full bg-gradient-to-r from-[#ff8c42] to-[#e67e2d] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 text-white text-sm font-bold h-12 sm:h-auto sm:py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
               >
                 <i class="fa-solid fa-plus text-xs"></i> Nueva Venta
               </Link>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="grid grid-cols-3 gap-2">
                 <Link
                   :href="route('admin.purchases.index')"
-                  class="flex flex-col items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 py-3 rounded-xl transition-colors"
+                  class="flex flex-col items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 min-h-[4.5rem] py-3 rounded-xl transition-colors"
                 >
                   <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center text-sm">
                     <i class="fa-solid fa-cubes"></i>
@@ -112,7 +114,7 @@
                 </Link>
                 <Link
                   :href="route('admin.sales.index')"
-                  class="flex flex-col items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 py-3 rounded-xl transition-colors"
+                  class="flex flex-col items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 min-h-[4.5rem] py-3 rounded-xl transition-colors"
                 >
                   <span class="w-8 h-8 rounded-lg bg-orange-50 text-[#ff8c42] flex items-center justify-center text-sm">
                     <i class="fa-solid fa-receipt"></i>
@@ -121,7 +123,7 @@
                 </Link>
                 <Link
                   :href="route('admin.customers.index')"
-                  class="flex flex-col items-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 py-3 rounded-xl transition-colors"
+                  class="flex flex-col items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 min-h-[4.5rem] py-3 rounded-xl transition-colors"
                 >
                   <span class="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center text-sm">
                     <i class="fa-solid fa-people-group"></i>
@@ -132,8 +134,8 @@
             </div>
           </div>
 
-          <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 class="text-sm font-bold text-gray-900 mb-4">Productos Top</h3>
+          <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h3 class="text-sm font-bold text-gray-900 mb-3 sm:mb-4">Productos Top</h3>
             <div v-if="topProductos.length > 0" class="space-y-4">
               <div v-for="product in topProductos" :key="product.name">
                 <div class="flex items-center justify-between text-xs mb-1.5">
@@ -151,15 +153,43 @@
       </div>
 
       <!-- Recent sales -->
-      <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center justify-between mb-4">
+      <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between mb-3 sm:mb-4">
           <h3 class="text-lg font-bold text-gray-900">Ventas Recientes</h3>
-          <Link :href="route('admin.sales.index')" class="text-xs font-semibold text-[#ff8c42] hover:text-[#ff7a24]">
+          <Link :href="route('admin.sales.index')" class="text-sm sm:text-xs font-semibold text-[#e67e2d] hover:text-[#ff7a24] h-11 sm:h-auto flex items-center">
             Ver todas <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i>
           </Link>
         </div>
 
-        <div v-if="ventasRecientes.length > 0" class="overflow-x-auto">
+        <!-- Celular: una tarjeta por venta (la tabla de 7 columnas no cabe) -->
+        <ul v-if="ventasRecientes.length > 0" class="md:hidden divide-y divide-gray-100 -mx-1">
+          <li v-for="venta in ventasRecientes" :key="'m' + venta.id">
+            <Link :href="`${route('admin.sales.index')}?venta=${venta.id}`" class="flex items-center gap-3 px-1 py-3.5 min-h-[4rem] active:bg-gray-50">
+              <span
+                :class="[
+                  'w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0',
+                  venta.cancelada ? 'bg-gray-100 text-gray-400' : venta.customer === 'Sin cliente registrado' ? 'bg-gray-100 text-gray-500' : 'bg-orange-50 text-[#e67e2d]',
+                ]"
+              >#{{ venta.id }}</span>
+              <span class="min-w-0 flex-1">
+                <span :class="['block text-sm font-semibold truncate', venta.cancelada ? 'text-gray-400 line-through' : 'text-gray-900']">{{ venta.customer }}</span>
+                <span class="flex items-center gap-1.5 text-xs text-gray-500 truncate">
+                  <ColorSwatch :hex="venta.colorHex" class="w-2.5 h-2.5 rounded-full border border-gray-200 flex-shrink-0" />
+                  <span class="truncate">{{ venta.product }}</span>
+                </span>
+                <span class="block text-[11px] text-gray-400 mt-0.5">{{ venta.fecha }}</span>
+              </span>
+              <span class="text-right flex-shrink-0">
+                <span :class="['block text-sm font-black tabular-nums', venta.cancelada ? 'text-gray-300 line-through' : 'text-gray-900']">S/ {{ venta.amount.toFixed(2) }}</span>
+                <span :class="['inline-flex items-center gap-1 mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full', venta.cancelada ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600']">
+                  <i :class="['fa-solid text-[8px]', venta.cancelada ? 'fa-ban' : 'fa-circle-check']" aria-hidden="true"></i>{{ venta.cancelada ? 'Cancelada' : 'Completada' }}
+                </span>
+              </span>
+            </Link>
+          </li>
+        </ul>
+
+        <div v-if="ventasRecientes.length > 0" class="hidden md:block overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="border-b border-gray-200">
               <tr>
@@ -291,6 +321,12 @@ const metrics = computed(() => [
     icon: 'fa-cubes', iconBg: 'bg-green-50', iconColor: 'text-green-500', accent: 'bg-green-400',
   },
 ]);
+
+// Montos cortos para el celular, donde 7 columnas no dejan espacio para "S/ 1234.56": 850 → "850", 1259 → "1.3K".
+const montoCorto = (m) => {
+  if (!m) return '—';
+  return m >= 1000 ? `${(m / 1000).toFixed(1)}K` : String(Math.round(m));
+};
 
 const maxSales = computed(() => Math.max(1, ...props.weeklySales.map(d => Math.max(d.ventas, d.canceladas))));
 const pctBarra = (valor) => (valor / maxSales.value) * 100;

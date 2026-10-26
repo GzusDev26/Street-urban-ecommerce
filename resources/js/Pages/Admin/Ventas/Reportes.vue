@@ -4,8 +4,8 @@
     <template #breadcrumb>Ventas / Reportes</template>
     <template #header>Reportes de Ventas</template>
 
-    <div class="viz space-y-6">
-      <nav class="flex gap-2 border-b border-gray-200" aria-label="Secciones de ventas">
+    <div class="viz space-y-5 sm:space-y-6">
+      <nav class="flex gap-2 border-b border-gray-200 overflow-x-auto whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Secciones de ventas">
         <Link :href="route('admin.sales.create')" class="px-4 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 border-b-2 border-transparent">Registrar Venta</Link>
         <Link :href="route('admin.sales.index')" class="px-4 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 border-b-2 border-transparent">Historial de Ventas</Link>
         <Link :href="route('admin.sales.reportes')" aria-current="page" class="px-4 py-2.5 text-sm font-semibold text-[#e67e2d] border-b-2 border-[#ff8c42]">Reportes de Ventas</Link>
@@ -47,13 +47,32 @@
         </div>
 
         <section class="bg-surface rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <header class="flex flex-wrap items-center gap-x-3 gap-y-1 px-6 pt-5 pb-4">
+          <header class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 sm:px-6 pt-5 pb-4">
             <span class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center" aria-hidden="true"><i class="fa-solid fa-trophy text-sm"></i></span>
             <h3 class="font-bold text-gray-900 text-lg">Productos más vendidos</h3>
             <p class="text-sm text-gray-500 sm:ml-auto">Se muestran {{ topProductos.length }} de {{ totalProductos }}<template v-if="totalProductos > topProductos.length"> · el Excel trae todos</template></p>
           </header>
 
-          <div class="overflow-x-auto">
+          <!-- Celular: una tarjeta por producto -->
+          <ol class="sm:hidden divide-y divide-gray-100 border-t border-gray-100">
+            <li v-for="(p, i) in topProductos" :key="'m' + p.label + p.marca" class="px-4 py-3.5">
+              <div class="flex items-start gap-3">
+                <span :class="['w-6 h-6 mt-0.5 rounded-full inline-flex items-center justify-center text-[11px] font-bold flex-shrink-0', medalla(i)]">{{ i + 1 }}</span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-semibold text-gray-900 leading-tight">{{ p.label }}</p>
+                  <p class="text-xs text-gray-500">{{ p.marca }} · {{ p.categoria }}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <p class="font-black text-gray-900 tabular-nums">{{ dinero(p.total) }}</p>
+                  <p :class="['text-xs font-bold tabular-nums', p.utilidad >= 0 ? 'text-green-600' : 'text-red-500']">{{ p.utilidad >= 0 ? '+' : '' }}{{ dinero(p.utilidad) }}</p>
+                </div>
+              </div>
+              <div class="mt-2.5 h-1.5 bg-gray-100 rounded-full overflow-hidden" role="presentation"><div class="h-full rounded-full" :style="{ width: ancho(p.total) + '%', background: 'var(--viz-2)' }"></div></div>
+              <p class="mt-1.5 text-xs text-gray-500 tabular-nums">{{ entero(p.unidades) }} unid. · {{ p.numeroVentas }} venta{{ p.numeroVentas === 1 ? '' : 's' }} · {{ dinero(p.precioPromedio) }} c/u · {{ porcentaje(p.total, stats.totalIngresos, 1) }} de los ingresos</p>
+            </li>
+          </ol>
+
+          <div class="hidden sm:block overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">

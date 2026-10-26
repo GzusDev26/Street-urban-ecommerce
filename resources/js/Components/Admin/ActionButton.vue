@@ -19,7 +19,7 @@ const TONOS = {
     type="button"
     :title="label"
     :aria-label="label"
-    :class="['w-9 h-9 rounded-lg text-gray-400 flex items-center justify-center transition-colors', TONOS[tone]]"
+    :class="['w-11 h-11 sm:w-9 sm:h-9 rounded-lg text-gray-400 flex items-center justify-center transition-colors', TONOS[tone]]"
   >
     <i :class="icon" class="text-sm"></i>
   </button>

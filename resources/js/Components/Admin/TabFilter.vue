@@ -7,7 +7,7 @@ const model = defineModel({ type: String, default: '' });
 </script>
 
 <template>
-  <div class="inline-flex p-1 bg-gray-100 rounded-xl" role="tablist">
+  <div class="flex sm:inline-flex w-full sm:w-auto max-w-full overflow-x-auto p-1 bg-gray-100 rounded-xl" role="tablist">
     <button
       v-for="tab in tabs"
       :key="tab.value"
@@ -16,7 +16,7 @@ const model = defineModel({ type: String, default: '' });
       :aria-selected="model === tab.value"
       @click="model = tab.value"
       :class="[
-        'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all',
+        'flex items-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-lg whitespace-nowrap flex-shrink-0 text-sm font-semibold transition-all',
         model === tab.value ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700',
       ]"
     >

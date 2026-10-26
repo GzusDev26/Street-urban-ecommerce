@@ -19,7 +19,45 @@
           <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre, documento, email o teléfono" class="w-full sm:w-80" />
         </template>
 
-        <DataTable v-if="clientesFiltrados.length > 0">
+        <!-- Celular: una tarjeta por cliente -->
+        <ul v-if="clientesFiltrados.length > 0" class="md:hidden px-4 pb-2 space-y-2.5">
+          <li v-for="cliente in clientesPaginados" :key="'m' + cliente.id" class="rounded-2xl border border-gray-100 bg-surface p-3.5">
+            <div class="flex items-start gap-3">
+              <InitialsAvatar
+                :name="cliente.name"
+                :id="cliente.id"
+                :icon="cliente.document_type === 'RUC' ? 'fa-solid fa-building' : ''"
+                :tone="cliente.document_type === 'RUC' ? 'bg-gray-100 text-gray-600' : ''"
+              />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="font-semibold text-gray-900 leading-tight break-words min-w-0">{{ cliente.name }}</p>
+                  <StatusPill :tone="cliente.activa ? 'green' : 'gray'" class="flex-shrink-0">{{ cliente.activa ? 'Con cuenta' : 'Solo registro' }}</StatusPill>
+                </div>
+                <p v-if="cliente.document_number" class="flex items-center gap-1.5 mt-1">
+                  <span class="text-[10px] font-bold tracking-wide text-gray-500 bg-gray-100 rounded px-1.5 py-0.5">{{ cliente.document_type }}</span>
+                  <span class="text-xs text-gray-500 tabular-nums">{{ cliente.document_number }}</span>
+                </p>
+                <p v-else class="text-xs text-gray-400 mt-1">Sin documento</p>
+              </div>
+            </div>
+
+            <div v-if="cliente.email || cliente.phone" class="mt-3 space-y-1.5 text-sm text-gray-700">
+              <p v-if="cliente.phone" class="flex items-center gap-2.5"><i class="fa-solid fa-phone text-gray-400 text-xs w-3.5" aria-hidden="true"></i><a :href="'tel:' + cliente.phone" class="tabular-nums">{{ cliente.phone }}</a></p>
+              <p v-if="cliente.email" class="flex items-center gap-2.5 min-w-0"><i class="fa-regular fa-envelope text-gray-400 text-xs w-3.5" aria-hidden="true"></i><span class="truncate">{{ cliente.email }}</span></p>
+            </div>
+            <p class="mt-2 text-[11px] text-gray-400">Registrado {{ cliente.registrado }}</p>
+
+            <div class="mt-3 grid grid-cols-[1fr_auto_auto] gap-2">
+                <button type="button" class="h-11 rounded-xl bg-purple-50 text-purple-600 text-sm font-semibold flex items-center justify-center gap-2 px-3" @click="verHistorial(cliente)"><i class="fa-solid fa-receipt text-xs" aria-hidden="true"></i>Historial</button>
+                <button type="button" aria-label="Editar" class="h-11 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center gap-2 w-11" @click="editarCliente(cliente)"><i class="fa-solid fa-pen text-xs" aria-hidden="true"></i></button>
+                <button type="button" aria-label="Eliminar" class="h-11 rounded-xl bg-red-50 text-red-500 text-sm font-semibold flex items-center justify-center gap-2 w-11" @click="eliminar(cliente)"><i class="fa-solid fa-trash text-xs" aria-hidden="true"></i></button>
+            </div>
+          </li>
+        </ul>
+        <div v-if="clientesFiltrados.length > 0" class="md:hidden px-4 pb-4"><Pagination v-model="paginaActual" :total-items="clientesFiltrados.length" :per-page="perPage" /></div>
+
+        <DataTable v-if="clientesFiltrados.length > 0" class="hidden md:block">
           <template #head>
             <tr>
               <th class="text-left">Cliente</th>

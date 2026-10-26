@@ -7,15 +7,15 @@ defineProps({
 
 <template>
   <div class="bg-surface rounded-2xl border border-gray-100 shadow-sm">
-    <div class="flex flex-wrap items-center justify-between gap-4 p-6 pb-5">
+    <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 pb-4 sm:pb-5">
       <div>
         <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>
         <p v-if="subtitle" class="text-sm text-gray-500 mt-0.5">{{ subtitle }}</p>
       </div>
-      <slot name="action" />
+      <div v-if="$slots.action" class="w-full sm:w-auto [&>button]:w-full sm:[&>button]:w-auto"><slot name="action" /></div>
     </div>
 
-    <div v-if="$slots.toolbar" class="flex flex-wrap items-center justify-between gap-3 px-6 pb-5">
+    <div v-if="$slots.toolbar" class="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 pb-4 sm:pb-5">
       <slot name="toolbar" />
     </div>
 

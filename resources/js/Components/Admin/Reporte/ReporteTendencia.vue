@@ -74,6 +74,8 @@ const alMover = (e) => {
   const px = e.clientX - caja.left - M.izq;
   activo.value = n.value === 1 ? 0 : Math.min(n.value - 1, Math.max(0, Math.round((px / areaW.value) * (n.value - 1))));
 };
+// Con el ratón el cuadro desaparece al salir; con el dedo se queda para poder leerlo después de levantarlo.
+const alSoltar = (e) => { if (e.pointerType !== 'touch') activo.value = null; };
 const alTeclear = (e) => {
   if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
   e.preventDefault();
@@ -96,16 +98,17 @@ const resumen = computed(() => `${props.nombre}: ${n.value} ${props.granularidad
       </span>
     </div>
 
-    <div ref="contenedor" class="relative select-none" @pointerleave="activo = null">
+    <div ref="contenedor" class="relative select-none" @pointerleave="alSoltar">
       <svg
         :width="ancho"
         :height="alto"
         :viewBox="`0 0 ${ancho} ${alto}`"
-        class="block outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42] rounded-lg"
+        class="block outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42] rounded-lg touch-pan-y"
         role="img"
         :aria-label="resumen"
         tabindex="0"
         @pointermove="alMover"
+        @pointerdown="alMover"
         @keydown="alTeclear"
         @focus="activo = activo ?? n - 1"
         @blur="activo = null"
@@ -157,7 +160,7 @@ const resumen = computed(() => `${props.nombre}: ${n.value} ${props.granularidad
       <!-- Un solo cuadro con todas las series: el valor manda, el nombre acompaña -->
       <div
         v-if="punto"
-        class="pointer-events-none absolute top-1 z-10 w-[180px] rounded-xl border border-gray-200 bg-surface px-3 py-2.5 shadow-lg"
+        class="pointer-events-none absolute top-1 z-10 w-[170px] sm:w-[180px] rounded-xl border border-gray-200 bg-surface px-3 py-2.5 shadow-lg"
         :style="{ left: izquierda + 'px' }"
         role="status"
       >

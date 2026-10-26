@@ -22,7 +22,37 @@
           <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre o email" class="w-full sm:w-80" />
         </template>
 
-        <DataTable v-if="usuariosFiltrados.length > 0">
+        <!-- Celular: una tarjeta por usuario -->
+        <ul v-if="usuariosFiltrados.length > 0" class="md:hidden px-4 pb-2 space-y-2.5">
+          <li v-for="usuario in usuariosPaginados" :key="'m' + usuario.id" :class="['rounded-2xl border border-gray-100 bg-surface p-3.5', !usuario.active ? 'opacity-70' : '']">
+            <div class="flex items-start gap-3">
+              <InitialsAvatar :name="usuario.name" :id="usuario.id" :src="usuario.avatarUrl" tone="bg-[#ff8c42] text-white" />
+              <div class="min-w-0 flex-1">
+                <p class="font-semibold text-gray-900 leading-tight break-words">
+                  {{ usuario.name }}
+                  <span v-if="usuario.esYo" class="ml-1 text-[11px] font-semibold text-[#e67e2d] bg-orange-50 rounded px-1.5 py-0.5 align-middle">Tú</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1 truncate">{{ usuario.email }}</p>
+                <div class="mt-2 flex flex-wrap gap-1.5">
+                  <StatusPill :tone="usuario.role === 'admin' ? 'orange' : 'blue'">{{ usuario.role === 'admin' ? 'Administrador' : 'Vendedor' }}</StatusPill>
+                  <StatusPill :tone="usuario.active ? 'green' : 'gray'">{{ usuario.active ? 'Activo' : 'Inactivo' }}</StatusPill>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 flex gap-2">
+                <button type="button" class="flex-1 h-11 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center gap-2 px-3" @click="editarUsuario(usuario)"><i class="fa-solid fa-pen text-xs" aria-hidden="true"></i>Editar</button>
+              <template v-if="!usuario.esYo">
+                <button v-if="usuario.active" type="button" class="flex-1 h-11 rounded-xl bg-gray-100 text-gray-600 text-sm font-semibold flex items-center justify-center gap-2 px-3" @click="usuarioPendienteDesactivar = usuario"><i class="fa-solid fa-user-slash text-xs" aria-hidden="true"></i>Desactivar</button>
+                <button v-else type="button" class="flex-1 h-11 rounded-xl bg-green-50 text-green-600 text-sm font-semibold flex items-center justify-center gap-2 px-3" @click="cambiarEstado(usuario)"><i class="fa-solid fa-user-check text-xs" aria-hidden="true"></i>Reactivar</button>
+                <button type="button" class="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0" aria-label="Eliminar" @click="eliminar(usuario)"><i class="fa-solid fa-trash text-xs" aria-hidden="true"></i></button>
+              </template>
+            </div>
+          </li>
+        </ul>
+        <div v-if="usuariosFiltrados.length > 0" class="md:hidden px-4 pb-4"><Pagination v-model="paginaActual" :total-items="usuariosFiltrados.length" :per-page="perPage" /></div>
+
+        <DataTable v-if="usuariosFiltrados.length > 0" class="hidden md:block">
           <template #head>
             <tr>
               <th class="text-left">Usuario</th>

@@ -20,8 +20,11 @@
         </div>
       </div>
 
-      <!-- Cómo funciona -->
-      <ol class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <!-- Cómo funciona (en el celular se pliega para no empujar la lista hacia abajo) -->
+      <button type="button" class="md:hidden -mb-3 self-start flex items-center gap-2 h-11 text-sm font-semibold text-[#e67e2d]" :aria-expanded="verPasos" @click="verPasos = !verPasos">
+        <i :class="['fa-solid text-xs', verPasos ? 'fa-chevron-up' : 'fa-circle-question']" aria-hidden="true"></i> {{ verPasos ? 'Ocultar' : '¿Cómo funciona?' }}
+      </button>
+      <ol :class="[verPasos ? 'grid' : 'hidden', 'md:grid grid-cols-1 md:grid-cols-3 gap-3']">
         <li v-for="(p, i) in PASOS" :key="p.titulo" class="flex items-start gap-3 rounded-2xl bg-gray-50 border border-gray-100 p-4">
           <span class="w-7 h-7 rounded-full bg-[#ff8c42] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" aria-hidden="true">{{ i + 1 }}</span>
           <div>
@@ -40,45 +43,54 @@
       </div>
 
       <!-- Acciones masivas -->
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-        <p class="font-semibold text-gray-900">{{ paginacion.total }} {{ paginacion.total === 1 ? 'prenda' : 'prendas' }} <span class="font-normal text-gray-500">· esta página: {{ grupos.length }} {{ grupos.length === 1 ? 'modelo' : 'modelos' }}</span></p>
-        <span class="flex-1"></span>
-        <button type="button" class="h-9 px-3 rounded-lg text-xs font-semibold text-[#e67e2d] bg-orange-50 hover:bg-orange-100 transition-colors" @click="poner(1)">1 a cada una de esta página</button>
-        <button type="button" class="h-9 px-3 rounded-lg text-xs font-semibold text-[#e67e2d] bg-orange-50 hover:bg-orange-100 transition-colors" @click="ponerSegunStock" :disabled="cargandoStock"><i v-if="cargandoStock" class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Una por unidad en stock (todo el filtro)</button>
-        <button type="button" class="h-9 px-3 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors" @click="quitarTodas">Quitar todas</button>
+      <div class="space-y-2.5">
+        <p class="text-sm font-semibold text-gray-900">{{ paginacion.total }} {{ paginacion.total === 1 ? 'prenda' : 'prendas' }} <span class="font-normal text-gray-500">· esta página: {{ grupos.length }} {{ grupos.length === 1 ? 'modelo' : 'modelos' }}</span></p>
+        <div class="flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:flex-wrap sm:overflow-visible" role="group" aria-label="Elegir cuántas etiquetas imprimir">
+          <button type="button" class="h-11 sm:h-9 px-3.5 sm:px-3 flex-shrink-0 rounded-xl sm:rounded-lg text-sm sm:text-xs font-semibold whitespace-nowrap text-[#e67e2d] bg-orange-50 hover:bg-orange-100 transition-colors" @click="poner(1)">1 a cada una con stock (esta página)</button>
+          <button type="button" class="h-11 sm:h-9 px-3.5 sm:px-3 flex-shrink-0 rounded-xl sm:rounded-lg text-sm sm:text-xs font-semibold whitespace-nowrap text-[#e67e2d] bg-orange-50 hover:bg-orange-100 transition-colors disabled:opacity-60" :disabled="cargandoStock" @click="ponerSegunStock"><i v-if="cargandoStock" class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i>Una por unidad en stock (todo el filtro)</button>
+          <button type="button" class="h-11 sm:h-9 px-3.5 sm:px-3 flex-shrink-0 rounded-xl sm:rounded-lg text-sm sm:text-xs font-semibold whitespace-nowrap text-gray-600 bg-gray-100 sm:bg-transparent hover:bg-gray-200 transition-colors" @click="quitarTodas">Quitar todas</button>
+        </div>
       </div>
 
       <!-- Modelos -->
       <div v-if="grupos.length" class="grid grid-cols-1 min-[1500px]:grid-cols-2 gap-4 items-start">
         <section v-for="g in grupos" :key="g.clave" class="bg-surface rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <header class="flex items-center gap-3 px-5 py-4 bg-gray-50/70 border-b border-gray-100">
+          <header class="flex items-center gap-3 px-4 sm:px-5 py-3.5 sm:py-4 bg-gray-50/70 border-b border-gray-100">
             <span class="w-10 h-10 rounded-xl bg-orange-50 text-[#ff8c42] flex items-center justify-center flex-shrink-0" aria-hidden="true"><i class="fa-solid fa-shirt"></i></span>
             <div class="min-w-0 flex-1">
-              <h3 class="font-bold text-gray-900 leading-tight truncate">{{ g.producto }}</h3>
-              <p class="text-xs text-gray-500 truncate">{{ g.marca }} · {{ g.categoria }} · {{ g.items.length }} {{ g.items.length === 1 ? 'variante' : 'variantes' }} · {{ g.stock }} en stock</p>
+              <h3 class="font-bold text-gray-900 leading-tight break-words sm:truncate">{{ g.producto }}</h3>
+              <p class="text-xs text-gray-500 leading-snug sm:truncate">{{ g.marca }} · {{ g.categoria }} · {{ g.items.length }} {{ g.items.length === 1 ? 'variante' : 'variantes' }} · {{ g.stock }} en stock</p>
             </div>
-            <button type="button" class="h-9 px-3 rounded-lg text-xs font-semibold text-gray-600 hover:text-[#e67e2d] hover:bg-orange-50 transition-colors whitespace-nowrap hidden sm:block" @click="etiquetarModelo(g)">Etiquetar modelo</button>
+            <button type="button" class="h-10 sm:h-9 px-3 rounded-lg text-xs font-semibold text-[#e67e2d] bg-orange-50 sm:bg-transparent sm:text-gray-600 hover:text-[#e67e2d] hover:bg-orange-50 transition-colors whitespace-nowrap flex-shrink-0" @click="etiquetarModelo(g)">Etiquetar<span class="hidden sm:inline"> modelo</span></button>
           </header>
 
           <ul class="divide-y divide-gray-100">
-            <li v-for="v in g.items" :key="v.id" class="px-5 py-3 flex flex-wrap items-center gap-x-4 gap-y-2.5 sm:grid sm:grid-cols-[minmax(0,1.2fr)_3.5rem_5.5rem_minmax(0,1.6fr)_auto]">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <ColorSwatch :hex="v.colorHex" class="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0" />
-                <span class="text-sm font-semibold text-gray-900 truncate">{{ v.color }}</span>
+            <li
+              v-for="v in g.items"
+              :key="v.id"
+              class="px-4 sm:px-5 py-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 sm:gap-x-4 sm:grid-cols-[minmax(0,1.2fr)_3.5rem_5.5rem_minmax(0,1.6fr)_auto]"
+            >
+              <!-- Color y talla -->
+              <div class="col-start-1 row-start-1 flex items-center gap-2.5 min-w-0 sm:contents">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <ColorSwatch :hex="v.colorHex" class="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0" />
+                  <span class="text-sm font-semibold text-gray-900 truncate">{{ v.color }}</span>
+                </div>
+                <span class="inline-flex items-center justify-center min-w-[2.75rem] h-7 px-2 rounded-lg bg-gray-100 text-xs font-bold text-gray-700 flex-shrink-0 sm:justify-self-start">{{ v.talla }}</span>
               </div>
 
-              <span class="inline-flex items-center justify-center min-w-[3rem] h-7 px-2 rounded-lg bg-gray-100 text-xs font-bold text-gray-700 justify-self-start">{{ v.talla }}</span>
+              <span :class="['hidden sm:block text-xs font-semibold tabular-nums', v.stock > 0 ? 'text-gray-600' : 'text-gray-400']">{{ v.stock > 0 ? v.stock + ' en stock' : 'Sin stock' }}</span>
 
-              <span :class="['text-xs font-semibold tabular-nums', v.stock > 0 ? 'text-gray-600' : 'text-gray-400']">{{ v.stock > 0 ? v.stock + ' en stock' : 'Sin stock' }}</span>
-
-              <div class="flex items-center gap-2 flex-1 basis-56 min-w-0 sm:flex-none sm:basis-auto">
+              <!-- Código, origen, stock (solo móvil) y cambiar -->
+              <div class="col-span-2 row-start-2 flex items-center gap-2 min-w-0 sm:col-span-1 sm:row-start-auto">
                 <code class="px-2.5 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-gray-800 tracking-wider truncate">{{ v.codigo }}</code>
                 <span :class="['text-[11px] font-semibold rounded-full px-2 py-0.5 whitespace-nowrap', v.propio ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700']">
                   {{ v.propio ? 'Propio' : 'De fábrica' }}
                 </span>
+                <span :class="['sm:hidden flex-1 min-w-0 truncate text-xs font-semibold tabular-nums', v.stock > 0 ? 'text-gray-500' : 'text-gray-400']">{{ v.stock > 0 ? v.stock + ' en stock' : 'Sin stock' }}</span>
                 <button
                   type="button"
-                  class="w-9 h-9 rounded-lg text-gray-400 hover:text-[#e67e2d] hover:bg-orange-50 flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]"
+                  class="w-11 h-11 -my-1.5 sm:my-0 sm:w-9 sm:h-9 rounded-lg text-gray-400 hover:text-[#e67e2d] hover:bg-orange-50 flex items-center justify-center flex-shrink-0 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]"
                   :aria-label="`Cambiar código de ${v.producto} ${v.color} talla ${v.talla}`"
                   title="Cambiar código"
                   @click="editando = v"
@@ -87,8 +99,9 @@
                 </button>
               </div>
 
-              <div class="inline-flex items-center rounded-xl border border-gray-200 bg-surface overflow-hidden" role="group" :aria-label="`Etiquetas de ${v.producto} ${v.color} talla ${v.talla}`">
-                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:bg-gray-100" aria-label="Una etiqueta menos" :disabled="!(copias[v.id] > 0)" @click="copias[v.id] = limitar((copias[v.id] || 0) - 1)">
+              <!-- Cuántas etiquetas -->
+              <div class="col-start-2 row-start-1 sm:col-auto sm:row-auto inline-flex items-center rounded-xl border border-gray-200 bg-surface overflow-hidden" role="group" :aria-label="`Etiquetas de ${v.producto} ${v.color} talla ${v.talla}`">
+                <button type="button" class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:bg-gray-100" aria-label="Una etiqueta menos" :disabled="!(copias[v.id] > 0)" @click="copias[v.id] = limitar((copias[v.id] || 0) - 1)">
                   <i class="fa-solid fa-minus text-[10px]" aria-hidden="true"></i>
                 </button>
                 <input
@@ -97,11 +110,12 @@
                   min="0"
                   max="99"
                   inputmode="numeric"
-                  class="w-12 h-10 border-0 border-x border-gray-200 bg-transparent text-center text-sm font-bold focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  class="w-12 h-11 sm:h-10 border-0 border-x border-gray-200 bg-transparent text-center text-base sm:text-sm font-bold focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   :class="copias[v.id] > 0 ? 'text-[#e67e2d]' : 'text-gray-400'"
-                  @input="copias[v.id] = limitar($event.target.value)"
+                  :disabled="v.stock <= 0"
+                  @input="copias[v.id] = limitar($event.target.value, v)"
                 >
-                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:bg-gray-100" aria-label="Una etiqueta más" :disabled="(copias[v.id] || 0) >= 99" @click="copias[v.id] = limitar((copias[v.id] || 0) + 1)">
+                <button type="button" class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:bg-gray-100" aria-label="Una etiqueta más" :disabled="(copias[v.id] || 0) >= tope(v)" :title="v.stock > 0 ? undefined : 'Sin stock: no hay prenda para etiquetar'" @click="copias[v.id] = limitar((copias[v.id] || 0) + 1, v)">
                   <i class="fa-solid fa-plus text-[10px]" aria-hidden="true"></i>
                 </button>
               </div>
@@ -115,25 +129,31 @@
       <EmptyState v-if="!grupos.length" icon="fa-solid fa-barcode" title="No hay prendas que coincidan" text="Prueba con otro modelo, color, talla o código, o cambia el filtro." />
     </div>
 
-    <!-- Barra de impresión -->
-    <div class="fixed bottom-4 inset-x-4 lg:left-auto lg:right-8 z-40 lg:w-[min(640px,calc(100vw-22rem))]" role="region" aria-label="Imprimir etiquetas">
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-fg text-canvas pl-5 pr-2 py-2 shadow-2xl shadow-black/30">
-        <p class="flex-1 text-sm font-medium min-w-[7rem]">
-          <i class="fa-solid fa-tags text-[#ff8c42] mr-1.5" aria-hidden="true"></i><b>{{ totalEtiquetas }}</b> {{ totalEtiquetas === 1 ? 'etiqueta' : 'etiquetas' }}
+    <!-- Barra de impresión: una sola línea también en el celular -->
+    <div class="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] inset-x-3 sm:inset-x-4 lg:left-auto lg:right-8 z-40 lg:w-[min(640px,calc(100vw-22rem))]" role="region" aria-label="Imprimir etiquetas">
+      <div class="flex items-center gap-2 sm:gap-3 rounded-2xl bg-fg text-canvas pl-4 pr-2 py-2 shadow-2xl shadow-black/30">
+        <p class="flex-1 min-w-0 text-sm font-medium whitespace-nowrap">
+          <i class="fa-solid fa-tags text-[#ff8c42] mr-1.5" aria-hidden="true"></i><b>{{ totalEtiquetas }}</b><span class="hidden min-[420px]:inline"> {{ totalEtiquetas === 1 ? 'etiqueta' : 'etiquetas' }}</span><span class="sr-only min-[420px]:hidden"> etiquetas</span>
         </p>
-        <label class="flex items-center gap-2 text-xs font-semibold">
+        <label class="flex-shrink-0">
           <span class="sr-only">Tamaño de la etiqueta</span>
-          <select v-model="tamanoId" class="h-10 rounded-xl border-0 bg-canvas/10 text-canvas text-sm font-semibold pl-3 pr-8 focus:ring-2 focus:ring-[#ff8c42]">
+          <select v-model="tamanoId" class="h-11 rounded-xl border-0 bg-canvas/10 text-canvas text-sm font-semibold pl-3 pr-8 focus:ring-2 focus:ring-[#ff8c42]">
             <option v-for="t in TAMANOS" :key="t.id" :value="t.id" class="text-gray-900">{{ t.label }}</option>
           </select>
         </label>
-        <label class="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-          <input v-model="conPrecio" type="checkbox" class="rounded border-0 bg-canvas/20 text-[#ff8c42] focus:ring-[#ff8c42]"> Precio
-        </label>
+        <button
+          type="button"
+          :aria-pressed="conPrecio"
+          :title="conPrecio ? 'La etiqueta lleva el precio' : 'La etiqueta no lleva el precio'"
+          :class="['h-11 min-w-[2.75rem] px-3 flex-shrink-0 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]', conPrecio ? 'bg-[#ff8c42]/20 text-[#ff8c42]' : 'bg-canvas/10 text-canvas/60']"
+          @click="conPrecio = !conPrecio"
+        >
+          S/<span class="hidden sm:inline text-xs font-semibold"> Precio</span><span class="sr-only">: {{ conPrecio ? 'incluido' : 'sin precio' }}</span>
+        </button>
         <button
           type="button"
           :disabled="totalEtiquetas === 0"
-          class="h-10 px-5 rounded-xl bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.98] text-white text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-canvas"
+          class="h-11 px-4 flex-shrink-0 rounded-xl bg-[#ff8c42] hover:bg-[#f27d30] active:scale-[0.98] text-white text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-canvas"
           @click="imprimir"
         >
           <i class="fa-solid fa-print text-xs" aria-hidden="true"></i> Imprimir
@@ -214,6 +234,7 @@ const pestanas = computed(() => [
 ]);
 const busqueda = ref(props.filtros.buscar);
 const filtro = ref(props.filtros.filtro);
+const verPasos = ref(false); // los 3 pasos se pliegan en el celular
 
 const ir = (extra = {}) => {
   router.get(route('admin.codigos.index'), {
@@ -263,17 +284,21 @@ const grupos = computed(() => {
   return [...mapa.values()];
 });
 
-const etiquetarModelo = (g) => g.items.forEach((v) => { copias[v.id] = Math.max(1, copias[v.id] || 0); });
+// Solo las prendas con stock: una etiqueta se pega en una prenda real. Las agotadas se etiquetan al volver a comprarlas
+// (y si hiciera falta antes, se puede subir su contador a mano).
+const etiquetarModelo = (g) => g.items.filter((v) => v.stock > 0).forEach((v) => { copias[v.id] = Math.max(1, copias[v.id] || 0); });
 
 // --- Cuántas etiquetas imprimir de cada prenda ----------------------------------------------------
 // La selección sobrevive al cambiar de página: se guardan los datos de cada prenda elegida.
 const copias = reactive({});
 const datos = {};
-const limitar = (valor) => Math.min(99, Math.max(0, parseInt(valor, 10) || 0));
+// Sin stock no hay prenda a la que pegarle la etiqueta: el tope de esas prendas es 0.
+const tope = (v) => (v.stock > 0 ? 99 : 0);
+const limitar = (valor, v = null) => Math.min(v ? tope(v) : 99, Math.max(0, parseInt(valor, 10) || 0));
 
 watch(() => props.variantes, (lista) => lista.forEach((v) => { datos[v.id] = v; }), { immediate: true });
 
-const poner = (n) => visibles.value.forEach((v) => { copias[v.id] = n; });
+const poner = (n) => visibles.value.filter((v) => n === 0 || v.stock > 0).forEach((v) => { copias[v.id] = n; });
 const quitarTodas = () => Object.keys(copias).forEach((id) => { copias[id] = 0; });
 
 // «Una por unidad en stock» abarca todas las prendas del filtro, no solo la página que se ve.

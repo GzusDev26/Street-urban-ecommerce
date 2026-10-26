@@ -22,7 +22,34 @@
           <SearchInput v-model="filtroTexto" placeholder="Buscar por nombre, email o teléfono" class="w-full sm:w-80" />
         </template>
 
-        <DataTable v-if="proveedoresFiltrados.length > 0">
+        <!-- Celular: una tarjeta por proveedor -->
+        <ul v-if="proveedoresFiltrados.length > 0" class="md:hidden px-4 pb-2 space-y-2.5">
+          <li v-for="proveedor in proveedoresPaginados" :key="'m' + proveedor.id" class="rounded-2xl border border-gray-100 bg-surface p-3.5">
+            <div class="flex items-start gap-3">
+              <InitialsAvatar :name="proveedor.name" :id="proveedor.id" icon="fa-solid fa-store" />
+              <div class="min-w-0 flex-1">
+                <p class="font-semibold text-gray-900 leading-tight break-words">{{ proveedor.name }}</p>
+                <p v-if="proveedor.address" class="flex items-start gap-1.5 text-xs text-gray-500 mt-1"><i class="fa-solid fa-location-dot text-gray-400 mt-0.5" aria-hidden="true"></i><span class="break-words min-w-0">{{ proveedor.address }}</span></p>
+                <p v-else class="text-xs text-gray-400 mt-1">Sin dirección</p>
+              </div>
+            </div>
+
+            <div v-if="proveedor.email || proveedor.phone" class="mt-3 space-y-1.5 text-sm text-gray-700">
+              <p v-if="proveedor.phone" class="flex items-center gap-2.5"><i class="fa-solid fa-phone text-gray-400 text-xs w-3.5" aria-hidden="true"></i><a :href="'tel:' + proveedor.phone" class="tabular-nums">{{ proveedor.phone }}</a></p>
+              <p v-if="proveedor.email" class="flex items-center gap-2.5 min-w-0"><i class="fa-regular fa-envelope text-gray-400 text-xs w-3.5" aria-hidden="true"></i><span class="truncate">{{ proveedor.email }}</span></p>
+            </div>
+            <p class="mt-2 text-[11px] text-gray-400">Registrado {{ proveedor.registrado }}</p>
+
+            <div class="mt-3 grid grid-cols-[1fr_auto_auto] gap-2">
+                <button type="button" class="h-11 rounded-xl bg-purple-50 text-purple-600 text-sm font-semibold flex items-center justify-center gap-2 px-3" @click="verHistorial(proveedor)"><i class="fa-solid fa-receipt text-xs" aria-hidden="true"></i>Historial</button>
+                <button type="button" aria-label="Editar" class="h-11 rounded-xl bg-blue-50 text-blue-600 text-sm font-semibold flex items-center justify-center gap-2 w-11" @click="editarProveedor(proveedor)"><i class="fa-solid fa-pen text-xs" aria-hidden="true"></i></button>
+                <button type="button" aria-label="Eliminar" class="h-11 rounded-xl bg-red-50 text-red-500 text-sm font-semibold flex items-center justify-center gap-2 w-11" @click="eliminar(proveedor)"><i class="fa-solid fa-trash text-xs" aria-hidden="true"></i></button>
+            </div>
+          </li>
+        </ul>
+        <div v-if="proveedoresFiltrados.length > 0" class="md:hidden px-4 pb-4"><Pagination v-model="paginaActual" :total-items="proveedoresFiltrados.length" :per-page="perPage" /></div>
+
+        <DataTable v-if="proveedoresFiltrados.length > 0" class="hidden md:block">
           <template #head>
             <tr>
               <th class="text-left">Proveedor</th>

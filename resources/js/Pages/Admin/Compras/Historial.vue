@@ -4,9 +4,9 @@
     <template #breadcrumb>Compras / Historial</template>
     <template #header>Historial de Compras</template>
 
-    <div class="space-y-6">
-      <!-- Tabs -->
-      <div class="flex gap-2 border-b border-gray-200">
+    <div class="space-y-5 sm:space-y-6">
+      <!-- Tabs (en el celular se deslizan hacia el lado si no caben) -->
+      <div class="flex gap-2 border-b border-gray-200 overflow-x-auto whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0">
         <Link
           :href="route('admin.purchases.index')"
           class="px-4 py-2.5 text-sm font-semibold text-gray-400 hover:text-gray-600 border-b-2 border-transparent"
@@ -35,28 +35,28 @@
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Total de Compras Registradas</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">{{ stats.totalCompras }}</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
+        <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Compras registradas</p>
+          <p class="text-2xl sm:text-3xl font-black text-gray-900 mt-1 tabular-nums">{{ stats.totalCompras }}</p>
         </div>
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Total Invertido</p>
-          <p class="text-3xl font-black text-[#ff8c42] mt-1">S/ {{ stats.totalGastado.toFixed(2) }}</p>
+        <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Promedio por compra</p>
+          <p class="text-xl min-[400px]:text-2xl sm:text-3xl font-black text-gray-900 mt-1 tabular-nums whitespace-nowrap">S/ {{ stats.promedioCompra.toFixed(2) }}</p>
         </div>
-        <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p class="text-sm text-gray-400 font-medium">Promedio por Compra</p>
-          <p class="text-3xl font-black text-gray-900 mt-1">S/ {{ stats.promedioCompra.toFixed(2) }}</p>
+        <div class="col-span-2 sm:col-span-1 bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+          <p class="text-xs sm:text-sm text-gray-500 font-medium">Total invertido</p>
+          <p class="text-3xl font-black text-[#ff8c42] mt-1 tabular-nums">S/ {{ stats.totalGastado.toFixed(2) }}</p>
         </div>
       </div>
 
       <!-- List -->
       <ListCard title="Compras registradas" subtitle="Historial de compras de mercadería a tus proveedores">
         <template #toolbar>
-          <SearchInput v-model="filtroTexto" placeholder="Buscar por producto, proveedor, factura o N° de compra" class="w-full sm:w-96" />
+          <SearchInput v-model="filtroTexto" placeholder="Producto, proveedor, factura o N°" class="w-full sm:w-96" />
         </template>
 
-        <div v-if="compras.length > 0" class="space-y-3 px-6 pb-6">
+        <div v-if="compras.length > 0" class="space-y-3 px-4 sm:px-6 pb-4 sm:pb-6">
           <div
             v-for="compra in compras"
             :key="compra.id"
@@ -69,10 +69,10 @@
           >
             <button
               @click="toggleExpand(compra.id)"
-              class="w-full flex items-center justify-between px-5 py-4 hover:bg-orange-50/40 transition-colors text-left"
+              class="w-full flex items-start sm:items-center justify-between gap-3 px-3.5 sm:px-5 py-3.5 sm:py-4 hover:bg-orange-50/40 transition-colors text-left"
             >
-              <div class="flex items-center gap-4 min-w-0">
-                <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded flex-shrink-0">{{ compra.numero }}</span>
+              <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+                <span class="font-mono text-[11px] sm:text-xs bg-gray-100 text-gray-600 px-1.5 sm:px-2 py-1 rounded flex-shrink-0 mt-0.5 sm:mt-0">{{ compra.numero }}</span>
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 min-w-0">
                     <p :class="['text-sm font-semibold text-gray-900 truncate', compra.cancelada ? 'line-through' : '']">{{ tituloCompra(compra) }}</p>
@@ -80,7 +80,7 @@
                       <i class="fa-solid fa-ban text-[9px] mr-1"></i>Cancelada
                     </span>
                   </div>
-                  <p class="text-xs text-gray-400 mt-0.5">
+                  <p class="text-xs text-gray-500 mt-0.5 leading-snug">
                     {{ compra.fecha }} · {{ compra.totalPrendas }} prenda{{ compra.totalPrendas === 1 ? '' : 's' }}
                     <span v-if="compra.proveedor"> · {{ compra.proveedor }}</span>
                     <span v-if="compra.factura"> · Factura {{ compra.factura }}</span>
@@ -89,26 +89,44 @@
                   </p>
                 </div>
               </div>
-              <div class="flex items-center gap-4 flex-shrink-0">
-                <span :class="['text-lg font-bold text-gray-900', compra.cancelada ? 'line-through' : '']">S/ {{ compra.total.toFixed(2) }}</span>
+              <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                <span :class="['text-base sm:text-lg font-bold text-gray-900 tabular-nums', compra.cancelada ? 'line-through' : '']">S/ {{ compra.total.toFixed(2) }}</span>
                 <i :class="['fa-solid', expandedId === compra.id ? 'fa-chevron-up' : 'fa-chevron-down', 'text-gray-400 text-xs']"></i>
               </div>
             </button>
 
-            <div v-if="expandedId === compra.id" class="border-t border-gray-100 bg-gray-50 px-5 py-4">
-              <div class="flex items-center justify-between mb-3">
+            <div v-if="expandedId === compra.id" class="border-t border-gray-100 bg-gray-50 px-3.5 sm:px-5 py-4">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <p v-if="compra.notas" class="text-xs text-gray-500 italic">"{{ compra.notas }}"</p>
                 <span v-else></span>
                 <button
                   v-if="!compra.cancelada && esAdmin"
                   @click="cancelarCompra(compra)"
-                  class="text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-surface border border-red-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors"
+                  class="hidden sm:flex items-center gap-1.5 flex-shrink-0 text-xs font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-surface border border-red-200 px-3 py-1.5 rounded-lg transition-colors"
                 >
                   <i class="fa-solid fa-ban text-[11px]"></i> Cancelar Compra
                 </button>
               </div>
 
-              <table class="w-full text-xs">
+              <!-- Celular: una tarjeta por prenda -->
+              <ul class="sm:hidden space-y-2.5">
+                <li v-for="(item, idx) in compra.items" :key="'m' + idx" class="bg-surface rounded-xl border border-gray-100 p-3.5">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-gray-900 leading-tight">{{ item.producto }}</p>
+                      <p class="text-xs text-gray-500 mt-0.5">{{ item.marca }}</p>
+                    </div>
+                    <p class="text-sm font-black text-gray-900 tabular-nums flex-shrink-0">S/ {{ item.subtotal.toFixed(2) }}</p>
+                  </div>
+                  <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-gray-600">
+                    <span class="inline-flex items-center gap-1.5"><ColorSwatch :hex="item.colorHex" class="w-3.5 h-3.5 rounded-full border border-gray-200" />{{ item.color }}</span>
+                    <span class="font-semibold bg-gray-100 rounded-md px-2 py-0.5">Talla {{ item.talla }}</span>
+                    <span class="tabular-nums">{{ item.cantidad }} × S/ {{ item.costoUnitario.toFixed(2) }}</span>
+                  </div>
+                </li>
+              </ul>
+
+              <table class="hidden sm:table w-full text-xs">
                 <thead>
                   <tr class="text-gray-400">
                     <th class="text-left py-1.5 pr-4 font-semibold">Producto</th>
@@ -137,6 +155,15 @@
                   </tr>
                 </tbody>
               </table>
+
+              <!-- Celular: la acción de cancelar va al final, después de ver lo que se cancelaría -->
+              <button
+                v-if="!compra.cancelada && esAdmin"
+                @click="cancelarCompra(compra)"
+                class="sm:hidden mt-4 w-full h-11 justify-center text-sm font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-surface border border-red-200 rounded-xl flex items-center gap-2 transition-colors"
+              >
+                <i class="fa-solid fa-ban text-xs" aria-hidden="true"></i> Cancelar compra
+              </button>
             </div>
           </div>
 

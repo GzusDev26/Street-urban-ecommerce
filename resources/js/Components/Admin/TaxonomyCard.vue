@@ -90,54 +90,54 @@ const confirmarEliminacion = () => {
 </script>
 
 <template>
-  <div class="bg-surface rounded-2xl border border-gray-100 p-6 shadow-sm">
+  <div class="bg-surface rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm">
     <div class="flex items-center gap-2 mb-1">
       <i :class="['fa-solid', icon, 'text-gray-400 text-sm']"></i>
       <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>
       <span class="text-xs text-gray-400 font-medium">({{ items.length }})</span>
     </div>
 
-    <form @submit.prevent="agregar" class="flex flex-wrap items-start gap-2 mt-4 mb-5">
+    <form @submit.prevent="agregar" class="flex flex-col sm:flex-row sm:flex-wrap sm:items-start gap-2 mt-4 mb-5">
       <input
         :aria-label="`Nueva ${entityLabel}`"
         v-model="nuevoNombre"
         type="text"
         :placeholder="`Nueva ${entityLabel}...`"
-        class="flex-1 min-w-[140px] px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
+        class="w-full sm:w-auto sm:flex-1 sm:min-w-[140px] h-11 sm:h-auto px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
       />
       <input
         :aria-label="`Descripción de la nueva ${entityLabel}`"
         v-model="nuevaDescripcion"
         type="text"
         placeholder="Descripción (opcional)"
-        class="flex-1 min-w-[140px] px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
+        class="w-full sm:w-auto sm:flex-1 sm:min-w-[140px] h-11 sm:h-auto px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
       />
       <select
         v-if="withSizeType"
         v-model="nuevoTipo"
         aria-label="Tipo de tallas de la nueva categoría"
-        class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
+        class="w-full sm:w-auto h-11 sm:h-auto px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
       >
         <option v-for="t in TIPOS_TALLA" :key="t.id" :value="t.id">Tallas de {{ t.nombre.toLowerCase() }} ({{ t.ejemplo }})</option>
       </select>
       <button
         type="submit"
         :disabled="creando || !nuevoNombre.trim()"
-        class="bg-[#ff8c42] hover:bg-[#ff7a24] disabled:opacity-40 text-white text-sm font-bold py-2 px-4 rounded-lg transition flex items-center gap-1.5 flex-shrink-0"
+        class="bg-[#ff8c42] hover:bg-[#ff7a24] disabled:opacity-40 text-white text-sm font-bold h-11 sm:h-auto sm:py-2 px-4 rounded-lg transition flex items-center justify-center gap-1.5 sm:flex-shrink-0"
       >
         <i class="fa-solid fa-plus text-xs"></i> Agregar
       </button>
     </form>
 
     <div v-if="items.length > 0" class="divide-y divide-gray-50">
-      <div v-for="item in items" :key="item.id" class="py-3 flex items-start gap-3">
+      <div v-for="item in items" :key="item.id" class="py-3 flex flex-wrap items-start gap-x-3 gap-y-2">
         <template v-if="editandoId === item.id">
-          <div class="flex-1 space-y-2">
+          <div class="w-full sm:w-auto sm:flex-1 space-y-2">
             <input
               aria-label="Nombre"
               v-model="editName"
               type="text"
-              class="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
+              class="w-full h-11 sm:h-auto px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
               @keyup.enter="guardar(item)"
             />
             <input
@@ -145,31 +145,33 @@ const confirmarEliminacion = () => {
               v-model="editDescription"
               type="text"
               placeholder="Descripción (opcional)"
-              class="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
+              class="w-full h-11 sm:h-auto px-3 py-1.5 text-sm sm:text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42]"
               @keyup.enter="guardar(item)"
             />
             <select
               v-if="withSizeType"
               v-model="editTipo"
               aria-label="Tipo de tallas"
-              class="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
+              class="w-full h-11 sm:h-auto px-3 py-1.5 text-sm sm:text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8c42] bg-surface"
             >
               <option v-for="t in TIPOS_TALLA" :key="t.id" :value="t.id">Tallas de {{ t.nombre.toLowerCase() }} ({{ t.ejemplo }})</option>
             </select>
           </div>
-          <div class="flex items-center gap-1.5 flex-shrink-0 pt-1">
+          <div class="flex items-center gap-2 sm:gap-1.5 flex-shrink-0 sm:pt-1 ml-auto">
             <button
+              aria-label="Guardar"
               @click="guardar(item)"
               :disabled="guardando"
               title="Guardar"
-              class="w-8 h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-500 hover:text-green-600 flex items-center justify-center transition-colors disabled:opacity-50"
+              class="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-green-50 hover:bg-green-100 text-green-500 hover:text-green-600 flex items-center justify-center transition-colors disabled:opacity-50"
             >
               <i class="fa-solid fa-check text-xs"></i>
             </button>
             <button
+              aria-label="Cancelar"
               @click="cancelarEdicion"
               title="Cancelar"
-              class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition-colors"
+              class="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center transition-colors"
             >
               <i class="fa-solid fa-xmark text-xs"></i>
             </button>
@@ -177,7 +179,7 @@ const confirmarEliminacion = () => {
         </template>
 
         <template v-else>
-          <div class="flex-1 min-w-0">
+          <div class="flex-1 min-w-[55%] sm:min-w-0">
             <p class="text-sm font-semibold text-gray-900 truncate">{{ item.name }}</p>
             <p v-if="item.description" class="text-xs text-gray-400 truncate">{{ item.description }}</p>
           </div>
@@ -192,18 +194,20 @@ const confirmarEliminacion = () => {
           >
             {{ item.productos }} producto{{ item.productos === 1 ? '' : 's' }}
           </span>
-          <div class="flex items-center gap-1.5 flex-shrink-0">
+          <div class="flex items-center gap-2 sm:gap-1.5 flex-shrink-0 ml-auto">
             <button
+              aria-label="Editar"
               @click="editar(item)"
               title="Editar"
-              class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 flex items-center justify-center transition-colors"
+              class="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 flex items-center justify-center transition-colors"
             >
               <i class="fa-solid fa-pen text-xs"></i>
             </button>
             <button
+              aria-label="Eliminar"
               @click="eliminar(item)"
               title="Eliminar"
-              class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 flex items-center justify-center transition-colors"
+              class="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 flex items-center justify-center transition-colors"
             >
               <i class="fa-solid fa-trash text-xs"></i>
             </button>

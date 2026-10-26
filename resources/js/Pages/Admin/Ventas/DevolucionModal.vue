@@ -1,4 +1,5 @@
 <script setup>
+import { useBloqueoScroll } from '@/useBloqueoScroll';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import ColorSwatch from '@/Components/Admin/ColorSwatch.vue';
@@ -41,6 +42,8 @@ const guardar = () => {
     },
   });
 };
+
+useBloqueoScroll(); // la página de atrás no se mueve mientras está abierto
 </script>
 
 <template>

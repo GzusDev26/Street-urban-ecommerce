@@ -18,7 +18,7 @@ const ancho = (v) => (maximo.value > 0 ? Math.max(1.5, (v / maximo.value) * 100)
 </script>
 
 <template>
-  <section class="viz bg-surface rounded-2xl border border-gray-100 shadow-sm p-6">
+  <section class="viz bg-surface rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
     <header class="flex items-center gap-2.5 mb-5">
       <span class="w-9 h-9 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center" aria-hidden="true"><i :class="icono" class="text-sm"></i></span>
       <h3 class="font-bold text-gray-900">{{ titulo }}</h3>

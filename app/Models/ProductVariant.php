@@ -31,10 +31,14 @@ class ProductVariant extends Model
         return self::PREFIJO_CODIGO . str_pad((string) $id, 6, '0', STR_PAD_LEFT);
     }
 
-    // Quita espacios y deja el código en mayúsculas (los lectores a veces agregan espacios o saltos).
+    // Quita espacios y deja el código en mayúsculas (los lectores a veces agregan espacios o saltos). Un UPC-A de 12
+    // dígitos es el mismo código que el EAN-13 con un 0 delante: se guarda y se busca siempre con 13, así da igual
+    // con cuál de los dos lo entregue la cámara o la pistola.
     public static function normalizarCodigo(string $codigo): string
     {
-        return mb_strtoupper(preg_replace('/\s+/', '', $codigo));
+        $codigo = mb_strtoupper(preg_replace('/\s+/', '', $codigo));
+
+        return preg_match('/^\d{12}$/', $codigo) ? '0' . $codigo : $codigo;
     }
 
     public function product()

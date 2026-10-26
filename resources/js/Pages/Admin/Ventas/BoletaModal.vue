@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div
-      class="boleta-modal-raiz fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex justify-end"
+      class="boleta-modal-raiz fixed inset-0 z-50 bg-black/40 flex justify-end overscroll-none touch-none sm:touch-auto"
       @mousedown="pulsoEnElFondo = $event.target === $event.currentTarget"
       @click.self="pulsoEnElFondo && emit('close')"
     >
@@ -9,10 +9,10 @@
         role="dialog"
         aria-modal="true"
         :aria-label="resumen ? 'Venta registrada' : 'Boleta de venta'"
-        class="modal-boleta bg-surface w-full sm:w-[36rem] max-w-full h-full shadow-2xl flex flex-col"
+        class="modal-boleta bg-surface w-full sm:w-[36rem] max-w-full h-[100dvh] max-h-[100dvh] shadow-2xl flex flex-col touch-auto"
       >
         <!-- Cabecera -->
-        <header class="flex items-start gap-3 px-6 pt-6 pb-4 print:hidden">
+        <header class="flex items-start gap-3 px-5 sm:px-6 pt-5 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0 print:hidden">
           <div v-if="resumen" class="w-11 h-11 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
             <i class="fa-solid fa-check"></i>
           </div>
@@ -37,7 +37,7 @@
         </header>
 
         <!-- Vista previa de la boleta -->
-        <div class="flex-1 min-h-0 overflow-auto bg-gray-200 px-4 py-6 flex justify-center items-start print:bg-surface print:p-0 print:overflow-visible">
+        <div class="flex-1 min-h-0 overflow-y-auto overflow-x-auto overscroll-contain bg-gray-200 px-4 py-6 flex justify-center items-start print:bg-surface print:p-0 print:overflow-visible">
           <div v-if="cargando" class="self-center text-sm text-gray-500 flex items-center gap-2 py-16">
             <i class="fa-solid fa-spinner fa-spin"></i> Cargando boleta...
           </div>
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Acciones -->
-        <footer class="px-6 py-4 border-t border-gray-100 space-y-3 print:hidden">
+        <footer class="px-5 sm:px-6 pt-3 sm:pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-gray-100 space-y-3 flex-shrink-0 print:hidden">
           <div class="flex items-center justify-between gap-3">
             <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Ancho del papel</p>
             <div class="inline-flex p-0.5 bg-gray-100 rounded-xl" role="group" aria-label="Ancho del papel">
@@ -138,13 +138,44 @@ const elegirAncho = (mm) => {
 // Al imprimir, el estilo global oculta el resto de la página y deja solo la boleta.
 const imprimir = () => window.print();
 
+// Si la página quedó ampliada (iOS hace zoom al escribir en un campo), el modal fijo se sale de la pantalla. Fijar un momento
+// el zoom máximo en 1 devuelve la página a su tamaño; enseguida se restaura la configuración normal.
+const restablecerZoom = () => {
+  const meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) return;
+
+  const original = meta.getAttribute('content');
+  meta.setAttribute('content', `${original}, maximum-scale=1`);
+  setTimeout(() => meta.setAttribute('content', original), 350);
+};
+
+// En iOS, `overflow: hidden` en el body no impide que la página de atrás se mueva al deslizar: se fija el body en su
+// lugar y se restaura la posición al cerrar. Así solo se desliza la boleta, y la cabecera y los botones se quedan fijos.
+let scrollGuardado = 0;
+const bloquearPagina = () => {
+  scrollGuardado = window.scrollY;
+  const b = document.body.style;
+  b.position = 'fixed';
+  b.top = `-${scrollGuardado}px`;
+  b.left = '0';
+  b.right = '0';
+  b.width = '100%';
+  b.overflow = 'hidden';
+};
+const liberarPagina = () => {
+  const b = document.body.style;
+  b.position = b.top = b.left = b.right = b.width = b.overflow = '';
+  window.scrollTo(0, scrollGuardado);
+};
+
 const alTeclear = (e) => {
   if (e.key === 'Escape') emit('close');
 };
 
 onMounted(async () => {
   document.addEventListener('keydown', alTeclear);
-  document.body.style.overflow = 'hidden';
+  restablecerZoom();
+  bloquearPagina();
   document.body.classList.add('boleta-modal-abierta');
 
   try {
@@ -159,7 +190,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', alTeclear);
-  document.body.style.overflow = '';
+  liberarPagina();
   document.body.classList.remove('boleta-modal-abierta');
 });
 </script>
@@ -177,6 +208,8 @@ onBeforeUnmount(() => {
 
 @media print {
   /* Solo sale la boleta: se oculta la app y el modal pasa a flujo normal. */
+  /* El body se fija mientras el modal está abierto (ver bloquearPagina): al imprimir vuelve a su flujo normal. */
+  body.boleta-modal-abierta { position: static !important; top: auto !important; width: auto !important; overflow: visible !important; }
   body.boleta-modal-abierta #app { display: none !important; }
   body.boleta-modal-abierta .boleta-modal-raiz {
     position: static !important;

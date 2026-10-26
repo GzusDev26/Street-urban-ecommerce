@@ -56,46 +56,46 @@ const opciones = (l) => [{ value: '', label: l.todas }, ...l.opciones.map((o) =>
 
 <template>
   <section class="flex flex-wrap items-center gap-x-3 gap-y-3" aria-label="Filtros del reporte">
-    <div class="inline-flex flex-wrap gap-1 p-1 rounded-2xl bg-gray-100" role="group" aria-label="Rangos rápidos">
+    <div class="flex sm:inline-flex gap-1 p-1 rounded-2xl bg-gray-100 overflow-x-auto sm:overflow-visible w-full sm:w-auto" role="group" aria-label="Rangos rápidos">
       <button
         v-for="r in rangos"
         :key="r.id"
         type="button"
         :aria-pressed="rangoActivo === r.id"
         :class="[
-          'h-9 px-3.5 rounded-xl text-sm font-semibold transition-colors',
+          'h-10 sm:h-9 px-3.5 flex-shrink-0 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors',
           rangoActivo === r.id ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800',
         ]"
         @click="elegirRango(r)"
       >{{ r.label }}</button>
     </div>
 
-    <div class="inline-flex items-center rounded-xl border border-gray-200 bg-surface divide-x divide-gray-200">
-      <label class="flex items-center gap-2 pl-3.5 pr-2 text-xs font-semibold text-gray-500">
+    <div class="grid grid-cols-2 gap-2 w-full sm:inline-flex sm:items-center sm:w-auto sm:gap-0 sm:rounded-xl sm:border sm:border-gray-200 sm:bg-surface sm:divide-x sm:divide-gray-200">
+      <label class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 sm:pl-3.5 sm:pr-2 text-xs font-semibold text-gray-500 min-w-0">
         Desde
-        <input v-model="form.desde" type="date" class="h-10 border-0 bg-transparent text-sm text-gray-800 px-1 focus:ring-0">
+        <input v-model="form.desde" type="date" class="w-full h-11 sm:h-10 min-w-0 rounded-xl border border-gray-200 sm:border-0 bg-surface sm:bg-transparent text-sm text-gray-800 px-3 sm:px-1 focus:ring-0">
       </label>
-      <label class="flex items-center gap-2 pl-3.5 pr-2 text-xs font-semibold text-gray-500">
+      <label class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 sm:pl-3.5 sm:pr-2 text-xs font-semibold text-gray-500 min-w-0">
         Hasta
-        <input v-model="form.hasta" type="date" class="h-10 border-0 bg-transparent text-sm text-gray-800 px-1 focus:ring-0">
+        <input v-model="form.hasta" type="date" class="w-full h-11 sm:h-10 min-w-0 rounded-xl border border-gray-200 sm:border-0 bg-surface sm:bg-transparent text-sm text-gray-800 px-3 sm:px-1 focus:ring-0">
       </label>
     </div>
 
-    <div v-for="l in listas" :key="l.clave" class="min-w-[200px]">
+    <div v-for="l in listas" :key="l.clave" class="w-full sm:w-auto sm:min-w-[200px]">
       <span class="sr-only">{{ l.etiqueta }}</span>
       <SelectDropdown v-model="form[l.clave]" :options="opciones(l)" />
     </div>
 
-    <button v-if="hayFiltros" type="button" class="h-10 px-2 text-sm font-semibold text-gray-500 hover:text-gray-800 flex items-center gap-1.5" @click="limpiar">
+    <button v-if="hayFiltros" type="button" class="h-11 sm:h-10 px-2 text-sm font-semibold text-gray-500 hover:text-gray-800 flex items-center gap-1.5" @click="limpiar">
       <i class="fa-solid fa-xmark text-xs" aria-hidden="true"></i> Limpiar
     </button>
 
-    <span class="flex-1"></span>
+    <span class="hidden sm:block flex-1"></span>
 
     <a
       :href="urlExcel"
       download
-      class="h-11 px-5 rounded-xl bg-[#1d6f42] hover:bg-[#185c37] active:scale-[0.98] text-white text-sm font-bold flex items-center gap-2.5 shadow-sm transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+      class="h-12 sm:h-11 w-full sm:w-auto justify-center px-5 rounded-xl bg-[#1d6f42] hover:bg-[#185c37] active:scale-[0.98] text-white text-sm font-bold flex items-center gap-2.5 shadow-sm transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
       @click="alDescargar"
     >
       <i :class="descargando ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-excel'" aria-hidden="true"></i>

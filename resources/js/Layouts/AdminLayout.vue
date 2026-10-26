@@ -1,5 +1,7 @@
 <template>
-  <div class="flex h-screen bg-canvas text-gray-900">
+  <!-- Celular: se desliza la página entera (así el navegador deja lo último por encima de su barra de abajo) y el menú de
+       arriba va pegado. Escritorio (lg+): pantalla fija con el aside y solo el contenido se desliza. -->
+  <div class="flex min-h-dvh lg:h-screen lg:overflow-hidden bg-canvas text-gray-900">
     <!-- Fondo oscuro del menú en móvil -->
     <Transition
       enter-active-class="transition-opacity duration-200 motion-reduce:transition-none"
@@ -23,7 +25,7 @@
     <CommandPalette :open="searchOpen" :nav="nav" @close="searchOpen = false" />
 
     <!-- Main Content -->
-    <div class="flex-1 min-w-0 overflow-auto flex flex-col">
+    <div class="flex-1 min-w-0 flex flex-col lg:min-h-0 lg:overflow-hidden">
       <AdminTopbar
         :user="sidebarUser"
         :collapsed="collapsed"
@@ -36,7 +38,8 @@
       </AdminTopbar>
 
       <!-- Content -->
-      <main class="flex-1 p-4 sm:p-8 overflow-auto">
+      <!-- scroll-region: en escritorio, Inertia sube esta zona al inicio al cambiar de pantalla (en el celular lo hace con la página). -->
+      <main class="flex-1 p-4 sm:p-8 pb-[max(2rem,env(safe-area-inset-bottom))] lg:min-h-0 lg:overflow-auto lg:overscroll-contain" scroll-region>
         <slot />
       </main>
     </div>
@@ -44,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AdminSidebar from '@/Components/Admin/AdminSidebar.vue';
 import AdminTopbar from '@/Components/Admin/AdminTopbar.vue';
@@ -92,6 +95,11 @@ const toggleCollapsed = () => {
 };
 
 const mobileOpen = ref(false);
+
+// Con el menú lateral abierto en el celular, la página de atrás no debe moverse.
+watch(mobileOpen, (abierto) => {
+  document.body.style.overflow = abierto ? 'hidden' : '';
+});
 const searchOpen = ref(false);
 const openSearch = () => {
   mobileOpen.value = false;
@@ -108,7 +116,10 @@ const onKeydown = (e) => {
 };
 
 onMounted(() => document.addEventListener('keydown', onKeydown));
-onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown));
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onKeydown);
+  document.body.style.overflow = '';
+});
 </script>
 
 <style scoped>

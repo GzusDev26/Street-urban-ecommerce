@@ -87,8 +87,12 @@ class PurchaseController extends Controller
             ->when($stock === 'sin', fn ($q) => $q->where('stock', 0))
             ->when($stock === 'bajo', fn ($q) => $q->where('stock', '>', 0)->where('stock', '<', $umbral))
             ->when($stock === 'con', fn ($q) => $q->where('stock', '>', 0))
-            ->orderByDesc('updated_at')
-            ->orderByDesc('id');
+            // Por modelo (A-Z) y color, para que las variantes de un mismo modelo queden juntas.
+            ->orderBy(Product::select('name')->whereColumn('products.id', 'product_variants.product_id'))
+            ->orderBy('product_id')
+            ->orderBy('product_color_id')
+            ->orderBy('size')
+            ->orderBy('id');
 
         $paginador = $query->paginate(self::POR_PAGINA, ['*'], 'pagina', max(1, (int) $request->query('pagina', 1)));
 

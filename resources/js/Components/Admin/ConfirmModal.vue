@@ -1,4 +1,5 @@
 <script setup>
+import { useBloqueoScroll } from '@/useBloqueoScroll';
 defineProps({
   title: { type: String, default: '¿Estás seguro?' },
   message: { type: String, default: '' },
@@ -9,6 +10,8 @@ defineProps({
 });
 
 const emit = defineEmits(['confirm', 'close']);
+
+useBloqueoScroll(); // la página de atrás no se mueve mientras está abierto
 </script>
 
 <template>

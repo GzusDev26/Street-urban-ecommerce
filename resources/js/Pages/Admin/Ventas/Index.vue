@@ -4,9 +4,9 @@
     <template #breadcrumb>Ventas / Historial</template>
     <template #header>Historial de Ventas</template>
 
-    <div class="space-y-6">
-      <!-- Tabs -->
-      <div class="flex gap-2 border-b border-gray-200">
+    <div class="space-y-5 sm:space-y-6">
+      <!-- Tabs (en el celular se deslizan hacia el lado si no caben) -->
+      <div class="flex gap-2 border-b border-gray-200 overflow-x-auto whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0">
         <Link
           :href="route('admin.sales.create')"
           class="px-4 py-2.5 text-sm font-semibold text-gray-400 hover:text-gray-600 border-b-2 border-transparent"
@@ -36,14 +36,14 @@
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <div v-for="stat in tarjetas" :key="stat.label" class="bg-surface rounded-2xl border border-gray-100 p-5 shadow-sm flex items-center gap-4">
-          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', stat.fondo]">
-            <i :class="['fa-solid text-lg', stat.icono, stat.color]"></i>
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
+        <div v-for="stat in tarjetas" :key="stat.label" class="bg-surface rounded-2xl border border-gray-100 p-3.5 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center items-start gap-2.5 sm:gap-4">
+          <div :class="['w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0', stat.fondo]">
+            <i :class="['fa-solid text-base sm:text-lg', stat.icono, stat.color]"></i>
           </div>
           <div class="min-w-0">
-            <p class="text-sm text-gray-400 font-medium">{{ stat.label }}</p>
-            <p :class="['text-2xl font-black mt-0.5 truncate', stat.destacado ? 'text-[#ff8c42]' : 'text-gray-900']">{{ stat.valor }}</p>
+            <p class="text-xs sm:text-sm text-gray-500 font-medium">{{ stat.label }}</p>
+            <p :class="['text-xl sm:text-2xl font-black mt-0.5 truncate', stat.destacado ? 'text-[#ff8c42]' : 'text-gray-900']">{{ stat.valor }}</p>
           </div>
         </div>
       </div>
@@ -55,15 +55,15 @@
         </template>
 
         <template #toolbar>
-          <SearchInput v-model="filtroTexto" placeholder="Buscar por producto, cliente o N° de venta" class="w-full sm:w-96" />
-          <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado">
+          <SearchInput v-model="filtroTexto" placeholder="Producto, cliente o N° de venta" class="w-full sm:w-96" />
+          <div class="flex gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 w-[calc(100%+2rem)] sm:w-auto" role="group" aria-label="Filtrar por estado">
             <button
               v-for="f in filtrosEstado"
               :key="f.value"
               @click="filtroEstado = f.value"
               :aria-pressed="filtroEstado === f.value"
               :class="[
-                'text-xs font-semibold px-3.5 py-2 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50',
+                'text-sm sm:text-xs font-semibold px-4 sm:px-3.5 h-11 sm:h-auto sm:py-2 flex-shrink-0 whitespace-nowrap rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]/50',
                 filtroEstado === f.value
                   ? 'bg-[#ff8c42] border-[#ff8c42] text-white shadow-sm'
                   : 'bg-surface border-gray-200 text-gray-500 hover:border-[#ff8c42]/50 hover:text-[#ff8c42]',
@@ -75,7 +75,7 @@
           </div>
         </template>
 
-        <div v-if="ventas.length > 0" class="px-6 pb-6">
+        <div v-if="ventas.length > 0" class="px-4 sm:px-6 pb-4 sm:pb-6">
           <section v-for="grupo in gruposPaginados" :key="grupo.fecha" class="mb-6 last:mb-0">
             <!-- Cabecera del día -->
             <div class="flex items-center gap-3 mb-3">
@@ -104,12 +104,12 @@
                   @click="toggleExpand(venta.id)"
                   :aria-expanded="expandedId === venta.id"
                   :aria-controls="`detalle-${venta.id}`"
-                  class="w-full flex items-center justify-between gap-4 px-5 py-4 hover:bg-orange-50/40 transition-colors text-left focus-visible:outline-none focus-visible:bg-orange-50/60"
+                  class="w-full flex items-center justify-between gap-3 sm:gap-4 px-3.5 sm:px-5 py-3.5 sm:py-4 hover:bg-orange-50/40 transition-colors text-left focus-visible:outline-none focus-visible:bg-orange-50/60"
                 >
-                  <div class="flex items-center gap-4 min-w-0">
+                  <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                     <div
                       :class="[
-                        'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold',
+                        'hidden min-[420px]:flex w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold',
                         venta.cliente ? 'bg-orange-50 text-[#ff8c42]' : 'bg-gray-100 text-gray-300',
                       ]"
                       aria-hidden="true"
@@ -138,25 +138,25 @@
                     </div>
                   </div>
 
-                  <div class="flex items-center gap-4 flex-shrink-0">
+                  <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                     <div class="text-right">
-                      <p :class="['text-lg font-black tabular-nums', venta.cancelada ? 'line-through text-gray-400' : 'text-gray-900']">S/ {{ venta.totalNeto.toFixed(2) }}</p>
+                      <p :class="['text-base sm:text-lg font-black tabular-nums', venta.cancelada ? 'line-through text-gray-400' : 'text-gray-900']">S/ {{ venta.totalNeto.toFixed(2) }}</p>
                       <p v-if="!venta.cancelada && venta.totalNeto !== venta.total" class="text-[11px] text-gray-400 line-through tabular-nums">S/ {{ venta.total.toFixed(2) }}</p>
                     </div>
-                    <span :class="['w-8 h-8 rounded-full flex items-center justify-center transition-colors', expandedId === venta.id ? 'bg-orange-50 text-[#ff8c42]' : 'bg-gray-50 text-gray-400']">
+                    <span :class="['w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors', expandedId === venta.id ? 'bg-orange-50 text-[#ff8c42]' : 'bg-gray-50 text-gray-400']">
                       <i :class="['fa-solid fa-chevron-down text-xs transition-transform duration-200', expandedId === venta.id ? 'rotate-180' : '']"></i>
                     </span>
                   </div>
                 </button>
 
                 <!-- Detalle -->
-                <div v-if="expandedId === venta.id" :id="`detalle-${venta.id}`" class="border-t border-gray-100 bg-gray-50/70 px-5 py-5">
+                <div v-if="expandedId === venta.id" :id="`detalle-${venta.id}`" class="border-t border-gray-100 bg-gray-50/70 px-3.5 sm:px-5 py-4 sm:py-5">
                   <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <p v-if="venta.notas" class="text-xs text-gray-500 italic flex items-center gap-1.5">
                       <i class="fa-regular fa-note-sticky text-gray-300"></i>{{ venta.notas }}
                     </p>
                     <span v-else></span>
-                    <div class="flex items-center gap-2">
+                    <div class="hidden sm:flex items-center gap-2">
                       <button
                         v-if="!venta.cancelada && esAdmin"
                         @click="cancelarVenta(venta)"
@@ -174,7 +174,33 @@
                     </div>
                   </div>
 
-                  <div class="bg-surface rounded-xl border border-gray-100 overflow-x-auto">
+                  <!-- Celular: una tarjeta por prenda (la tabla ancha obligaba a deslizar de lado) -->
+                  <ul class="sm:hidden space-y-2.5">
+                    <li v-for="(item, idx) in venta.items" :key="'m' + idx" class="bg-surface rounded-xl border border-gray-100 p-3.5">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="text-sm font-semibold text-gray-900 leading-tight">{{ item.producto }}</p>
+                          <p class="text-xs text-gray-500 mt-0.5">{{ item.marca }}</p>
+                        </div>
+                        <p class="text-sm font-black text-gray-900 tabular-nums flex-shrink-0">S/ {{ item.subtotalNeto.toFixed(2) }}</p>
+                      </div>
+                      <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-gray-600">
+                        <span class="inline-flex items-center gap-1.5"><ColorSwatch :hex="item.colorHex" class="w-3.5 h-3.5 rounded-full border border-gray-200" />{{ item.color }}</span>
+                        <span class="font-semibold bg-gray-100 rounded-md px-2 py-0.5">Talla {{ item.talla }}</span>
+                        <span class="tabular-nums">{{ item.cantidad }} × S/ {{ item.precioUnitario.toFixed(2) }}</span>
+                        <span v-if="item.cantidadDevuelta > 0" class="font-semibold text-red-400">-{{ item.cantidadDevuelta }} devuelta{{ item.cantidadDevuelta === 1 ? '' : 's' }}</span>
+                      </div>
+                      <button
+                        v-if="!venta.cancelada && esAdmin && item.pendienteDevolucion > 0"
+                        @click="devolverItem(item)"
+                        class="mt-3 w-full h-11 text-sm font-semibold text-gray-600 hover:text-white hover:bg-red-500 bg-surface border border-gray-200 rounded-xl transition-colors flex items-center justify-center gap-2"
+                      >
+                        <i class="fa-solid fa-rotate-left text-xs" aria-hidden="true"></i> Devolver
+                      </button>
+                    </li>
+                  </ul>
+
+                  <div class="hidden sm:block bg-surface rounded-xl border border-gray-100 overflow-x-auto">
                     <table class="w-full text-xs min-w-[640px]">
                       <thead>
                         <tr class="text-gray-400 bg-gray-50/80 uppercase tracking-wide text-[10px]">
@@ -242,6 +268,24 @@
                         <dd :class="['text-base font-black tabular-nums', venta.cancelada ? 'text-gray-400 line-through' : 'text-gray-900']">S/ {{ venta.totalNeto.toFixed(2) }}</dd>
                       </div>
                     </dl>
+                  </div>
+
+                  <!-- Celular: las acciones van al final, después de ver el detalle y el total -->
+                  <div class="sm:hidden mt-4 grid gap-2" :class="!venta.cancelada && esAdmin ? 'grid-cols-2' : 'grid-cols-1'">
+                    <button
+                      v-if="!venta.cancelada && esAdmin"
+                      @click="cancelarVenta(venta)"
+                      class="h-11 text-sm font-semibold text-red-500 hover:text-white hover:bg-red-500 bg-surface border border-red-200 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <i class="fa-solid fa-ban text-xs" aria-hidden="true"></i> Cancelar venta
+                    </button>
+                    <button
+                      type="button"
+                      @click="boletaAbierta = venta.id"
+                      class="h-11 text-sm font-semibold text-canvas bg-fg hover:bg-[#ff8c42] rounded-xl flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <i class="fa-solid fa-print text-xs" aria-hidden="true"></i> Imprimir boleta
+                    </button>
                   </div>
                 </div>
               </article>
